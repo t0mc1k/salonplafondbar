@@ -124,7 +124,8 @@
         <input type="text" id="dPhoto" placeholder="Bild-URL (wird automatisch generiert oder manuell)" class="p-3 rounded bg-slate-950 border border-slate-800 text-white text-xs mt-1">
       </div>
 
-      <textarea id="dIng" placeholder="Zutaten & Allergene (z. B. Prosecco 9cl, Aperol 6cl, Soda 3cl)" class="p-3 rounded bg-slate-900 border border-slate-700 text-white md:col-span-2"></textarea>
+      <textarea id="dIng" placeholder="Zutaten (z. B. 6 cl Prosecco, 4 cl Aperol, 2 cl Soda)" class="p-3 rounded bg-slate-900 border border-slate-700 text-white md:col-span-2"></textarea>
+      <textarea id="dAllergens" placeholder="Allergene (z. B. Enthält Sulfite, Nüsse...)" class="p-3 rounded bg-slate-900 border border-slate-700 text-white md:col-span-2"></textarea>
       <textarea id="dRecipe" placeholder="Zubereitung Schritt für Schritt..." class="p-3 rounded bg-slate-900 border border-slate-700 text-white md:col-span-2"></textarea>
       <input type="text" id="dVideo" placeholder="Video-URL (YouTube / MP4)" class="p-3 rounded bg-slate-900 border border-slate-700 text-white md:col-span-2">
 
@@ -193,7 +194,8 @@
         formTitleEdit: "✏️ Getränk bearbeiten",
         namePlaceholder: "Getränkename (z. B. Aperol Spritz)",
         catPlaceholder: "Kategorie (Cocktails, Kaffee, Alkoholfrei...)",
-        ingPlaceholder: "Zutaten & Allergene (z. B. Prosecco 9cl, Aperol 6cl, Soda 3cl)",
+        ingPlaceholder: "Zutaten (z. B. 6 cl Prosecco, 4 cl Aperol, 2 cl Soda)",
+        allergensPlaceholder: "Allergene (z. B. Enthält Sulfite...)",
         recipePlaceholder: "Zubereitung Schritt für Schritt...",
         photoLabel: "📸 Foto des Getränks (Direkt hochladen oder URL eingeben):",
         videoPlaceholder: "Video-URL (YouTube / MP4)",
@@ -205,7 +207,8 @@
         loading: "Lade Getränke aus der Datenbank...",
         noDrinksFound: "Keine Getränke gefunden.",
         addFirstDrink: "Fügen Sie oben das erste Getränk hinzu!",
-        ingredientsLabel: "📋 Zutaten & Allergene:",
+        ingredientsLabel: "📋 Zutaten:",
+        allergensLabel: "⚠️ Allergene:",
         recipeLabel: "🥣 Zubereitung:",
         deleteBtn: "Getränk löschen",
         editBtn: "Getränk bearbeiten",
@@ -232,7 +235,8 @@
         formTitleEdit: "✏️ Edit Drink",
         namePlaceholder: "Drink name (e.g. Aperol Spritz)",
         catPlaceholder: "Category (Cocktails, Coffee, Non-Alcoholic...)",
-        ingPlaceholder: "Ingredients & Allergens (e.g. Prosecco 9cl, Aperol 6cl, Soda 3cl)",
+        ingPlaceholder: "Ingredients (e.g. 6 cl Prosecco, 4 cl Aperol, 2 cl Soda)",
+        allergensPlaceholder: "Allergens (e.g. Contains sulfites...)",
         recipePlaceholder: "Preparation step by step...",
         photoLabel: "📸 Drink Photo (Upload directly or enter URL):",
         videoPlaceholder: "Video URL (YouTube / MP4)",
@@ -244,7 +248,8 @@
         loading: "Loading drinks from database...",
         noDrinksFound: "No drinks found.",
         addFirstDrink: "Add the first drink using the form above!",
-        ingredientsLabel: "📋 Ingredients & Allergens:",
+        ingredientsLabel: "📋 Ingredients:",
+        allergensLabel: "⚠️ Allergens:",
         recipeLabel: "🥣 Preparation:",
         deleteBtn: "Delete Drink",
         editBtn: "Edit Drink",
@@ -300,6 +305,7 @@
       document.getElementById('dName').placeholder = t.namePlaceholder;
       document.getElementById('dCat').placeholder = t.catPlaceholder;
       document.getElementById('dIng').placeholder = t.ingPlaceholder;
+      document.getElementById('dAllergens').placeholder = t.allergensPlaceholder;
       document.getElementById('dRecipe').placeholder = t.recipePlaceholder;
       document.getElementById('photoLabel').innerText = t.photoLabel;
       document.getElementById('dVideo').placeholder = t.videoPlaceholder;
@@ -417,7 +423,9 @@
 
       let filtered = allDrinks.filter(d => {
         const matchesCat = selectedCat === allLabel || d.category === selectedCat;
-        const matchesSearch = d.name.toLowerCase().includes(search) || (d.ingredients && d.ingredients.toLowerCase().includes(search));
+        const matchesSearch = d.name.toLowerCase().includes(search) || 
+                              (d.ingredients && d.ingredients.toLowerCase().includes(search)) ||
+                              (d.allergens && d.allergens.toLowerCase().includes(search));
         
         let matchesFilter = true;
         if (activeSpecialFilter === 'featured') matchesFilter = d.is_featured;
@@ -540,6 +548,13 @@
         html += '</div>';
       }
 
+      if (d.allergens) {
+        html += '<div class="mb-4 bg-amber-50/50 p-4 rounded-xl border border-amber-200/60">';
+        html += '<p class="text-sm text-amber-900 font-bold mb-1">' + t.allergensLabel + '</p>';
+        html += '<p class="text-sm text-amber-800">' + d.allergens + '</p>';
+        html += '</div>';
+      }
+
       if (d.recipe) {
         html += '<div class="mb-4 bg-slate-50 p-4 rounded-xl border border-slate-200">';
         html += '<p class="text-sm text-slate-900 font-bold mb-1">' + t.recipeLabel + '</p>';
@@ -604,6 +619,7 @@
       document.getElementById('dName').value = d.name || '';
       document.getElementById('dCat').value = d.category || '';
       document.getElementById('dIng').value = d.ingredients || '';
+      document.getElementById('dAllergens').value = d.allergens || '';
       document.getElementById('dRecipe').value = d.recipe || '';
       document.getElementById('dPhoto').value = d.photo_url || '';
       document.getElementById('dVideo').value = d.video_url || '';
@@ -632,6 +648,7 @@
       document.getElementById('dName').value = '';
       document.getElementById('dCat').value = '';
       document.getElementById('dIng').value = '';
+      document.getElementById('dAllergens').value = '';
       document.getElementById('dRecipe').value = '';
       document.getElementById('dPhoto').value = '';
       document.getElementById('dVideo').value = '';
@@ -654,6 +671,7 @@
       const name = document.getElementById('dName').value;
       const category = document.getElementById('dCat').value;
       const ingredients = document.getElementById('dIng').value;
+      const allergens = document.getElementById('dAllergens').value;
       const recipe = document.getElementById('dRecipe').value;
       const photo_url = document.getElementById('dPhoto').value;
       const video_url = document.getElementById('dVideo').value;
@@ -665,7 +683,7 @@
 
       if (!name || !category) { alert(t.alertFill); return; }
 
-      const drinkObj = { name, category, ingredients, recipe, photo_url, video_url, is_featured, is_vegan, is_glutenfree, is_lactosefree };
+      const drinkObj = { name, category, ingredients, allergens, recipe, photo_url, video_url, is_featured, is_vegan, is_glutenfree, is_lactosefree };
 
       if (id) {
         await _supabase.from('drinks').update(drinkObj).eq('id', id);
