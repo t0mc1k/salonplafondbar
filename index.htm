@@ -125,16 +125,23 @@
       </div>
 
       <textarea id="dIng" placeholder="Zutaten (z. B. 6 cl Prosecco, 4 cl Aperol, 2 cl Soda)" class="p-3 rounded bg-slate-900 border border-slate-700 text-white md:col-span-2"></textarea>
-      <textarea id="dAllergens" placeholder="Allergene (z. B. Enthält Sulfite...)" class="p-3 rounded bg-slate-900 border border-slate-700 text-white md:col-span-2"></textarea>
+      
+      <!-- Allergens & Dietary Checkboxes Grouped Together -->
+      <div class="md:col-span-2 flex flex-col gap-2">
+        <textarea id="dAllergens" placeholder="Allergene (z. B. Enthält Sulfite...)" class="p-3 rounded bg-slate-900 border border-slate-700 text-white w-full"></textarea>
+        <div class="flex flex-wrap gap-4 p-3 bg-slate-900 rounded border border-slate-800 text-xs text-slate-300">
+          <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="dVegan" class="accent-amber-500"> 🌱 Vegan</label>
+          <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="dGluten" class="accent-amber-500"> 🌾 Glutenfrei</label>
+          <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="dLactose" class="accent-amber-500"> 🥛 Laktosefrei</label>
+        </div>
+      </div>
+
       <textarea id="dRecipe" placeholder="Zubereitung Schritt für Schritt..." class="p-3 rounded bg-slate-900 border border-slate-700 text-white md:col-span-2"></textarea>
       <input type="text" id="dVideo" placeholder="Video-URL (YouTube / MP4)" class="p-3 rounded bg-slate-900 border border-slate-700 text-white md:col-span-2">
 
-      <!-- Checkboxes for Special Tags -->
-      <div class="md:col-span-2 flex flex-wrap gap-4 p-3 bg-slate-900 rounded border border-slate-800 text-xs text-slate-300">
+      <!-- Featured / Bestseller Checkbox -->
+      <div class="md:col-span-2 flex items-center p-3 bg-slate-900 rounded border border-slate-800 text-xs text-slate-300">
         <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="dFeatured" class="accent-amber-500"> ⭐ <span id="lblFeatured">Als Bestseller / Highlight markieren</span></label>
-        <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="dVegan" class="accent-amber-500"> 🌱 Vegan</label>
-        <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="dGluten" class="accent-amber-500"> 🌾 Glutenfrei</label>
-        <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="dLactose" class="accent-amber-500"> 🥛 Laktosefrei</label>
       </div>
     </div>
 
@@ -151,7 +158,7 @@
 
   <!-- Footer Credit -->
   <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-    Salonplafond BAR App v1.7.3 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+    Salonplafond BAR App v1.7.4 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
   </footer>
 
   <!-- Modal Detail View -->
