@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v2.0.3</title>
+  <title>Salonplafond BAR v2.0.4</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -13,18 +13,6 @@
     .list-item { background: #1e293b; border: 1px solid #334155; border-radius: 0.75rem; transition: background 0.2s; }
     .list-item:hover { background: #334155; border-color: #f59e0b; }
     
-    /* Splash Screen Animations */
-    #splashScreen {
-      transition: opacity 0.8s ease-out;
-    }
-    .splash-logo-animate {
-      animation: pulseLogo 1.5s ease-in-out infinite alternate;
-    }
-    @keyframes pulseLogo {
-      0% { transform: scale(0.95); opacity: 0.8; }
-      100% { transform: scale(1.05); opacity: 1; }
-    }
-
     /* Professional Print / PDF Styles */
     @media print {
       @page { size: portrait; margin: 10mm; }
@@ -35,33 +23,6 @@
 </head>
 <body class="p-4 md:p-8 max-w-6xl mx-auto pb-24" onclick="closeDropdowns(event)">
 
-  <!-- Intro / Splash Screen Animation (5 seconds with click to skip) -->
-  <div id="splashScreen" onclick="dismissSplash()" class="fixed inset-0 z-[100] bg-slate-950 flex flex-col items-center justify-center p-6 text-center cursor-pointer" title="Klicken zum Überspringen">
-    <div class="splash-logo-animate flex flex-col items-center gap-4">
-      <!-- Salonplafond Custom Logo Box -->
-      <div class="w-24 h-24 bg-amber-400 rounded-2xl flex flex-col items-center justify-center shadow-2xl p-2 text-slate-950 font-bold select-none border-2 border-amber-300">
-        <div class="text-xs font-black tracking-widest -mb-1">¯</div>
-        <div class="text-5xl font-black leading-none">Ō</div>
-        <div class="text-xs font-black leading-none mt-1">•</div>
-      </div>
-      <div>
-        <h1 class="text-2xl md:text-3xl font-black tracking-wider text-white uppercase">Willkommen bei</h1>
-        <h2 class="text-3xl md:text-4xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-      </div>
-    </div>
-    
-    <div class="mt-8 flex flex-col items-center gap-2">
-      <div class="w-8 h-8 border-4 border-amber-500/20 border-t-amber-400 rounded-full animate-spin"></div>
-      <span class="text-xs font-semibold text-slate-400 tracking-widest uppercase">Lade Rezeptdatenbank...</span>
-      <span class="text-[10px] text-slate-500 mt-2">(Tippen zum Überspringen)</span>
-    </div>
-
-    <div class="absolute bottom-6 text-center">
-      <span class="text-xs font-semibold text-amber-400/80 block">v2.0.3</span>
-      <span class="text-[11px] text-slate-500 font-medium">Erstellt von © T0mc1k (Tomas Kardos)</span>
-    </div>
-  </div>
-
   <!-- Header -->
   <header class="flex flex-col md:flex-row justify-between items-center gap-4 mb-8 pb-4 border-b border-slate-700">
     <div class="flex items-center gap-3">
@@ -71,7 +32,7 @@
       </div>
       <div>
         <h1 class="text-3xl font-bold tracking-tight text-amber-400">Salonplafond BAR</h1>
-        <span class="text-xs text-slate-400 font-medium">v2.0.3 • Erstellt von © T0mc1k (Tomas Kardos)</span>
+        <span class="text-xs text-slate-400 font-medium">v2.0.4 • Erstellt von © T0mc1k (Tomas Kardos)</span>
       </div>
     </div>
 
@@ -210,7 +171,7 @@
         </div>
       </div>
 
-      <!-- Hideable / Collapsible Allergens & Dietary Section in Edit Form -->
+      <!-- Hideable / Collapsible Allergens & Dietary Section in Edit Form (Single horizontal row) -->
       <div class="md:col-span-2 bg-slate-900 border border-slate-700/80 rounded-xl overflow-hidden">
         <button type="button" onclick="document.getElementById('allergensCollapse').classList.toggle('hidden')" class="w-full p-3 text-left font-bold text-amber-400 text-xs flex justify-between items-center bg-slate-800/80 hover:bg-slate-800 transition">
           <span id="lblAllergensTitle">⚠️ Allergene & Ernährungsfilter (Optional)</span>
@@ -218,7 +179,6 @@
         </button>
         
         <div id="allergensCollapse" class="hidden p-4 flex flex-col gap-3 border-t border-slate-700/60 bg-slate-950/50">
-          <!-- Pre-selected Common Allergens Checkboxes -->
           <div>
             <label class="text-[11px] text-slate-400 font-semibold mb-1.5 block" id="lblQuickAllergens">Häufige Allergene auswählen:</label>
             <div class="flex flex-wrap items-center gap-2 text-xs text-slate-300">
@@ -299,7 +259,7 @@
 
   <!-- Footer Credit -->
   <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-    Salonplafond BAR App v2.0.3 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+    Salonplafond BAR App v2.0.4 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
   </footer>
 
   <!-- Modal Detail View -->
@@ -360,29 +320,6 @@
     const SUPABASE_URL = "https://asrrkjcxqqvxzlikdkaq.supabase.co";
     const SUPABASE_KEY = "sb_publishable_2tw50zmlzxDClPx7zwnT3g_k2WiaUuL";
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    // Splash Screen Trigger (5 seconds with safe auto-hide and click-to-dismiss)
-    function dismissSplash() {
-      const splash = document.getElementById('splashScreen');
-      if (splash && splash.style.display !== 'none') {
-        splash.style.opacity = '0';
-        setTimeout(() => {
-          splash.style.display = 'none';
-          sessionStorage.setItem('splashShown', 'true');
-        }, 800);
-      }
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      const splash = document.getElementById('splashScreen');
-      if (!sessionStorage.getItem('splashShown')) {
-        setTimeout(() => {
-          dismissSplash();
-        }, 5000); // 5 seconds duration
-      } else {
-        if (splash) splash.style.display = 'none';
-      }
-    });
 
     let currentLang = 'de';
     let viewMode = 'grid'; // 'grid' or 'list'
@@ -1383,7 +1320,7 @@
 
       const cost_price = parseFloat(document.getElementById('dCost').value) || null;
       const selling_price = parseFloat(document.getElementById('dPrice').value) || null;
-      const allergens = document.getElementById('dAllergens'].value;
+      const allergens = document.getElementById('dAllergens').value;
       const recipe = document.getElementById('dRecipe').value;
       const photo_url = document.getElementById('dPhoto').value;
       const video_url = document.getElementById('dVideo').value;
