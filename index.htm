@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v2.1.2</title>
+  <title>Salonplafond BAR v2.1.3</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -13,7 +13,7 @@
     .list-item { background: #1e293b; border: 1px solid #334155; border-radius: 0.75rem; transition: background 0.2s; }
     .list-item:hover { background: #554133; border-color: #f59e0b; }
     
-    /* Splash Screen Animation - opravené: spustí sa vždy pri načítaní a trvá presne 3.5 sekundy */
+    /* Splash Screen Animation */
     #splashScreen {
       transition: opacity 0.6s ease-out, visibility 0.6s;
     }
@@ -25,7 +25,7 @@
       100% { transform: scale(1.05); opacity: 1; }
     }
 
-    /* Hravá animácia loga v hlavičke: otočenie, skok a zmena na koktailový pohár 🍸 */
+    /* Interaktívne animované logo s kurzorom pointer pre kliknutie */
     .header-logo-container {
       position: relative;
       width: 3rem;
@@ -39,6 +39,10 @@
       cursor: pointer;
       user-select: none;
       animation: salonLogoPlayful 7s ease-in-out infinite;
+      transition: transform 0.2s;
+    }
+    .header-logo-container:hover {
+      transform: scale(1.1) rotate(5deg);
     }
     
     .logo-text, .logo-icon {
@@ -54,23 +58,18 @@
     @keyframes salonLogoPlayful {
       0% { transform: translateY(0) rotate(0deg) scale(1); }
       10% { transform: translateY(-6px) rotate(-15deg) scale(1.1); }
-      20% { transform: translateY(0) rotate(360deg) scale(1); } /* Plná otočka */
-      30% { transform: translateY(-10px) rotate(360deg) scale(1.15); } /* Výskok */
+      20% { transform: translateY(0) rotate(360deg) scale(1); }
+      30% { transform: translateY(-10px) rotate(360deg) scale(1.15); }
       40% { transform: translateY(0) rotate(360deg) scale(1); }
-      
-      /* Prepnutie na koktailový pohár 🍸 */
       48% { transform: scale(0.8); opacity: 1; }
       50% { transform: scale(1.2) rotate(15deg); }
       55% { transform: scale(1) rotate(0deg); }
       65% { transform: scale(1) rotate(0deg); }
-      
-      /* Návrat na pôvodné Ó */
       72% { transform: scale(0.8); }
       75% { transform: scale(1) rotate(0deg); }
       100% { transform: translateY(0) rotate(0deg) scale(1); }
     }
 
-    /* Triky pre prepínanie obsahu loga v animácii pomocou CSS kľúčových snímok */
     @keyframes showCocktail {
       0%, 45%, 70%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
       50%, 65% { opacity: 1; transform: scale(1) rotate(10deg); }
@@ -96,7 +95,7 @@
     @media print {
       @page { size: portrait; margin: 10mm; }
       body { background: white !important; color: black !important; padding: 0 !important; }
-      body > *:not(#drinkModal):not(#supportModal):not(#seasonModal) { display: none !important; }
+      body > *:not(#drinkModal):not(#supportModal):not(#seasonModal):not(#motivationModal) { display: none !important; }
     }
   </style>
 </head>
@@ -122,7 +121,7 @@
     </div>
 
     <div class="absolute bottom-6 text-center">
-      <span class="text-xs font-semibold text-amber-400/80 block">v2.1.2</span>
+      <span class="text-xs font-semibold text-amber-400/80 block">v2.1.3</span>
       <span class="text-[11px] text-slate-500 font-medium">Erstellt von © T0mc1k (Tomas Kardos)</span>
     </div>
   </div>
@@ -130,14 +129,14 @@
   <!-- Header -->
   <header class="flex flex-col md:flex-row justify-between items-center gap-4 mb-8 pb-4 border-b border-slate-700">
     <div class="flex items-center gap-3">
-      <!-- Hravé animované logo v hlavičke (kotúľanie, skok, koktailový pohár 🍸) -->
-      <div class="header-logo-container" title="Salonplafond">
+      <!-- Kliknutím na toto logo sa otvorí náhodný motivačný nemecký citát! -->
+      <div class="header-logo-container" onclick="showRandomMotivation(event)" title="Klick mich für Motivation! 🍸">
         <span class="logo-text">Ō</span>
         <span class="logo-icon">🍸</span>
       </div>
       <div>
         <h1 class="text-3xl font-bold tracking-tight text-amber-400">Salonplafond BAR</h1>
-        <span class="text-xs text-slate-400 font-medium">v2.1.2 • Erstellt von © T0mc1k (Tomas Kardos)</span>
+        <span class="text-xs text-slate-400 font-medium">v2.1.3 • Erstellt von © T0mc1k (Tomas Kardos)</span>
       </div>
     </div>
 
@@ -351,7 +350,7 @@
 
   <!-- Footer Credit -->
   <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-    Salonplafond BAR App v2.1.2 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+    Salonplafond BAR App v2.1.3 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
   </footer>
 
   <!-- Modal Detail View -->
@@ -369,6 +368,22 @@
           🖨️ <span id="printBtnText">Drucken / PDF</span>
         </button>
         <button onclick="closeModal()" id="closeModalBtn" class="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition text-sm">Schließen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Motivation / Spruch des Tages Modal Dialog (Nové okno pre náhodné nemecké hlášky) -->
+  <div id="motivationModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="card max-w-md w-full bg-slate-900 border-amber-500/50 p-6 relative flex flex-col gap-4 text-center shadow-2xl">
+      <button onclick="closeMotivationModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
+      <div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-2xl mx-auto flex items-center justify-center text-3xl border border-amber-500/30">🍸</div>
+      <h3 class="text-xl font-bold text-amber-400">Salonplafond Motivation</h3>
+      <div id="motivationTextContainer" class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-sm text-slate-200 italic min-h-[80px] flex items-center justify-center">
+        <!-- Sem sa náhodne načíta text -->
+      </div>
+      <div class="flex gap-2 mt-2">
+        <button onclick="showRandomMotivation()" class="flex-1 py-2.5 bg-amber-500 hover:bg-amber-600 font-bold text-slate-950 rounded-lg text-xs transition">🔄 Noch ein Spruch</button>
+        <button onclick="closeMotivationModal()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 font-bold text-white rounded-lg text-xs transition">Schließen</button>
       </div>
     </div>
   </div>
@@ -420,6 +435,35 @@
         }, 3500);
       }
     });
+
+    // Zoznam skvelých nemeckých motivačných a barových hlášok pre personál
+    const motivationalQuotes = [
+      "„Wer nie vom Weg abkommt, bleibt auf der Strecke. Weitermachen, Team!“ 🚀",
+      "„Gute Getränke heben die Laune, aber ein starkes Team rockt den ganzen Abend!“ 🍸",
+      "„Auch der längste Shift geht einmal vorbei. Tschakka, du schaffst das!“ 💪",
+      "„Perfektion ist kein Zufall, sondern harte Arbeit. Danke für euren Einsatz im Salonplafond!“ ✨",
+      "„Ein Lächeln ist das beste Gewürz hinter der Bar. Prost auf euch!“ 🥂",
+      "„Wer heute gaaaanz entspannt bleibt, kriegt den Rush locker gebacken!“ 🧊",
+      "„Kleine Schritte führen zum Ziel. Und heute Abend rocken wir den Laden!“ 🔥",
+      "„Der frühe Vogel fängt den Wurm, aber der Barkeeper rettet den Abend!“ 🍋",
+      "„Lass dich nicht stressen, du bist der Star hinter der Theke!“ ⭐",
+      "„Jeder Gast verlässt das Salonplafond glücklicher dank eurer Magie!“ 🪄"
+    ];
+
+    function showRandomMotivation(event) {
+      if (event) event.stopPropagation();
+      const randomIndex = Math.floor(Math.random() * motivationalQuotes.length);
+      document.getElementById('motivationTextContainer').innerText = motivationalQuotes[randomIndex];
+      const modal = document.getElementById('motivationModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeMotivationModal() {
+      const modal = document.getElementById('motivationModal');
+      modal.classList.remove('flex');
+      modal.classList.add('hidden');
+    }
 
     let currentLang = 'de';
     let viewMode = 'grid';
