@@ -147,7 +147,7 @@
           <input type="text" id="dGlass" placeholder="z. B. Absinthe, Highball, Coupette" class="p-2.5 rounded bg-slate-950 border border-slate-800 text-white text-xs w-full">
         </div>
         <div>
-          <label class="text-xs text-slate-400 font-semibold mb-1 block" id="lblMethod">🥄 Method (Metode):</label>
+          <label class="text-xs text-slate-400 font-semibold mb-1 block" id="lblMethod">🥄 Method (Zubereitungsmethode):</label>
           <input type="text" id="dMethod" placeholder="z. B. Shake & fine strain, Stir, Build" class="p-2.5 rounded bg-slate-950 border border-slate-800 text-white text-xs w-full">
         </div>
         <div>
@@ -168,6 +168,39 @@
         </div>
         <div id="ingredientRowsContainer" class="flex flex-col gap-2">
           <!-- Rows added dynamically -->
+        </div>
+      </div>
+
+      <!-- Hideable / Collapsible Allergens & Dietary Section in Edit Form -->
+      <div class="md:col-span-2 bg-slate-900 border border-slate-700/80 rounded-xl overflow-hidden">
+        <button type="button" onclick="document.getElementById('allergensCollapse').classList.toggle('hidden')" class="w-full p-3 text-left font-bold text-amber-400 text-xs flex justify-between items-center bg-slate-800/80 hover:bg-slate-800 transition">
+          <span id="lblAllergensTitle">⚠️ Allergene & Ernährungsfilter (Optional)</span>
+          <span class="text-slate-400 text-xs">▼ <span class="lblShowHide">Anzeigen / Verbergen</span></span>
+        </button>
+        
+        <div id="allergensCollapse" class="hidden p-4 flex flex-col gap-3 border-t border-slate-700/60 bg-slate-950/50">
+          <!-- Pre-selected Common Allergens Checkboxes -->
+          <div>
+            <label class="text-[11px] text-slate-400 font-semibold mb-1.5 block" id="lblQuickAllergens">Häufige Allergene auswählen:</label>
+            <div class="flex flex-wrap gap-2 text-xs text-slate-300">
+              <label class="flex items-center gap-1.5 bg-slate-900 px-2.5 py-1.5 rounded border border-slate-800 cursor-pointer"><input type="checkbox" onchange="togglePresetAllergen('Sulfite', this.checked)" class="preset-alg accent-amber-500"> Sulfite</label>
+              <label class="flex items-center gap-1.5 bg-slate-900 px-2.5 py-1.5 rounded border border-slate-800 cursor-pointer"><input type="checkbox" onchange="togglePresetAllergen('Gluten', this.checked)" class="preset-alg accent-amber-500"> Gluten</label>
+              <label class="flex items-center gap-1.5 bg-slate-900 px-2.5 py-1.5 rounded border border-slate-800 cursor-pointer"><input type="checkbox" onchange="togglePresetAllergen('Laktose', this.checked)" class="preset-alg accent-amber-500"> Laktose</label>
+              <label class="flex items-center gap-1.5 bg-slate-900 px-2.5 py-1.5 rounded border border-slate-800 cursor-pointer"><input type="checkbox" onchange="togglePresetAllergen('Ei', this.checked)" class="preset-alg accent-amber-500"> Ei</label>
+              <label class="flex items-center gap-1.5 bg-slate-900 px-2.5 py-1.5 rounded border border-slate-800 cursor-pointer"><input type="checkbox" onchange="togglePresetAllergen('Nüsse', this.checked)" class="preset-alg accent-amber-500"> Nüsse</label>
+              <label class="flex items-center gap-1.5 bg-slate-900 px-2.5 py-1.5 rounded border border-slate-800 cursor-pointer"><input type="checkbox" onchange="togglePresetAllergen('Soja', this.checked)" class="preset-alg accent-amber-500"> Soja</label>
+            </div>
+          </div>
+
+          <!-- Free text for custom allergens -->
+          <textarea id="dAllergens" placeholder="Allergene (z. B. Enthält Sulfite, Hühnereieiweiß...)" class="p-3 rounded bg-slate-900 border border-slate-700 text-white text-xs w-full" rows="2"></textarea>
+          
+          <!-- Dietary Filters -->
+          <div class="flex flex-wrap gap-4 p-3 bg-slate-900 rounded border border-slate-800 text-xs text-slate-300">
+            <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="dVegan" class="accent-amber-500"> 🌱 Vegan</label>
+            <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="dGluten" class="accent-amber-500"> 🌾 Glutenfrei</label>
+            <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="dLactose" class="accent-amber-500"> 🥛 Laktosefrei</label>
+          </div>
         </div>
       </div>
 
@@ -201,16 +234,6 @@
           <span id="uploadStatus" class="text-xs text-amber-400 font-medium"></span>
         </div>
         <input type="text" id="dPhoto" placeholder="Bild-URL (wird automatisch generiert oder manuell)" class="p-3 rounded bg-slate-950 border border-slate-800 text-white text-xs mt-1">
-      </div>
-
-      <!-- Allergens & Dietary Checkboxes -->
-      <div class="md:col-span-2 flex flex-col gap-2">
-        <textarea id="dAllergens" placeholder="Allergene (z. B. Enthält Sulfite...)" class="p-3 rounded bg-slate-900 border border-slate-700 text-white w-full text-xs"></textarea>
-        <div class="flex flex-wrap gap-4 p-3 bg-slate-900 rounded border border-slate-800 text-xs text-slate-300">
-          <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="dVegan" class="accent-amber-500"> 🌱 Vegan</label>
-          <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="dGluten" class="accent-amber-500"> 🌾 Glutenfrei</label>
-          <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="dLactose" class="accent-amber-500"> 🥛 Laktosefrei</label>
-        </div>
       </div>
 
       <!-- Optional Step-by-Step Preparation -->
@@ -338,10 +361,12 @@
         btnAddIngredient: "+ Zutat hinzufügen",
         ingNamePlaceholder: "Zutat (z. B. Tequila)",
         ingAmountPlaceholder: "Menge (z. B. 5cL, 2 Dashes)",
+        lblAllergensTitle: "⚠️ Allergene & Ernährungsfilter (Optional)",
+        lblQuickAllergens: "Häufige Allergene auswählen:",
+        allergensPlaceholder: "Allergene (z. B. Enthält Sulfite...)",
         seasonLabel: "📅 Saison / Zeitraum:",
         costLabel: "💶 Wareneinsatz (€):",
         priceLabel: "🏷️ Verkaufspreis (€):",
-        allergensPlaceholder: "Allergene (z. B. Enthält Sulfite...)",
         photoLabel: "📸 Foto des Getränks (Direkt hochladen oder URL eingeben):",
         lblFeatured: "Als Bestseller / Highlight markieren",
         saveBtn: "Getränk speichern",
@@ -402,10 +427,12 @@
         btnAddIngredient: "+ Add Ingredient",
         ingNamePlaceholder: "Ingredient (e.g. Tequila)",
         ingAmountPlaceholder: "Amount (e.g. 5cL, 2 Dashes)",
+        lblAllergensTitle: "⚠️ Allergens & Dietary Filters (Optional)",
+        lblQuickAllergens: "Select common allergens:",
+        allergensPlaceholder: "Allergens (e.g. Contains sulfites...)",
         seasonLabel: "📅 Season / Period:",
         costLabel: "💶 Cost Price (€):",
         priceLabel: "🏷️ Selling Price (€):",
-        allergensPlaceholder: "Allergens (e.g. Contains sulfites...)",
         photoLabel: "📸 Drink Photo (Upload directly or enter URL):",
         lblFeatured: "Mark as Bestseller / Highlight",
         saveBtn: "Save Drink",
@@ -437,6 +464,19 @@
         filterLabel: "Filter:"
       }
     };
+
+    function togglePresetAllergen(allergenName, isChecked) {
+      const textarea = document.getElementById('dAllergens');
+      let currentVal = textarea.value.trim();
+      let list = currentVal ? currentVal.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+      if (isChecked) {
+        if (!list.includes(allergenName)) list.push(allergenName);
+      } else {
+        list = list.filter(item => item !== allergenName);
+      }
+      textarea.value = list.join(', ');
+    }
 
     function addIngredientRow(name = '', amount = '') {
       const container = document.getElementById('ingredientRowsContainer');
@@ -653,6 +693,12 @@
       document.getElementById('lblIngHeader').innerText = t.lblIngHeader;
       document.getElementById('btnAddIngredient').innerText = t.btnAddIngredient;
 
+      document.getElementById('lblAllergensTitle').innerText = t.lblAllergensTitle;
+      document.getElementById('lblQuickAllergens').innerText = t.lblQuickAllergens;
+      document.getElementById('dAllergens').placeholder = t.allergensPlaceholder;
+
+      document.querySelectorAll('.lblShowHide').forEach(el => el.innerText = t.toggleShowHide);
+
       document.getElementById('seasonLabel').innerText = t.seasonLabel;
       document.getElementById('costLabel').innerText = t.costLabel;
       document.getElementById('priceLabel').innerText = t.priceLabel;
@@ -661,7 +707,6 @@
       document.getElementById('formTitle').innerText = editingId ? t.formTitleEdit : t.formTitleAdd;
       
       document.getElementById('dName').placeholder = t.namePlaceholder;
-      document.getElementById('dAllergens').placeholder = t.allergensPlaceholder;
       document.getElementById('photoLabel').innerText = t.photoLabel;
       document.getElementById('lblFeatured').innerText = t.lblFeatured;
       document.getElementById('saveBtn').innerText = t.saveBtn;
@@ -1136,6 +1181,13 @@
       document.getElementById('dGluten').checked = !!d.is_glutenfree;
       document.getElementById('dLactose').checked = !!d.is_lactosefree;
       
+      // Sync preset checkboxes with loaded allergens text
+      const algText = (d.allergens || '').toLowerCase();
+      document.querySelectorAll('.preset-alg').forEach(chk => {
+        let label = chk.parentElement.textContent.trim().toLowerCase();
+        chk.checked = algText.includes(label);
+      });
+
       const t = i18n[currentLang];
       document.getElementById('formTitle').innerText = t.formTitleEdit;
       document.getElementById('cancelEditBtn').classList.remove('hidden');
@@ -1217,6 +1269,8 @@
       document.getElementById('dGluten').checked = false;
       document.getElementById('dLactose').checked = false;
       
+      document.querySelectorAll('.preset-alg').forEach(chk => chk.checked = false);
+
       const t = i18n[currentLang];
       document.getElementById('formTitle').innerText = t.formTitleAdd;
       document.getElementById('cancelEditBtn').classList.add('hidden');
