@@ -17,7 +17,7 @@
     @media print {
       @page { size: portrait; margin: 10mm; }
       body { background: white !important; color: black !important; padding: 0 !important; }
-      body > *:not(#drinkModal):not(#supportModal) { display: none !important; }
+      body > *:not(#drinkModal):not(#supportModal):not(#seasonModal) { display: none !important; }
     }
   </style>
 </head>
@@ -58,14 +58,12 @@
         <button onclick="toggleSettingsMenu(event)" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-semibold border border-slate-700 text-slate-300 flex items-center gap-1">
           ⚙️ <span id="menuText">Menü</span>
         </button>
-        <div id="settingsDropdown" class="hidden absolute right-0 mt-2 w-56 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl p-2 z-50 flex flex-col gap-2">
+        <div id="settingsDropdown" class="hidden absolute right-0 mt-2 w-52 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl p-2 z-50 flex flex-col gap-2">
           
-          <!-- Season Selector / Archive Section -->
-          <div class="text-[11px] text-slate-400 font-bold px-2 pt-1" id="seasonMenuLabel">📅 Saison / Archiv</div>
-          <select id="seasonFilterSelect" onchange="changeSeasonFilter(this.value)" class="p-1.5 rounded bg-slate-900 border border-slate-700 text-white text-xs w-full focus:outline-none focus:border-amber-400">
-            <option value="current">✨ Aktuelle Saison</option>
-            <option value="archive">📦 Sezonálny archív (Všetko staršie)</option>
-          </select>
+          <!-- Season Modal Trigger Button -->
+          <button onclick="openSeasonModal()" class="w-full text-left px-2 py-1.5 rounded hover:bg-slate-700 text-xs font-semibold text-amber-400 flex items-center gap-2">
+            📅 <span id="seasonMenuBtnText">Saison wählen...</span>
+          </button>
 
           <div class="border-t border-slate-700 my-1"></div>
 
@@ -84,7 +82,7 @@
           </button>
 
           <!-- Support Modal Trigger -->
-          <button onclick="openSupportModal()" class="w-full text-left px-2 py-1.5 rounded hover:bg-slate-700 text-xs font-semibold text-amber-400 flex items-center gap-2">
+          <button onclick="openSupportModal()" class="w-full text-left px-2 py-1.5 rounded hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-2">
             ✉️ <span id="supportMenuText">Support / Feedback</span>
           </button>
 
@@ -99,7 +97,7 @@
   <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 mb-6 -mt-4">
     <p id="subTitle" class="text-sm text-slate-400">Salonplafond • Rezepte & Getränkehandbuch</p>
     <div id="activeSeasonBadge" class="hidden px-3 py-1 bg-amber-500/10 border border-amber-500/30 rounded-full text-amber-400 text-xs font-semibold flex items-center gap-1.5">
-      <span>📦 Archiv-Modus:</span> <span id="archiveTitleName">Sezónny archív</span>
+      <span>📦 <span id="archiveBadgeText">Archiv:</span></span> <span id="activeSeasonName"></span>
     </div>
   </div>
 
@@ -139,11 +137,11 @@
 
       <!-- Season Selector for Drink -->
       <div class="md:col-span-2 bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col gap-2">
-        <label class="text-xs text-slate-400 font-semibold" id="seasonLabel">📅 Menu-Sezóny / Obdobie:</label>
+        <label class="text-xs text-slate-400 font-semibold" id="seasonLabel">📅 Saison / Zeitraum:</label>
         <select id="dSeason" class="p-3 rounded bg-slate-950 border border-slate-800 text-white text-xs">
-          <option value="current">✨ Aktuálna sezóna (1. Nov 2026 – 1. Jan 2027)</option>
-          <option value="archive_q3_2026">📦 Q3/2026 (1. Sep 2026 – 1. Nov 2026)</option>
-          <option value="archive_summer_2026">☀️ Sommer 2026 (Archiv)</option>
+          <option value="current">✨ Aktuelle Saison (01.11.2026 – 01.01.2027)</option>
+          <option value="archive_sep_nov_2026">📦 Archiv: 01.09.2026 – 01.11.2026</option>
+          <option value="archive_older">📦 Archiv: Ältere Saisonen</option>
         </select>
       </div>
 
@@ -217,7 +215,7 @@
 
   <!-- Footer Credit -->
   <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-    Salonplafond BAR App v1.8.4 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+    Salonplafond BAR App v1.8.5 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
   </footer>
 
   <!-- Modal Detail View -->
@@ -232,6 +230,47 @@
           🖨️ <span id="printBtnText">Drucken / PDF</span>
         </button>
         <button onclick="closeModal()" id="closeModalBtn" class="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition text-sm">Schließen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Season Selection Modal Dialog -->
+  <div id="seasonModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="card max-w-md w-full bg-slate-900 border-slate-700 p-6 relative flex flex-col gap-4">
+      <button onclick="closeSeasonModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
+      <h3 class="text-xl font-bold text-amber-400" id="seasonModalTitle">📅 Saison & Archiv wählen</h3>
+      <p class="text-xs text-slate-300" id="seasonModalDesc">
+        Wähle die aktive Saison oder das Archiv aus, um die entsprechenden Getränke anzuzeigen:
+      </p>
+      
+      <div class="flex flex-col gap-2 mt-2">
+        <button onclick="selectSeason('current')" class="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left transition flex items-center justify-between group">
+          <div>
+            <div class="text-sm font-bold text-white group-hover:text-amber-400">✨ Aktuelle Saison</div>
+            <div class="text-xs text-slate-400">01.11.2026 – 01.01.2027</div>
+          </div>
+          <span class="text-xs text-amber-400 font-semibold">Aktivieren →</span>
+        </button>
+
+        <button onclick="selectSeason('archive_sep_nov_2026')" class="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left transition flex items-center justify-between group">
+          <div>
+            <div class="text-sm font-bold text-white group-hover:text-amber-400">📦 Archiv: Vorherige Saison</div>
+            <div class="text-xs text-slate-400">01.09.2026 – 01.11.2026</div>
+          </div>
+          <span class="text-xs text-amber-400 font-semibold">Öffnen →</span>
+        </button>
+
+        <button onclick="selectSeason('archive_older')" class="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left transition flex items-center justify-between group">
+          <div>
+            <div class="text-sm font-bold text-white group-hover:text-amber-400">📦 Archiv: Ältere Saisonen</div>
+            <div class="text-xs text-slate-400">Frühere Menükarten & Klassiker</div>
+          </div>
+          <span class="text-xs text-amber-400 font-semibold">Öffnen →</span>
+        </button>
+      </div>
+
+      <div class="mt-4 pt-3 border-t border-slate-800 flex justify-end">
+        <button onclick="closeSeasonModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 font-bold text-white rounded-lg text-xs transition">Schließen</button>
       </div>
     </div>
   </div>
@@ -265,7 +304,7 @@
     let allDrinks = [];
     let selectedCat = 'All';
     let activeSpecialFilter = null;
-    let currentSeasonFilter = 'current'; // 'current' or 'archive'
+    let currentSeasonFilter = 'current'; // 'current' or specific archive key
     let isAdmin = false;
     const MANAGER_PASSWORD = "salon123";
 
@@ -277,10 +316,10 @@
         managerMode: "Modus: Manager",
         allCategories: "Alle",
         menuText: "Menü",
-        seasonMenuLabel: "📅 Saison / Archiv",
-        seasonMenuOptCurrent: "✨ Aktuelle Saison",
-        seasonMenuOptArchive: "📦 Sezonálny archív (Archiv)",
-        archiveBadgeTitle: "📦 Sezonálny archív",
+        seasonMenuBtnText: "Saison wählen...",
+        seasonModalTitle: "📅 Saison & Archiv wählen",
+        seasonModalDesc: "Wähle die aktive Saison oder das Archiv aus, um die entsprechenden Getränke anzuzeigen:",
+        archiveBadgeText: "Archiv:",
         langMenuLabel: "Sprache / Language",
         exportText: "CSV Export",
         supportText: "Support / Feedback",
@@ -292,7 +331,7 @@
         formTitleEdit: "✏️ Getränk bearbeiten",
         namePlaceholder: "Getränkename (z. B. Aperol Spritz)",
         catSelectLabel: "🏷️ Kategorie auswählen:",
-        seasonLabel: "📅 Menu-Sezóny / Obdobie:",
+        seasonLabel: "📅 Saison / Zeitraum:",
         glassLabel: "🍸 Glas-Typ / Ausrüstung:",
         costLabel: "💶 Wareneinsatz (€):",
         priceLabel: "🏷️ Verkaufspreis (€):",
@@ -340,10 +379,10 @@
         managerMode: "Mode: Manager",
         allCategories: "All",
         menuText: "Menu",
-        seasonMenuLabel: "📅 Season / Archive",
-        seasonMenuOptCurrent: "✨ Current Season",
-        seasonMenuOptArchive: "📦 Seasonal Archive",
-        archiveBadgeTitle: "📦 Seasonal Archive",
+        seasonMenuBtnText: "Select Season...",
+        seasonModalTitle: "📅 Select Season & Archive",
+        seasonModalDesc: "Choose the active season or archive to view the corresponding drinks:",
+        archiveBadgeText: "Archive:",
         langMenuLabel: "Language",
         exportText: "CSV Export",
         supportText: "Support / Feedback",
@@ -355,7 +394,7 @@
         formTitleEdit: "✏️ Edit Drink",
         namePlaceholder: "Drink name (e.g. Aperol Spritz)",
         catSelectLabel: "🏷️ Select Category:",
-        seasonLabel: "📅 Menu Season / Period:",
+        seasonLabel: "📅 Season / Period:",
         glassLabel: "🍸 Glass Type / Equipment:",
         costLabel: "💶 Cost Price (€):",
         priceLabel: "🏷️ Selling Price (€):",
@@ -411,17 +450,37 @@
       }
     }
 
-    function changeSeasonFilter(val) {
-      currentSeasonFilter = val;
+    function openSeasonModal() {
+      document.getElementById('settingsDropdown').classList.add('hidden');
+      document.getElementById('seasonModal').classList.remove('hidden');
+      document.getElementById('seasonModal').classList.add('flex');
+    }
+
+    function closeSeasonModal() {
+      document.getElementById('seasonModal').classList.remove('flex');
+      document.getElementById('seasonModal').classList.add('hidden');
+    }
+
+    function selectSeason(seasonKey) {
+      currentSeasonFilter = seasonKey;
+      closeSeasonModal();
+
       const badge = document.getElementById('activeSeasonBadge');
-      if (val === 'archive') {
-        badge.classList.remove('hidden');
-        badge.classList.add('flex');
-      } else {
+      const seasonNameEl = document.getElementById('activeSeasonName');
+
+      if (seasonKey === 'current') {
         badge.classList.remove('flex');
         badge.classList.add('hidden');
+      } else {
+        badge.classList.remove('hidden');
+        badge.classList.add('flex');
+        if (seasonKey === 'archive_sep_nov_2026') {
+          seasonNameEl.innerText = "01.09.2026 – 01.11.2026";
+        } else {
+          seasonNameEl.innerText = "Ältere Saisonen / Older Seasons";
+        }
       }
-      document.getElementById('settingsDropdown').classList.add('hidden');
+
       renderCategories();
       renderDrinks();
     }
@@ -474,13 +533,10 @@
       document.getElementById('modeBtn').innerText = isAdmin ? t.managerMode : t.waiterMode;
       document.getElementById('fsText').innerText = t.fullscreen;
       document.getElementById('menuText').innerText = t.menuText;
-      document.getElementById('seasonMenuLabel').innerText = t.seasonMenuLabel;
-      document.getElementById('archiveTitleName').innerText = t.archiveBadgeTitle;
-      
-      const seasonSelect = document.getElementById('seasonFilterSelect');
-      seasonSelect.options[0].text = t.seasonMenuOptCurrent;
-      seasonSelect.options[1].text = t.seasonMenuOptArchive;
-
+      document.getElementById('seasonMenuBtnText').innerText = t.seasonMenuBtnText;
+      document.getElementById('seasonModalTitle').innerText = t.seasonModalTitle;
+      document.getElementById('seasonModalDesc').innerText = t.seasonModalDesc;
+      document.getElementById('archiveBadgeText').innerText = t.archiveBadgeText;
       document.getElementById('langMenuLabel').innerText = t.langMenuLabel;
       document.getElementById('exportText').innerText = t.exportText;
       document.getElementById('supportMenuText').innerText = t.supportText;
@@ -639,11 +695,10 @@
       const t = i18n[currentLang];
       const allLabel = t.allCategories;
 
-      // Filter categories based on current season selection
       let seasonFilteredDrinks = allDrinks.filter(d => {
         let drinkSeason = d.season || 'current';
         if (currentSeasonFilter === 'current') return drinkSeason === 'current';
-        else return drinkSeason !== 'current';
+        else return drinkSeason === currentSeasonFilter;
       });
 
       const cats = [allLabel, ...new Set(seasonFilteredDrinks.map(d => d.category).filter(Boolean))];
@@ -664,7 +719,7 @@
 
       let filtered = allDrinks.filter(d => {
         let drinkSeason = d.season || 'current';
-        let matchesSeason = (currentSeasonFilter === 'current') ? (drinkSeason === 'current') : (drinkSeason !== 'current');
+        let matchesSeason = (currentSeasonFilter === 'current') ? (drinkSeason === 'current') : (drinkSeason === currentSeasonFilter);
 
         const matchesCat = selectedCat === allLabel || d.category === selectedCat;
         const matchesSearch = d.name.toLowerCase().includes(search) || 
@@ -773,7 +828,7 @@
       html += '<div class="flex items-center gap-2 mb-2">';
       html += '<span class="text-xs font-semibold px-2.5 py-1 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">' + (d.category || t.defaultDrinkCat) + '</span>';
       if (d.season && d.season !== 'current') {
-        html += '<span class="text-xs font-semibold px-2.5 py-1 rounded bg-slate-800 text-slate-300 border border-slate-700">📦 Sezóna: ' + d.season + '</span>';
+        html += '<span class="text-xs font-semibold px-2.5 py-1 rounded bg-slate-800 text-slate-300 border border-slate-700">📦 Saison: ' + d.season + '</span>';
       }
       if (d.is_featured) html += '<span class="text-xs font-bold px-2 py-0.5 rounded bg-amber-500 text-slate-950">⭐ TOP Highlight</span>';
       html += '</div>';
@@ -1024,7 +1079,7 @@
       const cost_price = parseFloat(document.getElementById('dCost').value) || null;
       const selling_price = parseFloat(document.getElementById('dPrice').value) || null;
       const ingredients = document.getElementById('dIng').value;
-      const allergens = document.getElementById('dAllergens'.value);
+      const allergens = document.getElementById('dAllergens').value;
       const recipe = document.getElementById('dRecipe').value;
       const photo_url = document.getElementById('dPhoto').value;
       const video_url = document.getElementById('dVideo').value;
