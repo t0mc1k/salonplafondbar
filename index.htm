@@ -133,7 +133,7 @@
           <option value="Tumbler">Tumbler</option>
           <option value="Coupette">Coupette</option>
           <option value="Longdrinkglas">Longdrinkglas</option>
-          <option value=" Weinglas">Weinglas</option>
+          <option value="Weinglas">Weinglas</option>
           <option value="Kaffeetasse">Kaffeetasse</option>
         </select>
       </div>
@@ -141,11 +141,11 @@
       <!-- Food Cost / Prices (Manager Only) -->
       <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-900 p-4 rounded-xl border border-slate-700">
         <div>
-          <label class="text-xs text-slate-400 font-semibold mb-1 block" id="costLabel">💶 Nákupná cena / Wareneinsatz (€):</label>
+          <label class="text-xs text-slate-400 font-semibold mb-1 block" id="costLabel">💶 Wareneinsatz (€):</label>
           <input type="number" step="0.10" id="dCost" placeholder="0.00" class="p-3 rounded bg-slate-950 border border-slate-800 text-white w-full text-xs">
         </div>
         <div>
-          <label class="text-xs text-slate-400 font-semibold mb-1 block" id="priceLabel">🏷️ Predajná cena / Verkaufspreis (€):</label>
+          <label class="text-xs text-slate-400 font-semibold mb-1 block" id="priceLabel">🏷️ Verkaufspreis (€):</label>
           <input type="number" step="0.10" id="dPrice" placeholder="0.00" class="p-3 rounded bg-slate-950 border border-slate-800 text-white w-full text-xs">
         </div>
       </div>
@@ -194,7 +194,7 @@
 
   <!-- Footer Credit -->
   <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-    Salonplafond BAR App v1.7.6 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+    Salonplafond BAR App v1.7.7 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
   </footer>
 
   <!-- Modal Detail View -->
@@ -238,8 +238,8 @@
         namePlaceholder: "Getränkename (z. B. Aperol Spritz)",
         catSelectLabel: "🏷️ Kategorie auswählen:",
         glassLabel: "🍸 Glas-Typ / Ausrüstung:",
-        costLabel: "💶 Nákupná cena / Wareneinsatz (€):",
-        priceLabel: "🏷️ Predajná cena / Verkaufspreis (€):",
+        costLabel: "💶 Wareneinsatz (€):",
+        priceLabel: "🏷️ Verkaufspreis (€):",
         ingPlaceholder: "Zutaten (z. B. 6 cl Prosecco, 4 cl Aperol, 2 cl Soda)",
         allergensPlaceholder: "Allergene (z. B. Enthält Sulfite...)",
         recipePlaceholder: "Zubereitung Schritt für Schritt...",
@@ -260,10 +260,10 @@
         costDisplay: "💶 Wareneinsatz:",
         priceDisplay: "🏷️ Verkaufspreis:",
         marginDisplay: "📈 Marge:",
-        lastUpdated: "Naposledy upravené:",
+        lastUpdated: "Zuletzt aktualisiert:",
         deleteBtn: "Getränk löschen",
         editBtn: "Getränk bearbeiten",
-        duplicateBtn: "Duplizieren / Kopieren",
+        duplicateBtn: "Duplizieren",
         alertFill: "Bitte geben Sie den Namen und wählen Sie eine Kategorie aus.",
         confirmDelete: "Möchten Sie dieses Getränk wirklich löschen?",
         passPrompt: "Bitte geben Sie das Manager-Passwort ein:",
@@ -748,7 +748,7 @@
       if (!d) return;
       closeModal();
       
-      document.getElementById('editingId').value = ''; // Empty ID means new insert
+      document.getElementById('editingId').value = '';
       document.getElementById('dName').value = (d.name || '') + ' (Kopie)';
       
       const radios = document.getElementsByName('dCatRadio');
