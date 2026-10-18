@@ -78,23 +78,33 @@
         <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs font-bold bg-slate-700/50 hover:bg-slate-700 w-4 h-4 rounded-full items-center justify-center">&times;</button>
       </div>
 
-      <!-- Settings Dropdown Menu (Language & Export) -->
+      <!-- Settings Dropdown Menu (Language, Export & Support) -->
       <div class="relative">
         <button onclick="toggleSettingsMenu(event)" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-semibold border border-slate-700 text-slate-300 flex items-center gap-1">
           ⚙️ <span id="menuText">Menü</span>
         </button>
-        <div id="settingsDropdown" class="hidden absolute right-0 mt-2 w-48 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl p-2 z-50 flex flex-col gap-2">
+        <div id="settingsDropdown" class="hidden absolute right-0 mt-2 w-52 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl p-2 z-50 flex flex-col gap-2">
+          
           <!-- Language Section -->
           <div class="text-[11px] text-slate-400 font-bold px-2 pt-1" id="langMenuLabel">Sprache / Language</div>
           <div class="grid grid-cols-2 gap-1 px-1">
             <button onclick="setLang('de')" id="langDe" class="py-1 text-xs font-bold rounded bg-amber-500 text-slate-950 text-center">DE</button>
             <button onclick="setLang('en')" id="langEn" class="py-1 text-xs font-bold rounded text-slate-400 hover:text-white text-center bg-slate-900">EN</button>
           </div>
+          
           <div class="border-t border-slate-700 my-1"></div>
+          
           <!-- Export Button -->
           <button onclick="exportToCSV()" class="w-full text-left px-2 py-1.5 rounded hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-2">
             📊 <span id="exportText">Export CSV</span>
           </button>
+
+          <!-- Support Button Inside Menu -->
+          <a href="mailto:kdstom@outlook.com?subject=Salonplafond%20BAR%20App%20-%20Support%20/%20Feedback&body=Hallo%20Tomas,%0A%0Aich%20möchte%20folgendes%20bezüglich%20der%20BAR%20App%20vorschlagen%20oder%20anfragen:%0A" 
+             class="w-full text-left px-2 py-1.5 rounded hover:bg-slate-700 text-xs font-semibold text-amber-400 flex items-center gap-2">
+            ✉️ <span id="supportMenuText">Support / Feedback</span>
+          </a>
+
         </div>
       </div>
 
@@ -206,17 +216,9 @@
     <p id="loadingTxt" class="col-span-full text-slate-400">Lade Getränke aus der Datenbank...</p>
   </div>
 
-  <!-- Footer Credit & Support Button -->
-  <footer class="mt-20 pt-6 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-    <div>
-      Salonplafond BAR App v1.8.0 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
-    </div>
-    <div>
-      <a href="mailto:kdstom@outlook.com?subject=Salonplafond%20BAR%20App%20-%20Support%20/%20Feedback&body=Hallo%20Tomas,%0A%0Aich%20möchte%20folgendes%20bezüglich%20der%20BAR%20App%20vorschlagen%20oder%20anfragen:%0A" 
-         class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 font-semibold rounded-lg border border-slate-700 transition flex items-center gap-1.5">
-        ✉️ <span id="supportBtnText">Support / Feedback</span>
-      </a>
-    </div>
+  <!-- Footer Credit -->
+  <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
+    Salonplafond BAR App v1.8.1 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
   </footer>
 
   <!-- Modal Detail View -->
@@ -352,7 +354,7 @@
         clickToView: "Click for recipe",
         noPhoto: "No photo",
         uploading: "Uploading...",
-        uploadSuccess: "✔ Foto successfully uploaded!",
+        uploadSuccess: "✔ Photo successfully uploaded!",
         fullscreen: "Fullscreen",
         catLabel: "Category:",
         filterLabel: "Filter:"
@@ -403,7 +405,7 @@
       document.getElementById('menuText').innerText = t.menuText;
       document.getElementById('langMenuLabel').innerText = t.langMenuLabel;
       document.getElementById('exportText').innerText = t.exportText;
-      document.getElementById('supportBtnText').innerText = t.supportText;
+      document.getElementById('supportMenuText').innerText = t.supportText;
       document.getElementById('catLabel').innerText = t.catLabel;
       document.getElementById('filterLabel').innerText = t.filterLabel;
       document.getElementById('catSelectLabel').innerText = t.catSelectLabel;
