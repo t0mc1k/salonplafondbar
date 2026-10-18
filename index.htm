@@ -23,16 +23,21 @@
       </div>
       <div>
         <h1 class="text-3xl font-bold tracking-tight text-amber-400">Salonplafond BAR</h1>
-        <span class="text-xs text-slate-400 font-medium">Created by © T0mc0 (Tomas Kardos)</span>
+        <span class="text-xs text-slate-400 font-medium">Erstellt von © T0mc1k</span>
       </div>
     </div>
     <div class="flex flex-wrap items-center gap-2">
       <div class="flex bg-slate-800 rounded-lg p-1 border border-slate-700">
         <button onclick="setLang('de')" id="langDe" class="px-2.5 py-1 text-xs font-bold rounded bg-amber-500 text-slate-950">DE</button>
-        <button onclick="setLang('sk')" id="langSk" class="px-2.5 py-1 text-xs font-bold rounded text-slate-400 hover:text-white">SK</button>
+        <button onclick="setLang('en')" id="langEn" class="px-2.5 py-1 text-xs font-bold rounded text-slate-400 hover:text-white">EN</button>
       </div>
 
-      <input type="text" id="searchInput" oninput="filterDrinks()" placeholder="🔍 Suchen..." class="px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 text-white w-48 md:w-64 focus:outline-none focus:border-amber-400">
+      <!-- Search Box with Clear Button (x) -->
+      <div class="relative w-48 md:w-64">
+        <input type="text" id="searchInput" oninput="onSearchInput()" placeholder="🔍 Suchen..." class="px-4 py-2 pr-8 rounded-lg bg-slate-800 border border-slate-700 text-white w-full focus:outline-none focus:border-amber-400">
+        <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-sm font-bold bg-slate-700/50 hover:bg-slate-700 w-5 h-5 rounded-full items-center justify-center">&times;</button>
+      </div>
+
       <button onclick="toggleMode()" id="modeBtn" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm font-semibold border border-slate-600">Modus: Kellner</button>
     </div>
   </header>
@@ -52,7 +57,7 @@
       
       <!-- Supabase Photo Upload Section -->
       <div class="md:col-span-2 bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col gap-2">
-        <label class="text-xs text-slate-400 font-semibold" id="photoLabel">📸 Foto des Getränks (Direkt in Supabase hochladen):</label>
+        <label class="text-xs text-slate-400 font-semibold" id="photoLabel">📸 Foto des Getränks (Direkt hochladen oder URL eingeben):</label>
         <div class="flex gap-2 items-center">
           <input type="file" id="imageFile" accept="image/*" onchange="uploadImageToSupabase(event)" class="text-xs text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-600 cursor-pointer">
           <span id="uploadStatus" class="text-xs text-amber-400 font-medium"></span>
@@ -77,7 +82,7 @@
 
   <!-- Footer Credit -->
   <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-    Salonplafond BAR App • Designed & Developed by <span class="text-amber-400 font-semibold">T0mc0 (Tomas Kardos)</span>
+    Salonplafond BAR App v1.5 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k</span>
   </footer>
 
   <!-- Modal Detail View -->
@@ -139,46 +144,46 @@
         uploading: "Wird hochgeladen...",
         uploadSuccess: "✔ Foto erfolgreich hochgeladen!"
       },
-      sk: {
-        subTitle: "Salonplafond • Receptúry & Manuál Nápojov",
-        searchPlaceholder: "🔍 Hľadať nápoj alebo recept...",
-        waiterMode: "Režim: Čašník",
-        managerMode: "Režim: Manažér",
-        allCategories: "Všetko",
-        formTitleAdd: "➕ Pridať nový nápoj",
-        formTitleEdit: "✏️ Upraviť nápoj",
-        namePlaceholder: "Názov nápoja (napr. Aperol Spritz)",
-        catPlaceholder: "Kategória (Koktaily, Káva, Nealko...)",
-        ingPlaceholder: "Suroviny & Alergény (napr. Prosecco 9cl, Aperol 6cl, Sóda 3cl)",
-        recipePlaceholder: "Postup prípravy krok za krokom...",
-        photoLabel: "📸 Foto nápoja (Nahrať z galérie alebo zadať URL):",
-        videoPlaceholder: "URL Odkaz na video (YouTube / MP4)",
-        saveBtn: "Uložiť nápoj",
-        cancelBtn: "Zrušiť",
-        closeBtn: "Zavrieť",
-        loading: "Načítavam nápoje z databázy...",
-        noDrinksFound: "Žiadne nápoje sa nenašli.",
-        addFirstDrink: "Pridajte prvý nápoj cez formulár vyššie!",
-        ingredientsLabel: "📋 Suroviny & Alergény:",
-        recipeLabel: "🥣 Postup:",
-        deleteBtn: "Vymazať nápoj",
-        editBtn: "Upraviť nápoj",
-        alertFill: "Zadajte prosím názov a kategóriu nápoja.",
-        confirmDelete: "Naozaj chcete vymazať tento nápoj?",
-        passPrompt: "Zadajte heslo pre manažérsky režim:",
-        passWrong: "Nesprávne heslo!",
-        defaultDrinkCat: "Nápoj",
-        clickToView: "Kliknúť pre recept",
-        noPhoto: "Bez fotky",
-        uploading: "Nahráva sa...",
-        uploadSuccess: "✔ Fotka úspešne nahratá!"
+      en: {
+        subTitle: "Salonplafond • Recipes & Drinks Manual",
+        searchPlaceholder: "🔍 Search drink or recipe...",
+        waiterMode: "Mode: Waiter",
+        managerMode: "Mode: Manager",
+        allCategories: "All",
+        formTitleAdd: "➕ Add New Drink",
+        formTitleEdit: "✏️ Edit Drink",
+        namePlaceholder: "Drink name (e.g. Aperol Spritz)",
+        catPlaceholder: "Category (Cocktails, Coffee, Non-Alcoholic...)",
+        ingPlaceholder: "Ingredients & Allergens (e.g. Prosecco 9cl, Aperol 6cl, Soda 3cl)",
+        recipePlaceholder: "Preparation step by step...",
+        photoLabel: "📸 Drink Photo (Upload directly or enter URL):",
+        videoPlaceholder: "Video URL (YouTube / MP4)",
+        saveBtn: "Save Drink",
+        cancelBtn: "Cancel",
+        closeBtn: "Close",
+        loading: "Loading drinks from database...",
+        noDrinksFound: "No drinks found.",
+        addFirstDrink: "Add the first drink using the form above!",
+        ingredientsLabel: "📋 Ingredients & Allergens:",
+        recipeLabel: "🥣 Preparation:",
+        deleteBtn: "Delete Drink",
+        editBtn: "Edit Drink",
+        alertFill: "Please enter the drink name and category.",
+        confirmDelete: "Do you really want to delete this drink?",
+        passPrompt: "Please enter the manager password:",
+        passWrong: "Wrong password!",
+        defaultDrinkCat: "Drink",
+        clickToView: "Click for recipe",
+        noPhoto: "No photo",
+        uploading: "Uploading...",
+        uploadSuccess: "✔ Photo successfully uploaded!"
       }
     };
 
     function setLang(lang) {
       currentLang = lang;
       document.getElementById('langDe').className = lang === 'de' ? 'px-2.5 py-1 text-xs font-bold rounded bg-amber-500 text-slate-950' : 'px-2.5 py-1 text-xs font-bold rounded text-slate-400 hover:text-white';
-      document.getElementById('langSk').className = lang === 'sk' ? 'px-2.5 py-1 text-xs font-bold rounded bg-amber-500 text-slate-950' : 'px-2.5 py-1 text-xs font-bold rounded text-slate-400 hover:text-white';
+      document.getElementById('langEn').className = lang === 'en' ? 'px-2.5 py-1 text-xs font-bold rounded bg-amber-500 text-slate-950' : 'px-2.5 py-1 text-xs font-bold rounded text-slate-400 hover:text-white';
       updateUI();
     }
 
@@ -202,6 +207,26 @@
       document.getElementById('closeModalBtn').innerText = t.closeBtn;
       renderCategories();
       renderDrinks();
+    }
+
+    function onSearchInput() {
+      const val = document.getElementById('searchInput').value;
+      const clearBtn = document.getElementById('clearSearchBtn');
+      if (val.length > 0) {
+        clearBtn.classList.remove('hidden');
+        clearBtn.classList.add('flex');
+      } else {
+        clearBtn.classList.add('hidden');
+        clearBtn.classList.remove('flex');
+      }
+      renderDrinks();
+    }
+
+    function clearSearch() {
+      const input = document.getElementById('searchInput');
+      input.value = '';
+      onSearchInput();
+      input.focus();
     }
 
     async function uploadImageToSupabase(event) {
