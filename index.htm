@@ -12,11 +12,36 @@
     .card:hover { transform: translateY(-4px); border-color: #f59e0b; }
     .list-item { background: #1e293b; border: 1px solid #334155; border-radius: 0.75rem; transition: background 0.2s; }
     .list-item:hover { background: #334155; border-color: #f59e0b; }
+    
+    /* Professional Print / PDF Styles */
     @media print {
-      body * { visibility: hidden; }
-      #drinkModal, #drinkModal * { visibility: visible; }
-      #drinkModal { position: absolute; left: 0; top: 0; width: 100%; background: white !important; color: black !important; }
+      @page { size: portrait; margin: 10mm; }
+      body { background: white !important; color: black !important; padding: 0 !important; }
+      body > *:not(#drinkModal) { display: none !important; }
+      #drinkModal {
+        position: absolute !important;
+        inset: 0 !important;
+        background: white !important;
+        display: flex !important;
+        align-items: flex-start !important;
+        justify-content: center !important;
+        padding: 0 !important;
+        z-index: 99999 !important;
+        overflow: visible !important;
+      }
+      #drinkModal > div {
+        background: white !important;
+        border: none !important;
+        box-shadow: none !important;
+        max-height: none !important;
+        width: 100% !important;
+        padding: 0 !important;
+        color: black !important;
+      }
       #modalContent { color: black !important; }
+      #modalContent h2 { color: black !important; }
+      #modalContent .bg-slate-800\/60 { background: #f8fafc !important; border: 1px solid #cbd5e1 !important; color: black !important; }
+      #modalContent p, #modalContent span { color: #1e293b !important; }
       .no-print { display: none !important; }
     }
   </style>
@@ -491,34 +516,34 @@
 
       let html = '';
       if (d.photo_url) {
-        html += '<img src="' + d.photo_url + '" class="w-full h-64 object-cover rounded-xl mb-4" alt="">';
+        html += '<img src="' + d.photo_url + '" class="w-full h-64 object-cover rounded-xl mb-4 shadow" alt="">';
       }
       html += '<div class="flex items-center gap-2 mb-2">';
-      html += '<span class="text-xs font-semibold px-2.5 py-1 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">' + (d.category || t.defaultDrinkCat) + '</span>';
+      html += '<span class="text-xs font-semibold px-2.5 py-1 rounded bg-amber-500/10 text-amber-600 border border-amber-500/20">' + (d.category || t.defaultDrinkCat) + '</span>';
       if (d.is_featured) html += '<span class="text-xs font-bold px-2 py-0.5 rounded bg-amber-500 text-slate-950">⭐ TOP Highlight</span>';
       html += '</div>';
 
-      html += '<h2 class="text-2xl font-bold text-white">' + d.name + '</h2>';
+      html += '<h2 class="text-3xl font-bold text-slate-900 mb-4">' + d.name + '</h2>';
 
       let tags = [];
       if (d.is_vegan) tags.push('🌱 Vegan');
       if (d.is_glutenfree) tags.push('🌾 Glutenfrei');
       if (d.is_lactosefree) tags.push('🥛 Laktosefrei');
       if (tags.length > 0) {
-        html += '<div class="flex gap-2 mt-2 text-xs text-slate-300">' + tags.map(tg => '<span class="px-2 py-0.5 bg-slate-800 rounded-md border border-slate-700">' + tg + '</span>').join('') + '</div>';
+        html += '<div class="flex gap-2 mb-4 text-xs text-slate-700">' + tags.map(tg => '<span class="px-2 py-0.5 bg-slate-100 rounded-md border border-slate-200">' + tg + '</span>').join('') + '</div>';
       }
 
       if (d.ingredients) {
-        html += '<div class="mt-4 bg-slate-800/60 p-4 rounded-xl border border-slate-700">';
-        html += '<p class="text-sm text-slate-200 font-medium">' + t.ingredientsLabel + '</p>';
-        html += '<p class="text-sm text-slate-300 mt-1">' + d.ingredients + '</p>';
+        html += '<div class="mb-4 bg-slate-50 p-4 rounded-xl border border-slate-200">';
+        html += '<p class="text-sm text-slate-900 font-bold mb-1">' + t.ingredientsLabel + '</p>';
+        html += '<p class="text-sm text-slate-700">' + d.ingredients + '</p>';
         html += '</div>';
       }
 
       if (d.recipe) {
-        html += '<div class="mt-4 bg-slate-800/60 p-4 rounded-xl border border-slate-700">';
-        html += '<p class="text-sm text-slate-200 font-medium">' + t.recipeLabel + '</p>';
-        html += '<p class="text-sm text-slate-300 mt-1 whitespace-pre-line">' + d.recipe + '</p>';
+        html += '<div class="mb-4 bg-slate-50 p-4 rounded-xl border border-slate-200">';
+        html += '<p class="text-sm text-slate-900 font-bold mb-1">' + t.recipeLabel + '</p>';
+        html += '<p class="text-sm text-slate-700 whitespace-pre-line">' + d.recipe + '</p>';
         html += '</div>';
       }
 
@@ -534,9 +559,9 @@
       }
 
       if (isAdmin) {
-        html += '<div class="mt-6 pt-4 border-t border-slate-800 flex justify-end gap-2 no-print">';
-        html += '<button onclick="event.stopPropagation(); editDrink(\'' + d.id + '\')" class="px-4 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-semibold rounded-lg border border-amber-500/20 transition">' + t.editBtn + '</button>';
-        html += '<button onclick="event.stopPropagation(); deleteDrink(\'' + d.id + '\')" class="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold rounded-lg border border-red-500/20 transition">' + t.deleteBtn + '</button>';
+        html += '<div class="mt-6 pt-4 border-t border-slate-200 flex justify-end gap-2 no-print">';
+        html += '<button onclick="event.stopPropagation(); editDrink(\'' + d.id + '\')" class="px-4 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 text-xs font-semibold rounded-lg border border-amber-500/20 transition">' + t.editBtn + '</button>';
+        html += '<button onclick="event.stopPropagation(); deleteDrink(\'' + d.id + '\')" class="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-600 text-xs font-semibold rounded-lg border border-red-500/20 transition">' + t.deleteBtn + '</button>';
         html += '</div>';
       }
 
