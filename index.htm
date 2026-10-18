@@ -58,10 +58,19 @@
         <button onclick="toggleSettingsMenu(event)" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-semibold border border-slate-700 text-slate-300 flex items-center gap-1">
           ⚙️ <span id="menuText">Menü</span>
         </button>
-        <div id="settingsDropdown" class="hidden absolute right-0 mt-2 w-52 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl p-2 z-50 flex flex-col gap-2">
+        <div id="settingsDropdown" class="hidden absolute right-0 mt-2 w-56 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl p-2 z-50 flex flex-col gap-2">
           
+          <!-- Season Selector / Archive Section -->
+          <div class="text-[11px] text-slate-400 font-bold px-2 pt-1" id="seasonMenuLabel">📅 Saison / Archiv</div>
+          <select id="seasonFilterSelect" onchange="changeSeasonFilter(this.value)" class="p-1.5 rounded bg-slate-900 border border-slate-700 text-white text-xs w-full focus:outline-none focus:border-amber-400">
+            <option value="current">✨ Aktuelle Saison</option>
+            <option value="archive">📦 Sezonálny archív (Všetko staršie)</option>
+          </select>
+
+          <div class="border-t border-slate-700 my-1"></div>
+
           <!-- Language Section -->
-          <div class="text-[11px] text-slate-400 font-bold px-2 pt-1" id="langMenuLabel">Sprache / Language</div>
+          <div class="text-[11px] text-slate-400 font-bold px-2" id="langMenuLabel">Sprache / Language</div>
           <div class="grid grid-cols-2 gap-1 px-1">
             <button onclick="setLang('de')" id="langDe" class="py-1 text-xs font-bold rounded bg-amber-500 text-slate-950 text-center">DE</button>
             <button onclick="setLang('en')" id="langEn" class="py-1 text-xs font-bold rounded text-slate-400 hover:text-white text-center bg-slate-900">EN</button>
@@ -86,7 +95,13 @@
     </div>
   </header>
 
-  <p id="subTitle" class="text-sm text-slate-400 mb-6 -mt-4">Salonplafond • Rezepte & Getränkehandbuch</p>
+  <!-- Subtitle & Active Season Badge -->
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 mb-6 -mt-4">
+    <p id="subTitle" class="text-sm text-slate-400">Salonplafond • Rezepte & Getränkehandbuch</p>
+    <div id="activeSeasonBadge" class="hidden px-3 py-1 bg-amber-500/10 border border-amber-500/30 rounded-full text-amber-400 text-xs font-semibold flex items-center gap-1.5">
+      <span>📦 Archiv-Modus:</span> <span id="archiveTitleName">Sezónny archív</span>
+    </div>
+  </div>
 
   <!-- Categories & Special Filters -->
   <div class="flex flex-col gap-3 mb-6">
@@ -120,6 +135,16 @@
           <label class="flex items-center gap-1.5 cursor-pointer"><input type="radio" name="dCatRadio" value="Longdrinks" class="accent-amber-500"> Longdrinks</label>
           <label class="flex items-center gap-1.5 cursor-pointer"><input type="radio" name="dCatRadio" value="Alkoholfrei" class="accent-amber-500"> Alkoholfrei</label>
         </div>
+      </div>
+
+      <!-- Season Selector for Drink -->
+      <div class="md:col-span-2 bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col gap-2">
+        <label class="text-xs text-slate-400 font-semibold" id="seasonLabel">📅 Menu-Sezóny / Obdobie:</label>
+        <select id="dSeason" class="p-3 rounded bg-slate-950 border border-slate-800 text-white text-xs">
+          <option value="current">✨ Aktuálna sezóna (1. Nov 2026 – 1. Jan 2027)</option>
+          <option value="archive_q3_2026">📦 Q3/2026 (1. Sep 2026 – 1. Nov 2026)</option>
+          <option value="archive_summer_2026">☀️ Sommer 2026 (Archiv)</option>
+        </select>
       </div>
 
       <!-- Glass Type Selection -->
@@ -192,7 +217,7 @@
 
   <!-- Footer Credit -->
   <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-    Salonplafond BAR App v1.8.3 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+    Salonplafond BAR App v1.8.4 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
   </footer>
 
   <!-- Modal Detail View -->
@@ -240,6 +265,7 @@
     let allDrinks = [];
     let selectedCat = 'All';
     let activeSpecialFilter = null;
+    let currentSeasonFilter = 'current'; // 'current' or 'archive'
     let isAdmin = false;
     const MANAGER_PASSWORD = "salon123";
 
@@ -251,6 +277,10 @@
         managerMode: "Modus: Manager",
         allCategories: "Alle",
         menuText: "Menü",
+        seasonMenuLabel: "📅 Saison / Archiv",
+        seasonMenuOptCurrent: "✨ Aktuelle Saison",
+        seasonMenuOptArchive: "📦 Sezonálny archív (Archiv)",
+        archiveBadgeTitle: "📦 Sezonálny archív",
         langMenuLabel: "Sprache / Language",
         exportText: "CSV Export",
         supportText: "Support / Feedback",
@@ -262,6 +292,7 @@
         formTitleEdit: "✏️ Getränk bearbeiten",
         namePlaceholder: "Getränkename (z. B. Aperol Spritz)",
         catSelectLabel: "🏷️ Kategorie auswählen:",
+        seasonLabel: "📅 Menu-Sezóny / Obdobie:",
         glassLabel: "🍸 Glas-Typ / Ausrüstung:",
         costLabel: "💶 Wareneinsatz (€):",
         priceLabel: "🏷️ Verkaufspreis (€):",
@@ -276,7 +307,7 @@
         closeBtn: "Schließen",
         printBtn: "Drucken / PDF",
         loading: "Lade Getränke aus der Datenbank...",
-        noDrinksFound: "Keine Getränke gefunden.",
+        noDrinksFound: "Keine Getränke in dieser Saison gefunden.",
         addFirstDrink: "Fügen Sie oben das erste Getränk hinzu!",
         ingredientsLabel: "📋 Zutaten:",
         allergensLabel: "⚠️ Allergene:",
@@ -309,6 +340,10 @@
         managerMode: "Mode: Manager",
         allCategories: "All",
         menuText: "Menu",
+        seasonMenuLabel: "📅 Season / Archive",
+        seasonMenuOptCurrent: "✨ Current Season",
+        seasonMenuOptArchive: "📦 Seasonal Archive",
+        archiveBadgeTitle: "📦 Seasonal Archive",
         langMenuLabel: "Language",
         exportText: "CSV Export",
         supportText: "Support / Feedback",
@@ -320,6 +355,7 @@
         formTitleEdit: "✏️ Edit Drink",
         namePlaceholder: "Drink name (e.g. Aperol Spritz)",
         catSelectLabel: "🏷️ Select Category:",
+        seasonLabel: "📅 Menu Season / Period:",
         glassLabel: "🍸 Glass Type / Equipment:",
         costLabel: "💶 Cost Price (€):",
         priceLabel: "🏷️ Selling Price (€):",
@@ -334,7 +370,7 @@
         closeBtn: "Close",
         printBtn: "Print / PDF",
         loading: "Loading drinks from database...",
-        noDrinksFound: "No drinks found.",
+        noDrinksFound: "No drinks found in this season.",
         addFirstDrink: "Add the first drink using the form above!",
         ingredientsLabel: "📋 Ingredients:",
         allergensLabel: "⚠️ Allergens:",
@@ -373,6 +409,21 @@
       if (!dropdown.contains(event.target)) {
         dropdown.classList.add('hidden');
       }
+    }
+
+    function changeSeasonFilter(val) {
+      currentSeasonFilter = val;
+      const badge = document.getElementById('activeSeasonBadge');
+      if (val === 'archive') {
+        badge.classList.remove('hidden');
+        badge.classList.add('flex');
+      } else {
+        badge.classList.remove('flex');
+        badge.classList.add('hidden');
+      }
+      document.getElementById('settingsDropdown').classList.add('hidden');
+      renderCategories();
+      renderDrinks();
     }
 
     function openSupportModal() {
@@ -423,6 +474,13 @@
       document.getElementById('modeBtn').innerText = isAdmin ? t.managerMode : t.waiterMode;
       document.getElementById('fsText').innerText = t.fullscreen;
       document.getElementById('menuText').innerText = t.menuText;
+      document.getElementById('seasonMenuLabel').innerText = t.seasonMenuLabel;
+      document.getElementById('archiveTitleName').innerText = t.archiveBadgeTitle;
+      
+      const seasonSelect = document.getElementById('seasonFilterSelect');
+      seasonSelect.options[0].text = t.seasonMenuOptCurrent;
+      seasonSelect.options[1].text = t.seasonMenuOptArchive;
+
       document.getElementById('langMenuLabel').innerText = t.langMenuLabel;
       document.getElementById('exportText').innerText = t.exportText;
       document.getElementById('supportMenuText').innerText = t.supportText;
@@ -433,6 +491,7 @@
       document.getElementById('catLabel').innerText = t.catLabel;
       document.getElementById('filterLabel').innerText = t.filterLabel;
       document.getElementById('catSelectLabel').innerText = t.catSelectLabel;
+      document.getElementById('seasonLabel').innerText = t.seasonLabel;
       document.getElementById('glassLabel').innerText = t.glassLabel;
       document.getElementById('costLabel').innerText = t.costLabel;
       document.getElementById('priceLabel').innerText = t.priceLabel;
@@ -510,12 +569,13 @@
       }
 
       let csvContent = "data:text/csv;charset=utf-8,";
-      csvContent += "Name;Category;Glass;CostPrice;SellingPrice;Ingredients;Allergens;Recipe;Vegan;Glutenfree;Lactosefree;Featured\r\n";
+      csvContent += "Name;Category;Season;Glass;CostPrice;SellingPrice;Ingredients;Allergens;Recipe;Vegan;Glutenfree;Lactosefree;Featured\r\n";
 
       allDrinks.forEach(d => {
         let row = [
           `"${(d.name || '').replace(/"/g, '""')}"`,
           `"${(d.category || '').replace(/"/g, '""')}"`,
+          `"${(d.season || 'current').replace(/"/g, '""')}"`,
           `"${(d.glass_type || '').replace(/"/g, '""')}"`,
           d.cost_price || 0,
           d.selling_price || 0,
@@ -578,7 +638,15 @@
     function renderCategories() {
       const t = i18n[currentLang];
       const allLabel = t.allCategories;
-      const cats = [allLabel, ...new Set(allDrinks.map(d => d.category).filter(Boolean))];
+
+      // Filter categories based on current season selection
+      let seasonFilteredDrinks = allDrinks.filter(d => {
+        let drinkSeason = d.season || 'current';
+        if (currentSeasonFilter === 'current') return drinkSeason === 'current';
+        else return drinkSeason !== 'current';
+      });
+
+      const cats = [allLabel, ...new Set(seasonFilteredDrinks.map(d => d.category).filter(Boolean))];
       if (!cats.includes(selectedCat)) selectedCat = allLabel;
 
       const container = document.getElementById('categories');
@@ -595,6 +663,9 @@
       const allLabel = t.allCategories;
 
       let filtered = allDrinks.filter(d => {
+        let drinkSeason = d.season || 'current';
+        let matchesSeason = (currentSeasonFilter === 'current') ? (drinkSeason === 'current') : (drinkSeason !== 'current');
+
         const matchesCat = selectedCat === allLabel || d.category === selectedCat;
         const matchesSearch = d.name.toLowerCase().includes(search) || 
                               (d.ingredients && d.ingredients.toLowerCase().includes(search)) ||
@@ -607,7 +678,7 @@
         if (activeSpecialFilter === 'lactosefree') matchesFilter = d.is_lactosefree;
         if (activeSpecialFilter === 'nonalcoholic') matchesFilter = d.category && d.category.toLowerCase().includes('alkoholfrei');
 
-        return matchesCat && matchesSearch && matchesFilter;
+        return matchesSeason && matchesCat && matchesSearch && matchesFilter;
       });
 
       // Sort featured drinks to top
@@ -616,7 +687,7 @@
       const container = document.getElementById('drinksGrid');
       if (filtered.length === 0) {
         container.className = 'block';
-        container.innerHTML = '<p class="text-center text-slate-500 py-12">' + t.noDrinksFound + ' ' + (isAdmin ? t.addFirstDrink : '') + '</p>';
+        container.innerHTML = '<p class="text-center text-slate-500 py-12">' + t.noDrinksFound + ' ' + (isAdmin && currentSeasonFilter === 'current' ? t.addFirstDrink : '') + '</p>';
         return;
       }
 
@@ -701,6 +772,9 @@
       }
       html += '<div class="flex items-center gap-2 mb-2">';
       html += '<span class="text-xs font-semibold px-2.5 py-1 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">' + (d.category || t.defaultDrinkCat) + '</span>';
+      if (d.season && d.season !== 'current') {
+        html += '<span class="text-xs font-semibold px-2.5 py-1 rounded bg-slate-800 text-slate-300 border border-slate-700">📦 Sezóna: ' + d.season + '</span>';
+      }
       if (d.is_featured) html += '<span class="text-xs font-bold px-2 py-0.5 rounded bg-amber-500 text-slate-950">⭐ TOP Highlight</span>';
       html += '</div>';
 
@@ -765,7 +839,7 @@
         html += '</div>';
       }
 
-      // Last updated info & Action buttons (Edit always available, prompts password if not admin)
+      // Last updated info & Action buttons
       html += '<div class="mt-6 pt-4 border-t border-slate-700 flex flex-wrap items-center justify-between gap-2">';
       if (d.updated_at) {
         let dateStr = new Date(d.updated_at).toLocaleDateString();
@@ -840,6 +914,7 @@
       const radios = document.getElementsByName('dCatRadio');
       for (let r of radios) r.checked = (r.value === d.category);
 
+      document.getElementById('dSeason').value = d.season || 'current';
       document.getElementById('dGlass').value = d.glass_type || '';
       document.getElementById('dCost').value = d.cost_price || '';
       document.getElementById('dPrice').value = d.selling_price || '';
@@ -872,6 +947,7 @@
       const radios = document.getElementsByName('dCatRadio');
       for (let r of radios) r.checked = (r.value === d.category);
 
+      document.getElementById('dSeason').value = d.season || 'current';
       document.getElementById('dGlass').value = d.glass_type || '';
       document.getElementById('dCost').value = d.cost_price || '';
       document.getElementById('dPrice').value = d.selling_price || '';
@@ -907,6 +983,7 @@
       const radios = document.getElementsByName('dCatRadio');
       for (let r of radios) r.checked = false;
 
+      document.getElementById('dSeason').value = 'current';
       document.getElementById('dGlass').value = '';
       document.getElementById('dCost').value = '';
       document.getElementById('dPrice').value = '';
@@ -942,11 +1019,12 @@
         }
       }
 
+      const season = document.getElementById('dSeason').value;
       const glass_type = document.getElementById('dGlass').value;
       const cost_price = parseFloat(document.getElementById('dCost').value) || null;
       const selling_price = parseFloat(document.getElementById('dPrice').value) || null;
       const ingredients = document.getElementById('dIng').value;
-      const allergens = document.getElementById('dAllergens').value;
+      const allergens = document.getElementById('dAllergens'.value);
       const recipe = document.getElementById('dRecipe').value;
       const photo_url = document.getElementById('dPhoto').value;
       const video_url = document.getElementById('dVideo').value;
@@ -959,7 +1037,7 @@
 
       if (!name || !category) { alert(t.alertFill); return; }
 
-      const drinkObj = { name, category, glass_type, cost_price, selling_price, ingredients, allergens, recipe, photo_url, video_url, is_featured, is_vegan, is_glutenfree, is_lactosefree, updated_at };
+      const drinkObj = { name, category, season, glass_type, cost_price, selling_price, ingredients, allergens, recipe, photo_url, video_url, is_featured, is_vegan, is_glutenfree, is_lactosefree, updated_at };
 
       if (id) {
         await _supabase.from('drinks').update(drinkObj).eq('id', id);
