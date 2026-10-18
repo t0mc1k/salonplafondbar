@@ -101,7 +101,7 @@
 </head>
 <body class="p-4 md:p-8 max-w-6xl mx-auto pb-24" onclick="closeDropdowns(event)">
 
-  <!-- Úvodná animácia (Splash Screen) - trvá presne 3.5 sekundy pri každom zapnutí/refreshi -->
+  <!-- Úvodná animácia (Splash Screen) -->
   <div id="splashScreen" class="fixed inset-0 z-[100] bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
     <div class="splash-logo-animate flex flex-col items-center gap-4">
       <div class="w-24 h-24 bg-amber-400 rounded-2xl flex flex-col items-center justify-center shadow-2xl p-2 text-slate-950 font-bold select-none border-2 border-amber-300">
@@ -129,7 +129,7 @@
   <!-- Header -->
   <header class="flex flex-col md:flex-row justify-between items-center gap-4 mb-8 pb-4 border-b border-slate-700">
     <div class="flex items-center gap-3">
-      <!-- Kliknutím na toto logo sa otvorí náhodný motivačný nemecký citát! -->
+      <!-- Kliknutím na logo sa otvorí náhodná motivácia / správa od Tomasa -->
       <div class="header-logo-container" onclick="showRandomMotivation(event)" title="Klick mich für Motivation! 🍸">
         <span class="logo-text">Ō</span>
         <span class="logo-icon">🍸</span>
@@ -141,23 +141,19 @@
     </div>
 
     <div class="flex flex-wrap items-center gap-2">
-      <!-- Refresh / Update Button -->
       <button onclick="refreshData()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-semibold border border-slate-700 text-slate-300 flex items-center gap-1 transition" title="Daten aktualisieren">
         🔄 <span id="refreshText">Aktualisieren</span>
       </button>
 
-      <!-- Fullscreen Toggle -->
       <button onclick="toggleFullscreen()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-semibold border border-slate-700 text-slate-300 flex items-center gap-1">
         ⛶ <span id="fsText">Vollbild</span>
       </button>
 
-      <!-- Search Box with Clear Button (x) -->
       <div class="relative w-48 md:w-64">
         <input type="text" id="searchInput" oninput="onSearchInput()" placeholder="🔍 Suchen..." class="px-4 py-1.5 pr-8 rounded-lg bg-slate-800 border border-slate-700 text-white w-full focus:outline-none focus:border-amber-400 text-xs">
         <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs font-bold bg-slate-700/50 hover:bg-slate-700 w-4 h-4 rounded-full items-center justify-center">&times;</button>
       </div>
 
-      <!-- Compact Settings & Control Dropdown Menu -->
       <div class="relative">
         <button onclick="toggleSettingsMenu(event)" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs flex items-center gap-1 shadow-lg transition">
           ⚙️ <span id="menuText">Menü</span>
@@ -200,7 +196,6 @@
     </div>
   </header>
 
-  <!-- Subtitle & Active Season Badge -->
   <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 mb-6 -mt-4">
     <p id="subTitle" class="text-sm text-slate-400">Salonplafond • Rezepte & Getränkehandbuch</p>
     <div id="activeSeasonBadge" class="hidden px-3 py-1 bg-amber-500/10 border border-amber-500/30 rounded-full text-amber-400 text-xs font-semibold flex items-center gap-1.5">
@@ -208,7 +203,6 @@
     </div>
   </div>
 
-  <!-- Categories & Special Filters -->
   <div class="flex flex-col gap-3 mb-6">
     <div class="flex items-center gap-2 overflow-x-auto pb-2">
       <span class="text-xs text-slate-400 font-semibold mr-1 shrink-0" id="catLabel">Kategorie:</span>
@@ -436,7 +430,7 @@
       }
     });
 
-    // Zoznam nemeckých motivačných a špeciálnych hlášok pre tím
+    // Zoznam nemeckých motivačných a špeciálnych hlášok pre tím (vrátane Tomasa)
     const motivationalQuotes = [
       "„Weißt du, wer der beste Spüler im Salonplafond ist? Natürlich Tomas, der auch diese App für euch erstellt hat, um euch die Arbeit zu erleichtern! Er grüßt euch und freut sich, dass ihr diese App nutzt, da ihn die Programmierung viel Arbeit gekostet hat!“ 🧽✨",
       "„Wer nie vom Weg abkommt, bleibt auf der Strecke. Weitermachen, Team!“ 🚀",
