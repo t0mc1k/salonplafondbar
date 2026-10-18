@@ -10,6 +10,8 @@
     body { background-color: #0f172a; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
     .card { background: #1e293b; border: 1px solid #334155; border-radius: 1rem; transition: transform 0.2s; }
     .card:hover { transform: translateY(-4px); border-color: #f59e0b; }
+    .list-item { background: #1e293b; border: 1px solid #334155; border-radius: 0.75rem; transition: background 0.2s; }
+    .list-item:hover { background: #334155; border-color: #f59e0b; }
     @media print {
       body * { visibility: hidden; }
       #drinkModal, #drinkModal * { visibility: visible; }
@@ -34,6 +36,12 @@
       </div>
     </div>
     <div class="flex flex-wrap items-center gap-2">
+      <!-- View Layout Toggle (Grid / List) -->
+      <div class="flex bg-slate-800 rounded-lg p-1 border border-slate-700">
+        <button onclick="setViewMode('grid')" id="viewGrid" class="px-2.5 py-1 text-xs font-bold rounded bg-amber-500 text-slate-950 flex items-center gap-1">🖼️ Grid</button>
+        <button onclick="setViewMode('list')" id="viewList" class="px-2.5 py-1 text-xs font-bold rounded text-slate-400 hover:text-white flex items-center gap-1">☰ Liste</button>
+      </div>
+
       <!-- Fullscreen Toggle -->
       <button onclick="toggleFullscreen()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-semibold border border-slate-700 text-slate-300 flex items-center gap-1">
         ⛶ <span id="fsText">Vollbild</span>
@@ -107,14 +115,14 @@
     </div>
   </div>
 
-  <!-- Drinks Grid -->
-  <div id="drinksGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+  <!-- Drinks Grid / List Container -->
+  <div id="drinksGrid">
     <p id="loadingTxt" class="col-span-full text-slate-400">Lade Getränke aus der Datenbank...</p>
   </div>
 
   <!-- Footer Credit -->
   <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-    Salonplafond BAR App v1.6 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+    Salonplafond BAR App v1.7 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
   </footer>
 
   <!-- Modal Detail View -->
@@ -139,6 +147,7 @@
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let currentLang = 'de';
+    let viewMode = 'grid'; // 'grid' or 'list'
     let allDrinks = [];
     let selectedCat = 'All';
     let activeSpecialFilter = null;
@@ -231,6 +240,13 @@
       updateUI();
     }
 
+    function setViewMode(mode) {
+      viewMode = mode;
+      document.getElementById('viewGrid').className = mode === 'grid' ? 'px-2.5 py-1 text-xs font-bold rounded bg-amber-500 text-slate-950 flex items-center gap-1' : 'px-2.5 py-1 text-xs font-bold rounded text-slate-400 hover:text-white flex items-center gap-1';
+      document.getElementById('viewList').className = mode === 'list' ? 'px-2.5 py-1 text-xs font-bold rounded bg-amber-500 text-slate-950 flex items-center gap-1' : 'px-2.5 py-1 text-xs font-bold rounded text-slate-400 hover:text-white flex items-center gap-1';
+      renderDrinks();
+    }
+
     function toggleFullscreen() {
       if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen();
@@ -292,18 +308,22 @@
         activeSpecialFilter = filterType;
       }
       
-      ['featured', 'vegan', 'gluten', 'lactose', 'nonalc'].forEach(f => {
-        const el = document.getElementById('filter' + f.charAt(0).toUpperCase() + f.slice(1));
+      const filterButtons = {
+        featured: 'filterFeatured',
+        vegan: 'filterVegan',
+        glutenfree: 'filterGluten',
+        lactosefree: 'filterLactose',
+        nonalcoholic: 'filterNonAlc'
+      };
+
+      Object.values(filterButtons).forEach(id => {
+        const el = document.getElementById(id);
         if (el) el.className = 'px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 hover:border-amber-400';
       });
 
-      if (activeSpecialFilter) {
-        let activeId = 'filter' + activeSpecialFilter.charAt(0).toUpperCase() + activeSpecialFilter.slice(1);
-        if (activeSpecialFilter === 'glutenfree') activeId = 'filterGluten';
-        if (activeSpecialFilter === 'lactosefree') activeId = 'filterLactose';
-        if (activeSpecialFilter === 'nonalcoholic') activeId = 'filterNonAlc';
-        const el = document.getElementById(activeId);
-        if (el) el.className = 'px-3 py-1 rounded-full bg-amber-500 text-slate-950 font-bold border border-amber-400';
+      if (activeSpecialFilter && filterButtons[activeSpecialFilter]) {
+        const activeEl = document.getElementById(filterButtons[activeSpecialFilter]);
+        if (activeEl) activeEl.className = 'px-3 py-1 rounded-full bg-amber-500 text-slate-950 font-bold border border-amber-400';
       }
 
       renderDrinks();
@@ -383,35 +403,65 @@
 
       const container = document.getElementById('drinksGrid');
       if (filtered.length === 0) {
-        container.innerHTML = '<p class="col-span-full text-center text-slate-500 py-12">' + t.noDrinksFound + ' ' + (isAdmin ? t.addFirstDrink : '') + '</p>';
+        container.className = 'block';
+        container.innerHTML = '<p class="text-center text-slate-500 py-12">' + t.noDrinksFound + ' ' + (isAdmin ? t.addFirstDrink : '') + '</p>';
         return;
       }
 
-      container.innerHTML = filtered.map(d => {
-        let photoHtml = d.photo_url 
-          ? '<img src="' + d.photo_url + '" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="">' 
-          : '<div class="flex items-center justify-center h-full text-slate-500 text-xs">' + t.noPhoto + '</div>';
+      if (viewMode === 'grid') {
+        container.className = 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6';
+        container.innerHTML = filtered.map(d => {
+          let photoHtml = d.photo_url 
+            ? '<img src="' + d.photo_url + '" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="">' 
+            : '<div class="flex items-center justify-center h-full text-slate-500 text-xs">' + t.noPhoto + '</div>';
 
-        let badgeHtml = d.is_featured 
-          ? '<span class="absolute top-2 right-2 text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500 text-slate-950 shadow">⭐ TOP</span>' 
-          : '';
+          let badgeHtml = d.is_featured 
+            ? '<span class="absolute top-2 right-2 text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500 text-slate-950 shadow">⭐ TOP</span>' 
+            : '';
 
-        let tagsHtml = '';
-        if (d.is_vegan) tagsHtml += '🌱 ';
-        if (d.is_glutenfree) tagsHtml += '🌾 ';
-        if (d.is_lactosefree) tagsHtml += '🥛 ';
+          let tagsHtml = '';
+          if (d.is_vegan) tagsHtml += '🌱 ';
+          if (d.is_glutenfree) tagsHtml += '🌾 ';
+          if (d.is_lactosefree) tagsHtml += '🥛 ';
 
-        return '<div onclick="openDrinkModal(\'' + d.id + '\')" class="card overflow-hidden cursor-pointer flex flex-col justify-between group">' +
-               '<div class="relative h-48 bg-slate-800">' + photoHtml + badgeHtml +
-               '<span class="absolute top-2 left-2 text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-900/80 backdrop-blur text-amber-400 border border-amber-500/30">' + (d.category || t.defaultDrinkCat) + '</span>' +
-               '</div>' +
-               '<div class="p-4 text-center">' +
-               '<h3 class="text-lg font-bold text-white group-hover:text-amber-400 transition">' + d.name + '</h3>' +
-               (tagsHtml ? '<div class="text-xs mt-1">' + tagsHtml + '</div>' : '') +
-               '<span class="text-xs text-slate-400 mt-1 inline-block">' + t.clickToView + '</span>' +
-               '</div>' +
-               '</div>';
-      }).join('');
+          return '<div onclick="openDrinkModal(\'' + d.id + '\')" class="card overflow-hidden cursor-pointer flex flex-col justify-between group">' +
+                 '<div class="relative h-48 bg-slate-800">' + photoHtml + badgeHtml +
+                 '<span class="absolute top-2 left-2 text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-900/80 backdrop-blur text-amber-400 border border-amber-500/30">' + (d.category || t.defaultDrinkCat) + '</span>' +
+                 '</div>' +
+                 '<div class="p-4 text-center">' +
+                 '<h3 class="text-lg font-bold text-white group-hover:text-amber-400 transition">' + d.name + '</h3>' +
+                 (tagsHtml ? '<div class="text-xs mt-1">' + tagsHtml + '</div>' : '') +
+                 '<span class="text-xs text-slate-400 mt-1 inline-block">' + t.clickToView + '</span>' +
+                 '</div>' +
+                 '</div>';
+        }).join('');
+      } else {
+        // List Mode
+        container.className = 'flex flex-col gap-3';
+        container.innerHTML = filtered.map(d => {
+          let photoHtml = d.photo_url 
+            ? '<img src="' + d.photo_url + '" class="w-14 h-14 object-cover rounded-lg shrink-0" alt="">' 
+            : '<div class="w-14 h-14 bg-slate-800 rounded-lg shrink-0 flex items-center justify-center text-[10px] text-slate-500">No Pic</div>';
+
+          let tagsHtml = '';
+          if (d.is_featured) tagsHtml += '<span class="text-xs font-bold px-2 py-0.5 rounded bg-amber-500 text-slate-950">⭐ TOP</span>';
+          if (d.is_vegan) tagsHtml += '<span class="text-xs">🌱</span>';
+          if (d.is_glutenfree) tagsHtml += '<span class="text-xs">🌾</span>';
+          if (d.is_lactosefree) tagsHtml += '<span class="text-xs">🥛</span>';
+
+          return '<div onclick="openDrinkModal(\'' + d.id + '\')" class="list-item p-3 cursor-pointer flex items-center justify-between gap-4 group">' +
+                 '<div class="flex items-center gap-4 min-w-0">' + photoHtml +
+                 '<div class="min-w-0">' +
+                 '<div class="flex items-center gap-2 flex-wrap">' +
+                 '<h3 class="text-base font-bold text-white group-hover:text-amber-400 transition truncate">' + d.name + '</h3>' + tagsHtml +
+                 '</div>' +
+                 '<p class="text-xs text-slate-400 truncate mt-0.5">' + (d.ingredients || (d.category || t.defaultDrinkCat)) + '</p>' +
+                 '</div>' +
+                 '</div>' +
+                 '<span class="text-xs font-semibold px-2.5 py-1 rounded bg-slate-800 text-amber-400 border border-slate-700 shrink-0">' + (d.category || t.defaultDrinkCat) + '</span>' +
+                 '</div>';
+        }).join('');
+      }
     }
 
     function getEmbedUrl(url) {
