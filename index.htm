@@ -111,9 +111,19 @@
     <h2 id="formTitle" class="text-xl font-bold mb-4 text-amber-400">➕ Neues Getränk hinzufügen</h2>
     <input type="hidden" id="editingId" value="">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <input type="text" id="dName" placeholder="Getränkename (z. B. Aperol Spritz)" class="p-3 rounded bg-slate-900 border border-slate-700 text-white">
-      <input type="text" id="dCat" placeholder="Kategorie (Cocktails, Kaffee, Alkoholfrei...)" class="p-3 rounded bg-slate-900 border border-slate-700 text-white">
+      <input type="text" id="dName" placeholder="Getränkename (z. B. Aperol Spritz)" class="p-3 rounded bg-slate-900 border border-slate-700 text-white md:col-span-2">
       
+      <!-- Category Selection Radios / Checkboxes -->
+      <div class="md:col-span-2 bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col gap-2">
+        <label class="text-xs text-slate-400 font-semibold" id="catSelectLabel">🏷️ Kategorie auswählen:</label>
+        <div class="flex flex-wrap gap-4 text-xs text-slate-200" id="categoryRadios">
+          <label class="flex items-center gap-1.5 cursor-pointer"><input type="radio" name="dCatRadio" value="Cocktails & Spritz" class="accent-amber-500"> Cocktails & Spritz</label>
+          <label class="flex items-center gap-1.5 cursor-pointer"><input type="radio" name="dCatRadio" value="Kaffee" class="accent-amber-500"> Kaffee</label>
+          <label class="flex items-center gap-1.5 cursor-pointer"><input type="radio" name="dCatRadio" value="Longdrinks" class="accent-amber-500"> Longdrinks</label>
+          <label class="flex items-center gap-1.5 cursor-pointer"><input type="radio" name="dCatRadio" value="Alkoholfrei" class="accent-amber-500"> Alkoholfrei</label>
+        </div>
+      </div>
+
       <!-- Supabase Photo Upload Section -->
       <div class="md:col-span-2 bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col gap-2">
         <label class="text-xs text-slate-400 font-semibold" id="photoLabel">📸 Foto des Getränks (Direkt hochladen oder URL eingeben):</label>
@@ -158,7 +168,7 @@
 
   <!-- Footer Credit -->
   <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-    Salonplafond BAR App v1.7.4 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+    Salonplafond BAR App v1.7.5 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
   </footer>
 
   <!-- Modal Detail View -->
@@ -200,7 +210,7 @@
         formTitleAdd: "➕ Neues Getränk hinzufügen",
         formTitleEdit: "✏️ Getränk bearbeiten",
         namePlaceholder: "Getränkename (z. B. Aperol Spritz)",
-        catPlaceholder: "Kategorie (Cocktails, Kaffee, Alkoholfrei...)",
+        catSelectLabel: "🏷️ Kategorie auswählen:",
         ingPlaceholder: "Zutaten (z. B. 6 cl Prosecco, 4 cl Aperol, 2 cl Soda)",
         allergensPlaceholder: "Allergene (z. B. Enthält Sulfite...)",
         recipePlaceholder: "Zubereitung Schritt für Schritt...",
@@ -219,7 +229,7 @@
         recipeLabel: "🥣 Zubereitung:",
         deleteBtn: "Getränk löschen",
         editBtn: "Getränk bearbeiten",
-        alertFill: "Bitte geben Sie den Namen und die Kategorie des Getränks ein.",
+        alertFill: "Bitte geben Sie den Namen und wählen Sie eine Kategorie aus.",
         confirmDelete: "Möchten Sie dieses Getränk wirklich löschen?",
         passPrompt: "Bitte geben Sie das Manager-Passwort ein:",
         passWrong: "Falsches Passwort!",
@@ -241,7 +251,7 @@
         formTitleAdd: "➕ Add New Drink",
         formTitleEdit: "✏️ Edit Drink",
         namePlaceholder: "Drink name (e.g. Aperol Spritz)",
-        catPlaceholder: "Category (Cocktails, Coffee, Non-Alcoholic...)",
+        catSelectLabel: "🏷️ Select Category:",
         ingPlaceholder: "Ingredients (e.g. 6 cl Prosecco, 4 cl Aperol, 2 cl Soda)",
         allergensPlaceholder: "Allergens (e.g. Contains sulfites...)",
         recipePlaceholder: "Preparation step by step...",
@@ -260,7 +270,7 @@
         recipeLabel: "🥣 Preparation:",
         deleteBtn: "Delete Drink",
         editBtn: "Edit Drink",
-        alertFill: "Please enter the drink name and category.",
+        alertFill: "Please enter the drink name and select a category.",
         confirmDelete: "Do you really want to delete this drink?",
         passPrompt: "Please enter the manager password:",
         passWrong: "Wrong password!",
@@ -305,12 +315,12 @@
       document.getElementById('fsText').innerText = t.fullscreen;
       document.getElementById('catLabel').innerText = t.catLabel;
       document.getElementById('filterLabel').innerText = t.filterLabel;
+      document.getElementById('catSelectLabel').innerText = t.catSelectLabel;
       
       const editingId = document.getElementById('editingId').value;
       document.getElementById('formTitle').innerText = editingId ? t.formTitleEdit : t.formTitleAdd;
       
       document.getElementById('dName').placeholder = t.namePlaceholder;
-      document.getElementById('dCat').placeholder = t.catPlaceholder;
       document.getElementById('dIng').placeholder = t.ingPlaceholder;
       document.getElementById('dAllergens').placeholder = t.allergensPlaceholder;
       document.getElementById('dRecipe').placeholder = t.recipePlaceholder;
@@ -624,7 +634,13 @@
       
       document.getElementById('editingId').value = d.id;
       document.getElementById('dName').value = d.name || '';
-      document.getElementById('dCat').value = d.category || '';
+      
+      // Set category radio
+      const radios = document.getElementsByName('dCatRadio');
+      for (let r of radios) {
+        r.checked = (r.value === d.category);
+      }
+
       document.getElementById('dIng').value = d.ingredients || '';
       document.getElementById('dAllergens').value = d.allergens || '';
       document.getElementById('dRecipe').value = d.recipe || '';
@@ -653,7 +669,10 @@
     function resetForm() {
       document.getElementById('editingId').value = '';
       document.getElementById('dName').value = '';
-      document.getElementById('dCat').value = '';
+      
+      const radios = document.getElementsByName('dCatRadio');
+      for (let r of radios) r.checked = false;
+
       document.getElementById('dIng').value = '';
       document.getElementById('dAllergens').value = '';
       document.getElementById('dRecipe').value = '';
@@ -676,7 +695,16 @@
       const t = i18n[currentLang];
       const id = document.getElementById('editingId').value;
       const name = document.getElementById('dName').value;
-      const category = document.getElementById('dCat').value;
+      
+      let category = '';
+      const radios = document.getElementsByName('dCatRadio');
+      for (let r of radios) {
+        if (r.checked) {
+          category = r.value;
+          break;
+        }
+      }
+
       const ingredients = document.getElementById('dIng').value;
       const allergens = document.getElementById('dAllergens').value;
       const recipe = document.getElementById('dRecipe').value;
