@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v2.0.2</title>
+  <title>Salonplafond BAR v2.0.3</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -15,7 +15,7 @@
     
     /* Splash Screen Animations */
     #splashScreen {
-      transition: opacity 0.8s ease-out, visibility 0.8s;
+      transition: opacity 0.8s ease-out;
     }
     .splash-logo-animate {
       animation: pulseLogo 1.5s ease-in-out infinite alternate;
@@ -35,8 +35,8 @@
 </head>
 <body class="p-4 md:p-8 max-w-6xl mx-auto pb-24" onclick="closeDropdowns(event)">
 
-  <!-- Intro / Splash Screen Animation (5 seconds) -->
-  <div id="splashScreen" class="fixed inset-0 z-[100] bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
+  <!-- Intro / Splash Screen Animation (5 seconds with click to skip) -->
+  <div id="splashScreen" onclick="dismissSplash()" class="fixed inset-0 z-[100] bg-slate-950 flex flex-col items-center justify-center p-6 text-center cursor-pointer" title="Klicken zum Überspringen">
     <div class="splash-logo-animate flex flex-col items-center gap-4">
       <!-- Salonplafond Custom Logo Box -->
       <div class="w-24 h-24 bg-amber-400 rounded-2xl flex flex-col items-center justify-center shadow-2xl p-2 text-slate-950 font-bold select-none border-2 border-amber-300">
@@ -53,10 +53,11 @@
     <div class="mt-8 flex flex-col items-center gap-2">
       <div class="w-8 h-8 border-4 border-amber-500/20 border-t-amber-400 rounded-full animate-spin"></div>
       <span class="text-xs font-semibold text-slate-400 tracking-widest uppercase">Lade Rezeptdatenbank...</span>
+      <span class="text-[10px] text-slate-500 mt-2">(Tippen zum Überspringen)</span>
     </div>
 
     <div class="absolute bottom-6 text-center">
-      <span class="text-xs font-semibold text-amber-400/80 block">v2.0.2</span>
+      <span class="text-xs font-semibold text-amber-400/80 block">v2.0.3</span>
       <span class="text-[11px] text-slate-500 font-medium">Erstellt von © T0mc1k (Tomas Kardos)</span>
     </div>
   </div>
@@ -70,7 +71,7 @@
       </div>
       <div>
         <h1 class="text-3xl font-bold tracking-tight text-amber-400">Salonplafond BAR</h1>
-        <span class="text-xs text-slate-400 font-medium">v2.0.2 • Erstellt von © T0mc1k (Tomas Kardos)</span>
+        <span class="text-xs text-slate-400 font-medium">v2.0.3 • Erstellt von © T0mc1k (Tomas Kardos)</span>
       </div>
     </div>
 
@@ -139,7 +140,7 @@
   <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 mb-6 -mt-4">
     <p id="subTitle" class="text-sm text-slate-400">Salonplafond • Rezepte & Getränkehandbuch</p>
     <div id="activeSeasonBadge" class="hidden px-3 py-1 bg-amber-500/10 border border-amber-500/30 rounded-full text-amber-400 text-xs font-semibold flex items-center gap-1.5">
-      <span>📦 <span id="archiveBadgeText">Saison:</span></span> <span id="activeSeasonName"></span>
+      <span>📦 <span id="archiveBadgeText">Aktive Saison:</span></span> <span id="activeSeasonName"></span>
     </div>
   </div>
 
@@ -298,7 +299,7 @@
 
   <!-- Footer Credit -->
   <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-    Salonplafond BAR App v2.0.2 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+    Salonplafond BAR App v2.0.3 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
   </footer>
 
   <!-- Modal Detail View -->
@@ -360,19 +361,26 @@
     const SUPABASE_KEY = "sb_publishable_2tw50zmlzxDClPx7zwnT3g_k2WiaUuL";
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Splash Screen Trigger (5 seconds, runs once per session)
+    // Splash Screen Trigger (5 seconds with safe auto-hide and click-to-dismiss)
+    function dismissSplash() {
+      const splash = document.getElementById('splashScreen');
+      if (splash && splash.style.display !== 'none') {
+        splash.style.opacity = '0';
+        setTimeout(() => {
+          splash.style.display = 'none';
+          sessionStorage.setItem('splashShown', 'true');
+        }, 800);
+      }
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       const splash = document.getElementById('splashScreen');
       if (!sessionStorage.getItem('splashShown')) {
         setTimeout(() => {
-          splash.style.opacity = '0';
-          setTimeout(() => {
-            splash.style.visibility = 'hidden';
-            sessionStorage.setItem('splashShown', 'true');
-          }, 800);
+          dismissSplash();
         }, 5000); // 5 seconds duration
       } else {
-        splash.style.display = 'none';
+        if (splash) splash.style.display = 'none';
       }
     });
 
@@ -607,7 +615,6 @@
       return seasons;
     }
 
-    // Automatically check which season matches today's date (format: "DD.MM.YYYY – DD.MM.YYYY")
     function determineActiveSeasonAutomatically() {
       const now = new Date();
       let matchedSeason = 'current';
@@ -921,7 +928,6 @@
       if (error) { console.error(error); return; }
       allDrinks = data || [];
       
-      // Automatically determine active season based on today's date upon first load
       currentSeasonFilter = determineActiveSeasonAutomatically();
       updateActiveSeasonBadgeUI();
 
@@ -985,7 +991,6 @@
         return matchesSeason && matchesCat && matchesSearch && matchesFilter;
       });
 
-      // Sort featured drinks to top
       filtered.sort((a, b) => (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0));
 
       const container = document.getElementById('drinksGrid');
@@ -1025,7 +1030,6 @@
                  '</div>';
         }).join('');
       } else {
-        // List Mode
         container.className = 'flex flex-col gap-3';
         container.innerHTML = filtered.map(d => {
           let photoHtml = d.photo_url 
@@ -1099,20 +1103,16 @@
         html += '<div class="flex gap-2 mb-4 text-xs text-slate-300">' + tags.map(tg => '<span class="px-2 py-0.5 bg-slate-800 rounded-md border border-slate-700">' + tg + '</span>').join('') + '</div>';
       }
 
-      // Professional Bar Card Table View (Glass, Method, Ice, Garnish, Ingredients)
       html += '<div class="mb-6 border border-slate-700 rounded-xl overflow-hidden bg-slate-950 text-xs text-slate-200">';
       
-      // Glass & Method Row
       html += '<div class="grid grid-cols-2 border-b border-slate-800 p-2.5 bg-slate-900/50">';
       html += '<div><span class="text-slate-400 font-semibold block">Glass:</span> ' + (d.glass_type || '-') + '</div>';
       html += '<div><span class="text-slate-400 font-semibold block">Method:</span> ' + (d.method || '-') + '</div>';
       html += '</div>';
 
-      // Ice Row
       html += '<div class="border-b border-slate-800 p-2.5 bg-slate-900/30">';
       html += '<span class="text-slate-400 font-semibold block">Ice:</span> ' + (d.ice || '-') + '</div>';
 
-      // Ingredients & Amount Table
       html += '<div class="p-2.5 border-b border-slate-800">';
       html += '<div class="grid grid-cols-2 font-bold text-amber-400 pb-1.5 border-b border-slate-800 mb-1.5"><span>Ingredients:</span><span>Amount:</span></div>';
       
@@ -1127,13 +1127,11 @@
       }
       html += '</div>';
 
-      // Garnish Row
       html += '<div class="p-2.5 bg-slate-900/30">';
       html += '<span class="text-slate-400 font-semibold block">Garnish:</span> ' + (d.garnish || '-') + '</div>';
 
-      html += '</div>'; // End Card Table
+      html += '</div>';
 
-      // Allergens
       if (d.allergens) {
         html += '<div class="mb-4 bg-amber-500/10 p-3 rounded-xl border border-amber-500/30 text-xs text-white">';
         html += '<p class="font-bold mb-0.5 text-amber-400">' + t.allergensLabel + '</p>';
@@ -1141,7 +1139,6 @@
         html += '</div>';
       }
 
-      // Hideable Zubereitung / Recipe Section (Clean without Slovak text)
       if (d.recipe) {
         html += '<div class="mb-4 bg-slate-800/40 border border-slate-700/80 rounded-xl overflow-hidden">';
         html += '<button onclick="document.getElementById(\'recipeCollapse\').classList.toggle(\'hidden\')" class="w-full p-3 text-left font-bold text-amber-400 text-xs flex justify-between items-center bg-slate-800/80 hover:bg-slate-800 transition">';
@@ -1152,7 +1149,6 @@
         html += '</div>';
       }
 
-      // Manager-only Food Cost / Price view inside modal
       if (isAdmin && (d.cost_price || d.selling_price)) {
         let cost = parseFloat(d.cost_price) || 0;
         let price = parseFloat(d.selling_price) || 0;
@@ -1175,7 +1171,6 @@
         html += '</div>';
       }
 
-      // Last updated info & Action buttons
       html += '<div class="mt-6 pt-4 border-t border-slate-700 flex flex-wrap items-center justify-between gap-2">';
       if (d.updated_at) {
         let dateStr = new Date(d.updated_at).toLocaleDateString();
@@ -1270,7 +1265,6 @@
       document.getElementById('dGluten').checked = !!d.is_glutenfree;
       document.getElementById('dLactose').checked = !!d.is_lactosefree;
       
-      // Sync preset checkboxes with loaded allergens text
       const algText = (d.allergens || '').toLowerCase();
       document.querySelectorAll('.preset-alg').forEach(chk => {
         let label = chk.parentElement.textContent.trim().toLowerCase();
@@ -1368,7 +1362,7 @@
     async function saveDrink() {
       const t = i18n[currentLang];
       const id = document.getElementById('editingId').value;
-      const name = document.getElementById('dName'].value;
+      const name = document.getElementById('dName').value;
       
       let category = '';
       const radios = document.getElementsByName('dCatRadio');
@@ -1389,7 +1383,7 @@
 
       const cost_price = parseFloat(document.getElementById('dCost').value) || null;
       const selling_price = parseFloat(document.getElementById('dPrice').value) || null;
-      const allergens = document.getElementById('dAllergens').value;
+      const allergens = document.getElementById('dAllergens'].value;
       const recipe = document.getElementById('dRecipe').value;
       const photo_url = document.getElementById('dPhoto').value;
       const video_url = document.getElementById('dVideo').value;
