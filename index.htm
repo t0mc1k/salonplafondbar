@@ -68,26 +68,26 @@
 
           <div class="border-t border-slate-700 my-0.5"></div>
 
-          <!-- Season Modal Trigger Button -->
-          <button onclick="openSeasonModal()" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-2">
-            📅 <span id="seasonMenuBtnText">Saison wählen...</span>
-          </button>
-
           <!-- Language Section -->
           <div class="text-[10px] text-slate-400 font-bold px-2.5 pt-1" id="langMenuLabel">Sprache / Language</div>
           <div class="grid grid-cols-2 gap-1 px-1">
             <button onclick="setLang('de')" id="langDe" class="py-1 text-xs font-bold rounded bg-amber-500 text-slate-950 text-center">DE</button>
             <button onclick="setLang('en')" id="langEn" class="py-1 text-xs font-bold rounded text-slate-400 hover:text-white text-center bg-slate-900">EN</button>
           </div>
-          
+
           <div class="border-t border-slate-700 my-0.5"></div>
+
+          <!-- Season Modal Trigger Button (3rd from bottom) -->
+          <button onclick="openSeasonModal()" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-2">
+            📅 <span id="seasonMenuBtnText">Saison wählen...</span>
+          </button>
           
-          <!-- Export Button -->
+          <!-- Export Button (2nd from bottom) -->
           <button onclick="exportToCSV()" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-2">
             📊 <span id="exportText">Export CSV</span>
           </button>
 
-          <!-- Support Modal Trigger -->
+          <!-- Support Modal Trigger (1st from bottom) -->
           <button onclick="openSupportModal()" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-700 text-xs font-semibold text-amber-400 flex items-center gap-2">
             ✉️ <span id="supportMenuText">Support / Feedback</span>
           </button>
@@ -128,7 +128,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <input type="text" id="dName" placeholder="Getränkename (z. B. Strawberry Kiss)" class="p-3 rounded bg-slate-900 border border-slate-700 text-white md:col-span-2">
       
-      <!-- New Category Selection Radios -->
+      <!-- Category Selection Radios -->
       <div class="md:col-span-2 bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col gap-2">
         <label class="text-xs text-slate-400 font-semibold" id="catSelectLabel">🏷️ Kategorie auswählen:</label>
         <div class="flex flex-wrap gap-3 text-xs text-slate-200" id="categoryRadios">
@@ -143,19 +143,19 @@
       <!-- Professional Bar Card Options: Method, Glass, Ice, Garnish -->
       <div class="md:col-span-2 bg-slate-900 p-4 rounded-xl border border-slate-700 grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label class="text-xs text-slate-400 font-semibold mb-1 block">🍸 Glas-Typ / Equipment:</label>
+          <label class="text-xs text-slate-400 font-semibold mb-1 block" id="lblGlass">🍸 Glas-Typ / Equipment:</label>
           <input type="text" id="dGlass" placeholder="z. B. Absinthe, Highball, Coupette" class="p-2.5 rounded bg-slate-950 border border-slate-800 text-white text-xs w-full">
         </div>
         <div>
-          <label class="text-xs text-slate-400 font-semibold mb-1 block">🥄 Method (Metóda):</label>
+          <label class="text-xs text-slate-400 font-semibold mb-1 block" id="lblMethod">🥄 Method (Metode):</label>
           <input type="text" id="dMethod" placeholder="z. B. Shake & fine strain, Stir, Build" class="p-2.5 rounded bg-slate-950 border border-slate-800 text-white text-xs w-full">
         </div>
         <div>
-          <label class="text-xs text-slate-400 font-semibold mb-1 block">🧊 Ice (Ľad):</label>
+          <label class="text-xs text-slate-400 font-semibold mb-1 block" id="lblIce">🧊 Ice (Eis):</label>
           <input type="text" id="dIce" placeholder="z. B. None, Cubed, Crushed" class="p-2.5 rounded bg-slate-950 border border-slate-800 text-white text-xs w-full">
         </div>
         <div>
-          <label class="text-xs text-slate-400 font-semibold mb-1 block">🍋 Garnish (Ozdoba):</label>
+          <label class="text-xs text-slate-400 font-semibold mb-1 block" id="lblGarnish">🍋 Garnish (Garnitur):</label>
           <input type="text" id="dGarnish" placeholder="z. B. Dried strawberry, Mint sprig" class="p-2.5 rounded bg-slate-950 border border-slate-800 text-white text-xs w-full">
         </div>
       </div>
@@ -163,8 +163,8 @@
       <!-- Structured Ingredients Table Input -->
       <div class="md:col-span-2 bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col gap-3">
         <div class="flex justify-between items-center">
-          <label class="text-xs text-slate-400 font-semibold">📋 Ingredients & Amount (Suroviny a Množstvá):</label>
-          <button type="button" onclick="addIngredientRow()" class="px-3 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 font-bold rounded-lg text-xs border border-amber-500/30">+ Surovina</button>
+          <label class="text-xs text-slate-400 font-semibold" id="lblIngHeader">📋 Zutaten & Mengen:</label>
+          <button type="button" onclick="addIngredientRow()" id="btnAddIngredient" class="px-3 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 font-bold rounded-lg text-xs border border-amber-500/30">+ Zutat hinzufügen</button>
         </div>
         <div id="ingredientRowsContainer" class="flex flex-col gap-2">
           <!-- Rows added dynamically -->
@@ -330,6 +330,14 @@
         formTitleEdit: "✏️ Getränk bearbeiten",
         namePlaceholder: "Getränkename (z. B. Strawberry Kiss)",
         catSelectLabel: "🏷️ Kategorie auswählen:",
+        lblGlass: "🍸 Glas-Typ / Equipment:",
+        lblMethod: "🥄 Method (Zubereitungsmethode):",
+        lblIce: "🧊 Ice (Eis):",
+        lblGarnish: "🍋 Garnish (Garnitur):",
+        lblIngHeader: "📋 Zutaten & Mengen:",
+        btnAddIngredient: "+ Zutat hinzufügen",
+        ingNamePlaceholder: "Zutat (z. B. Tequila)",
+        ingAmountPlaceholder: "Menge (z. B. 5cL, 2 Dashes)",
         seasonLabel: "📅 Saison / Zeitraum:",
         costLabel: "💶 Wareneinsatz (€):",
         priceLabel: "🏷️ Verkaufspreis (€):",
@@ -343,9 +351,10 @@
         loading: "Lade Getränke aus der Datenbank...",
         noDrinksFound: "Keine Getränke in dieser Saison gefunden.",
         addFirstDrink: "Fügen Sie oben das erste Getränk hinzu!",
-        ingredientsLabel: "📋 Ingredients / Suroviny:",
+        ingredientsLabel: "📋 Ingredients / Zutaten:",
         allergensLabel: "⚠️ Allergene:",
-        recipeLabel: "🥣 Zubereitung / Postup:",
+        recipeLabel: "Zubereitung",
+        toggleShowHide: "Anzeigen / Verbergen",
         lastUpdated: "Zuletzt aktualisiert:",
         deleteBtn: "Getränk löschen",
         editBtn: "Getränk bearbeiten",
@@ -385,6 +394,14 @@
         formTitleEdit: "✏️ Edit Drink",
         namePlaceholder: "Drink name (e.g. Strawberry Kiss)",
         catSelectLabel: "🏷️ Select Category:",
+        lblGlass: "🍸 Glass Type / Equipment:",
+        lblMethod: "🥄 Method:",
+        lblIce: "🧊 Ice:",
+        lblGarnish: "🍋 Garnish:",
+        lblIngHeader: "📋 Ingredients & Amounts:",
+        btnAddIngredient: "+ Add Ingredient",
+        ingNamePlaceholder: "Ingredient (e.g. Tequila)",
+        ingAmountPlaceholder: "Amount (e.g. 5cL, 2 Dashes)",
         seasonLabel: "📅 Season / Period:",
         costLabel: "💶 Cost Price (€):",
         priceLabel: "🏷️ Selling Price (€):",
@@ -400,7 +417,8 @@
         addFirstDrink: "Add the first drink using the form above!",
         ingredientsLabel: "📋 Ingredients:",
         allergensLabel: "⚠️ Allergens:",
-        recipeLabel: "🥣 Preparation:",
+        recipeLabel: "Preparation",
+        toggleShowHide: "Show / Hide",
         lastUpdated: "Last updated:",
         deleteBtn: "Delete Drink",
         editBtn: "Edit Drink",
@@ -423,13 +441,14 @@
     function addIngredientRow(name = '', amount = '') {
       const container = document.getElementById('ingredientRowsContainer');
       const rowId = 'ing_row_' + Date.now() + '_' + Math.random().toString(36).substring(2, 5);
+      const t = i18n[currentLang];
       
       const div = document.createElement('div');
       div.id = rowId;
       div.className = 'flex gap-2 items-center';
       div.innerHTML = `
-        <input type="text" placeholder="Ingredient (z. B. Tequila)" value="${name}" class="ing-name flex-1 p-2 rounded bg-slate-950 border border-slate-800 text-white text-xs">
-        <input type="text" placeholder="Amount (z. B. 5cL, 2 Dashes)" value="${amount}" class="ing-amount w-36 p-2 rounded bg-slate-950 border border-slate-800 text-white text-xs">
+        <input type="text" placeholder="${t.ingNamePlaceholder}" value="${name}" class="ing-name flex-1 p-2 rounded bg-slate-950 border border-slate-800 text-white text-xs">
+        <input type="text" placeholder="${t.ingAmountPlaceholder}" value="${amount}" class="ing-amount w-36 p-2 rounded bg-slate-950 border border-slate-800 text-white text-xs">
         <button type="button" onclick="document.getElementById('${rowId}').remove()" class="text-red-400 hover:text-red-300 p-2 text-base font-bold">&times;</button>
       `;
       container.appendChild(div);
@@ -626,6 +645,14 @@
       document.getElementById('catLabel').innerText = t.catLabel;
       document.getElementById('filterLabel').innerText = t.filterLabel;
       document.getElementById('catSelectLabel').innerText = t.catSelectLabel;
+      
+      document.getElementById('lblGlass').innerText = t.lblGlass;
+      document.getElementById('lblMethod').innerText = t.lblMethod;
+      document.getElementById('lblIce').innerText = t.lblIce;
+      document.getElementById('lblGarnish').innerText = t.lblGarnish;
+      document.getElementById('lblIngHeader').innerText = t.lblIngHeader;
+      document.getElementById('btnAddIngredient').innerText = t.btnAddIngredient;
+
       document.getElementById('seasonLabel').innerText = t.seasonLabel;
       document.getElementById('costLabel').innerText = t.costLabel;
       document.getElementById('priceLabel').innerText = t.priceLabel;
@@ -980,12 +1007,12 @@
         html += '</div>';
       }
 
-      // Hideable Zubereitung / Recipe Section
+      // Hideable Zubereitung / Recipe Section (Clean without Slovak text)
       if (d.recipe) {
         html += '<div class="mb-4 bg-slate-800/40 border border-slate-700/80 rounded-xl overflow-hidden">';
         html += '<button onclick="document.getElementById(\'recipeCollapse\').classList.toggle(\'hidden\')" class="w-full p-3 text-left font-bold text-amber-400 text-xs flex justify-between items-center bg-slate-800/80 hover:bg-slate-800 transition">';
         html += '<span>🥣 ' + t.recipeLabel + '</span>';
-        html += '<span class="text-slate-400 text-xs">▼ Anzeigen/Verbergen</span>';
+        html += '<span class="text-slate-400 text-xs">▼ ' + t.toggleShowHide + '</span>';
         html += '</button>';
         html += '<div id="recipeCollapse" class="hidden p-4 text-xs text-slate-200 whitespace-pre-line border-t border-slate-700/60 bg-slate-950/50">' + d.recipe + '</div>';
         html += '</div>';
