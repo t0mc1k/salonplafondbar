@@ -82,7 +82,7 @@
           </button>
 
           <!-- Support Modal Trigger -->
-          <button onclick="openSupportModal()" class="w-full text-left px-2 py-1.5 rounded hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-2">
+          <button onclick="openSupportModal()" class="w-full text-left px-2 py-1.5 rounded hover:bg-slate-700 text-xs font-semibold text-amber-400 flex items-center gap-2">
             ✉️ <span id="supportMenuText">Support / Feedback</span>
           </button>
 
@@ -135,13 +135,13 @@
         </div>
       </div>
 
-      <!-- Season Selector for Drink -->
+      <!-- Season Selector for Drink with Custom Creation Option -->
       <div class="md:col-span-2 bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col gap-2">
         <label class="text-xs text-slate-400 font-semibold" id="seasonLabel">📅 Saison / Zeitraum:</label>
-        <select id="dSeason" class="p-3 rounded bg-slate-950 border border-slate-800 text-white text-xs">
+        <select id="dSeason" onchange="handleSeasonSelectChange(this)" class="p-3 rounded bg-slate-950 border border-slate-800 text-white text-xs">
           <option value="current">✨ Aktuelle Saison (01.11.2026 – 01.01.2027)</option>
           <option value="archive_sep_nov_2026">📦 Archiv: 01.09.2026 – 01.11.2026</option>
-          <option value="archive_older">📦 Archiv: Ältere Saisonen</option>
+          <option value="addNew">➕ Neue Saison erstellen...</option>
         </select>
       </div>
 
@@ -215,7 +215,7 @@
 
   <!-- Footer Credit -->
   <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-    Salonplafond BAR App v1.8.5 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+    Salonplafond BAR App v1.8.4 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
   </footer>
 
   <!-- Modal Detail View -->
@@ -243,30 +243,8 @@
         Wähle die aktive Saison oder das Archiv aus, um die entsprechenden Getränke anzuzeigen:
       </p>
       
-      <div class="flex flex-col gap-2 mt-2">
-        <button onclick="selectSeason('current')" class="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left transition flex items-center justify-between group">
-          <div>
-            <div class="text-sm font-bold text-white group-hover:text-amber-400">✨ Aktuelle Saison</div>
-            <div class="text-xs text-slate-400">01.11.2026 – 01.01.2027</div>
-          </div>
-          <span class="text-xs text-amber-400 font-semibold">Aktivieren →</span>
-        </button>
-
-        <button onclick="selectSeason('archive_sep_nov_2026')" class="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left transition flex items-center justify-between group">
-          <div>
-            <div class="text-sm font-bold text-white group-hover:text-amber-400">📦 Archiv: Vorherige Saison</div>
-            <div class="text-xs text-slate-400">01.09.2026 – 01.11.2026</div>
-          </div>
-          <span class="text-xs text-amber-400 font-semibold">Öffnen →</span>
-        </button>
-
-        <button onclick="selectSeason('archive_older')" class="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left transition flex items-center justify-between group">
-          <div>
-            <div class="text-sm font-bold text-white group-hover:text-amber-400">📦 Archiv: Ältere Saisonen</div>
-            <div class="text-xs text-slate-400">Frühere Menükarten & Klassiker</div>
-          </div>
-          <span class="text-xs text-amber-400 font-semibold">Öffnen →</span>
-        </button>
+      <div id="seasonModalList" class="flex flex-col gap-2 mt-2">
+        <!-- Dynamic Season List -->
       </div>
 
       <div class="mt-4 pt-3 border-t border-slate-800 flex justify-end">
@@ -304,7 +282,7 @@
     let allDrinks = [];
     let selectedCat = 'All';
     let activeSpecialFilter = null;
-    let currentSeasonFilter = 'current'; // 'current' or specific archive key
+    let currentSeasonFilter = 'current'; // 'current' or specific season name
     let isAdmin = false;
     const MANAGER_PASSWORD = "salon123";
 
@@ -319,7 +297,7 @@
         seasonMenuBtnText: "Saison wählen...",
         seasonModalTitle: "📅 Saison & Archiv wählen",
         seasonModalDesc: "Wähle die aktive Saison oder das Archiv aus, um die entsprechenden Getränke anzuzeigen:",
-        archiveBadgeText: "Archiv:",
+        archiveBadgeText: "Saison:",
         langMenuLabel: "Sprache / Language",
         exportText: "CSV Export",
         supportText: "Support / Feedback",
@@ -382,7 +360,7 @@
         seasonMenuBtnText: "Select Season...",
         seasonModalTitle: "📅 Select Season & Archive",
         seasonModalDesc: "Choose the active season or archive to view the corresponding drinks:",
-        archiveBadgeText: "Archive:",
+        archiveBadgeText: "Season:",
         langMenuLabel: "Language",
         exportText: "CSV Export",
         supportText: "Support / Feedback",
@@ -452,6 +430,7 @@
 
     function openSeasonModal() {
       document.getElementById('settingsDropdown').classList.add('hidden');
+      renderSeasonModalList();
       document.getElementById('seasonModal').classList.remove('hidden');
       document.getElementById('seasonModal').classList.add('flex');
     }
@@ -459,6 +438,67 @@
     function closeSeasonModal() {
       document.getElementById('seasonModal').classList.remove('flex');
       document.getElementById('seasonModal').classList.add('hidden');
+    }
+
+    function getAllSeasons() {
+      let seasons = ['current', '01.09.2026 – 01.11.2026', '01.11.2026 – 01.01.2027'];
+      allDrinks.forEach(d => {
+        if (d.season && !seasons.includes(d.season)) {
+          seasons.push(d.season);
+        }
+      });
+      return seasons;
+    }
+
+    function renderSeasonModalList() {
+      const seasons = getAllSeasons();
+      const listContainer = document.getElementById('seasonModalList');
+      
+      listContainer.innerHTML = seasons.map(s => {
+        let label = s === 'current' ? '✨ Aktuelle Saison (Standard)' : `📦 Saison / Archiv: ${s}`;
+        let activeClass = currentSeasonFilter === s ? 'border-amber-400 bg-amber-500/10' : 'bg-slate-800 border-slate-700 hover:bg-slate-700';
+        return `
+          <button onclick="selectSeason('${s}')" class="p-3 rounded-xl ${activeClass} border text-left transition flex items-center justify-between group">
+            <div>
+              <div class="text-sm font-bold text-white group-hover:text-amber-400">${label}</div>
+            </div>
+            <span class="text-xs text-amber-400 font-semibold">${currentSeasonFilter === s ? 'Aktiv ✓' : 'Öffnen →'}</span>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function renderSeasonFormSelect(selectedVal = 'current') {
+      const seasons = getAllSeasons();
+      const select = document.getElementById('dSeason');
+      
+      let html = `<option value="current">✨ Aktuelle Saison (Standard)</option>`;
+      seasons.forEach(s => {
+        if (s !== 'current') {
+          html += `<option value="${s}" ${selectedVal === s ? 'selected' : ''}>📦 ${s}</option>`;
+        }
+      });
+      html += `<option value="addNew">➕ Neue Saison erstellen...</option>`;
+      select.innerHTML = html;
+      select.value = selectedVal;
+    }
+
+    function handleSeasonSelectChange(selectEl) {
+      if (selectEl.value === 'addNew') {
+        let newSeasonName = prompt(currentLang === 'de' ? 'Bitte geben Sie den Namen/Zeitraum der neuen Saison ein (z. B. 01.01.2027 – 01.04.2027):' : 'Please enter the name/period of the new season:');
+        if (newSeasonName && newSeasonName.trim() !== '') {
+          let formattedName = newSeasonName.trim();
+          let select = document.getElementById('dSeason');
+          
+          let opt = document.createElement('option');
+          opt.value = formattedName;
+          opt.text = `📦 ${formattedName}`;
+          select.insertBefore(opt, select.lastElementChild);
+          select.value = formattedName;
+        } else {
+          selectEl.value = 'current';
+        }
+      }
     }
 
     function selectSeason(seasonKey) {
@@ -474,11 +514,7 @@
       } else {
         badge.classList.remove('hidden');
         badge.classList.add('flex');
-        if (seasonKey === 'archive_sep_nov_2026') {
-          seasonNameEl.innerText = "01.09.2026 – 01.11.2026";
-        } else {
-          seasonNameEl.innerText = "Ältere Saisonen / Older Seasons";
-        }
+        seasonNameEl.innerText = seasonKey;
       }
 
       renderCategories();
@@ -687,6 +723,7 @@
       const { data, error } = await _supabase.from('drinks').select('*').order('created_at', { ascending: false });
       if (error) { console.error(error); return; }
       allDrinks = data || [];
+      renderSeasonFormSelect(document.getElementById('dSeason').value);
       renderCategories();
       renderDrinks();
     }
@@ -969,7 +1006,7 @@
       const radios = document.getElementsByName('dCatRadio');
       for (let r of radios) r.checked = (r.value === d.category);
 
-      document.getElementById('dSeason').value = d.season || 'current';
+      renderSeasonFormSelect(d.season || 'current');
       document.getElementById('dGlass').value = d.glass_type || '';
       document.getElementById('dCost').value = d.cost_price || '';
       document.getElementById('dPrice').value = d.selling_price || '';
@@ -1002,7 +1039,7 @@
       const radios = document.getElementsByName('dCatRadio');
       for (let r of radios) r.checked = (r.value === d.category);
 
-      document.getElementById('dSeason').value = d.season || 'current';
+      renderSeasonFormSelect(d.season || 'current');
       document.getElementById('dGlass').value = d.glass_type || '';
       document.getElementById('dCost').value = d.cost_price || '';
       document.getElementById('dPrice').value = d.selling_price || '';
@@ -1038,7 +1075,7 @@
       const radios = document.getElementsByName('dCatRadio');
       for (let r of radios) r.checked = false;
 
-      document.getElementById('dSeason').value = 'current';
+      renderSeasonFormSelect('current');
       document.getElementById('dGlass').value = '';
       document.getElementById('dCost').value = '';
       document.getElementById('dPrice').value = '';
