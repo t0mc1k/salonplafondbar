@@ -67,6 +67,11 @@
         <button onclick="setViewMode('list')" id="viewList" class="px-2.5 py-1 text-xs font-bold rounded text-slate-400 hover:text-white flex items-center gap-1">☰ Liste</button>
       </div>
 
+      <!-- Export CSV Button -->
+      <button onclick="exportToCSV()" id="exportCsvBtn" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-semibold border border-slate-700 text-slate-300 flex items-center gap-1">
+        📊 <span id="exportText">Export CSV</span>
+      </button>
+
       <!-- Fullscreen Toggle -->
       <button onclick="toggleFullscreen()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-semibold border border-slate-700 text-slate-300 flex items-center gap-1">
         ⛶ <span id="fsText">Vollbild</span>
@@ -194,7 +199,7 @@
 
   <!-- Footer Credit -->
   <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-    Salonplafond BAR App v1.7.7 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+    Salonplafond BAR App v1.7.8 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
   </footer>
 
   <!-- Modal Detail View -->
@@ -233,6 +238,7 @@
         waiterMode: "Modus: Kellner",
         managerMode: "Modus: Manager",
         allCategories: "Alle",
+        exportText: "CSV Export",
         formTitleAdd: "➕ Neues Getränk hinzufügen",
         formTitleEdit: "✏️ Getränk bearbeiten",
         namePlaceholder: "Getränkename (z. B. Aperol Spritz)",
@@ -283,6 +289,7 @@
         waiterMode: "Mode: Waiter",
         managerMode: "Mode: Manager",
         allCategories: "All",
+        exportText: "CSV Export",
         formTitleAdd: "➕ Add New Drink",
         formTitleEdit: "✏️ Edit Drink",
         namePlaceholder: "Drink name (e.g. Aperol Spritz)",
@@ -357,6 +364,7 @@
       document.getElementById('searchInput').placeholder = t.searchPlaceholder;
       document.getElementById('modeBtn').innerText = isAdmin ? t.managerMode : t.waiterMode;
       document.getElementById('fsText').innerText = t.fullscreen;
+      document.getElementById('exportText').innerText = t.exportText;
       document.getElementById('catLabel').innerText = t.catLabel;
       document.getElementById('filterLabel').innerText = t.filterLabel;
       document.getElementById('catSelectLabel').innerText = t.catSelectLabel;
@@ -428,6 +436,42 @@
       }
 
       renderDrinks();
+    }
+
+    function exportToCSV() {
+      if (!allDrinks || allDrinks.length === 0) {
+        alert("Keine Getränke zum Exportieren vorhanden.");
+        return;
+      }
+
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "Name;Category;Glass;CostPrice;SellingPrice;Ingredients;Allergens;Recipe;Vegan;Glutenfree;Lactosefree;Featured\r\n";
+
+      allDrinks.forEach(d => {
+        let row = [
+          `"${(d.name || '').replace(/"/g, '""')}"`,
+          `"${(d.category || '').replace(/"/g, '""')}"`,
+          `"${(d.glass_type || '').replace(/"/g, '""')}"`,
+          d.cost_price || 0,
+          d.selling_price || 0,
+          `"${(d.ingredients || '').replace(/"/g, '""')}"`,
+          `"${(d.allergens || '').replace(/"/g, '""')}"`,
+          `"${(d.recipe || '').replace(/"/g, '""')}"`,
+          d.is_vegan ? 'Yes' : 'No',
+          d.is_glutenfree ? 'Yes' : 'No',
+          d.is_lactosefree ? 'Yes' : 'No',
+          d.is_featured ? 'Yes' : 'No'
+        ];
+        csvContent += row.join(";") + "\r\n";
+      });
+
+      let encodedUri = encodeURI(csvContent);
+      let link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `salonplafond_bar_export_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
 
     async function uploadImageToSupabase(event) {
