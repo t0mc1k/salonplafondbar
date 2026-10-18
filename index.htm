@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v2.0.0</title>
+  <title>Salonplafond BAR v2.0.2</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -15,7 +15,7 @@
     
     /* Splash Screen Animations */
     #splashScreen {
-      transition: opacity 0.6s ease-out, visibility 0.6s;
+      transition: opacity 0.8s ease-out, visibility 0.8s;
     }
     .splash-logo-animate {
       animation: pulseLogo 1.5s ease-in-out infinite alternate;
@@ -35,7 +35,7 @@
 </head>
 <body class="p-4 md:p-8 max-w-6xl mx-auto pb-24" onclick="closeDropdowns(event)">
 
-  <!-- Intro / Splash Screen Animation -->
+  <!-- Intro / Splash Screen Animation (5 seconds) -->
   <div id="splashScreen" class="fixed inset-0 z-[100] bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
     <div class="splash-logo-animate flex flex-col items-center gap-4">
       <!-- Salonplafond Custom Logo Box -->
@@ -56,7 +56,7 @@
     </div>
 
     <div class="absolute bottom-6 text-center">
-      <span class="text-xs font-semibold text-amber-400/80 block">v2.0.0</span>
+      <span class="text-xs font-semibold text-amber-400/80 block">v2.0.2</span>
       <span class="text-[11px] text-slate-500 font-medium">Erstellt von © T0mc1k (Tomas Kardos)</span>
     </div>
   </div>
@@ -70,7 +70,7 @@
       </div>
       <div>
         <h1 class="text-3xl font-bold tracking-tight text-amber-400">Salonplafond BAR</h1>
-        <span class="text-xs text-slate-400 font-medium">v2.0.0 • Erstellt von © T0mc1k (Tomas Kardos)</span>
+        <span class="text-xs text-slate-400 font-medium">v2.0.2 • Erstellt von © T0mc1k (Tomas Kardos)</span>
       </div>
     </div>
 
@@ -189,7 +189,7 @@
           <input type="text" id="dMethod" placeholder="z. B. Shake & fine strain, Stir, Build" class="p-2.5 rounded bg-slate-950 border border-slate-800 text-white text-xs w-full">
         </div>
         <div>
-          <label class="text-xs text-slate-400 font-semibold mb-1 block" id="lblIce">Eis):</label>
+          <label class="text-xs text-slate-400 font-semibold mb-1 block" id="lblIce">🧊 Ice (Eis):</label>
           <input type="text" id="dIce" placeholder="z. B. None, Cubed, Crushed" class="p-2.5 rounded bg-slate-950 border border-slate-800 text-white text-xs w-full">
         </div>
         <div>
@@ -220,13 +220,13 @@
           <!-- Pre-selected Common Allergens Checkboxes -->
           <div>
             <label class="text-[11px] text-slate-400 font-semibold mb-1.5 block" id="lblQuickAllergens">Häufige Allergene auswählen:</label>
-            <div class="flex flex-wrap gap-2 text-xs text-slate-300">
-              <label class="flex items-center gap-1.5 bg-slate-900 px-2.5 py-1.5 rounded border border-slate-800 cursor-pointer"><input type="checkbox" onchange="togglePresetAllergen('Sulfite', this.checked)" class="preset-alg accent-amber-500"> Sulfite</label>
-              <label class="flex items-center gap-1.5 bg-slate-900 px-2.5 py-1.5 rounded border border-slate-800 cursor-pointer"><input type="checkbox" onchange="togglePresetAllergen('Gluten', this.checked)" class="preset-alg accent-amber-500"> Gluten</label>
-              <label class="flex items-center gap-1.5 bg-slate-900 px-2.5 py-1.5 rounded border border-slate-800 cursor-pointer"><input type="checkbox" onchange="togglePresetAllergen('Laktose', this.checked)" class="preset-alg accent-amber-500"> Laktose</label>
-              <label class="flex items-center gap-1.5 bg-slate-900 px-2.5 py-1.5 rounded border border-slate-800 cursor-pointer"><input type="checkbox" onchange="togglePresetAllergen('Ei', this.checked)" class="preset-alg accent-amber-500"> Ei</label>
-              <label class="flex items-center gap-1.5 bg-slate-900 px-2.5 py-1.5 rounded border border-slate-800 cursor-pointer"><input type="checkbox" onchange="togglePresetAllergen('Nüsse', this.checked)" class="preset-alg accent-amber-500"> Nüsse</label>
-              <label class="flex items-center gap-1.5 bg-slate-900 px-2.5 py-1.5 rounded border border-slate-800 cursor-pointer"><input type="checkbox" onchange="togglePresetAllergen('Soja', this.checked)" class="preset-alg accent-amber-500"> Soja</label>
+            <div class="flex flex-wrap items-center gap-2 text-xs text-slate-300">
+              <label class="flex items-center gap-1.5 bg-slate-900 px-3 py-2 rounded-lg border border-slate-800 cursor-pointer"><input type="checkbox" onchange="togglePresetAllergen('Sulfite', this.checked)" class="preset-alg accent-amber-500"> Sulfite</label>
+              <label class="flex items-center gap-1.5 bg-slate-900 px-3 py-2 rounded-lg border border-slate-800 cursor-pointer"><input type="checkbox" onchange="togglePresetAllergen('Gluten', this.checked)" class="preset-alg accent-amber-500"> Gluten</label>
+              <label class="flex items-center gap-1.5 bg-slate-900 px-3 py-2 rounded-lg border border-slate-800 cursor-pointer"><input type="checkbox" onchange="togglePresetAllergen('Laktose', this.checked)" class="preset-alg accent-amber-500"> Laktose</label>
+              <label class="flex items-center gap-1.5 bg-slate-900 px-3 py-2 rounded-lg border border-slate-800 cursor-pointer"><input type="checkbox" onchange="togglePresetAllergen('Ei', this.checked)" class="preset-alg accent-amber-500"> Ei</label>
+              <label class="flex items-center gap-1.5 bg-slate-900 px-3 py-2 rounded-lg border border-slate-800 cursor-pointer"><input type="checkbox" onchange="togglePresetAllergen('Nüsse', this.checked)" class="preset-alg accent-amber-500"> Nüsse</label>
+              <label class="flex items-center gap-1.5 bg-slate-900 px-3 py-2 rounded-lg border border-slate-800 cursor-pointer"><input type="checkbox" onchange="togglePresetAllergen('Soja', this.checked)" class="preset-alg accent-amber-500"> Soja</label>
             </div>
           </div>
 
@@ -244,10 +244,11 @@
 
       <!-- Season Selector for Drink -->
       <div class="md:col-span-2 bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col gap-2">
-        <label class="text-xs text-slate-400 font-semibold" id="seasonLabel">📅 Saison / Zeitraum:</label>
+        <label class="text-xs text-slate-400 font-semibold" id="seasonLabel">📅 Saison / Zeitraum (z. B. 01.11.2026 – 31.12.2026):</label>
         <select id="dSeason" onchange="handleSeasonSelectChange(this)" class="p-3 rounded bg-slate-950 border border-slate-800 text-white text-xs">
           <option value="current">✨ Aktuelle Saison (Standard)</option>
-          <option value="01.09.2026 – 01.11.2026">📦 Archiv: 01.09.2026 – 01.11.2026</option>
+          <option value="01.09.2026 – 31.10.2026">📦 Archiv: 01.09.2026 – 31.10.2026</option>
+          <option value="01.11.2026 – 31.12.2026">📦 Zukünftig: 01.11.2026 – 31.12.2026</option>
           <option value="addNew">➕ Neue Saison erstellen...</option>
         </select>
       </div>
@@ -297,7 +298,7 @@
 
   <!-- Footer Credit -->
   <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-    Salonplafond BAR App v2.0.0 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+    Salonplafond BAR App v2.0.2 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
   </footer>
 
   <!-- Modal Detail View -->
@@ -359,7 +360,7 @@
     const SUPABASE_KEY = "sb_publishable_2tw50zmlzxDClPx7zwnT3g_k2WiaUuL";
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Splash Screen Trigger (Runs once per session)
+    // Splash Screen Trigger (5 seconds, runs once per session)
     window.addEventListener('DOMContentLoaded', () => {
       const splash = document.getElementById('splashScreen');
       if (!sessionStorage.getItem('splashShown')) {
@@ -368,8 +369,8 @@
           setTimeout(() => {
             splash.style.visibility = 'hidden';
             sessionStorage.setItem('splashShown', 'true');
-          }, 600);
-        }, 1800);
+          }, 800);
+        }, 5000); // 5 seconds duration
       } else {
         splash.style.display = 'none';
       }
@@ -380,7 +381,7 @@
     let allDrinks = [];
     let selectedCat = 'All';
     let activeSpecialFilter = null;
-    let currentSeasonFilter = 'current'; // 'current' or specific season name
+    let currentSeasonFilter = 'current'; // Automatically determined by current date
     let isAdmin = false;
     const MANAGER_PASSWORD = "salon123";
 
@@ -395,9 +396,9 @@
         seasonMenuBtnText: "Saison wählen...",
         seasonModalTitle: "📅 Saison & Archiv wählen",
         seasonModalDesc: "Wähle die aktive Saison oder das Archiv aus, um die entsprechenden Getränke anzuzeigen:",
-        archiveBadgeText: "Saison:",
+        archiveBadgeText: "Aktive Saison:",
         langMenuLabel: "Sprache / Language",
-        exportText: "CSV Export",
+        exportText: "Export CSV",
         supportText: "Support / Feedback",
         supportModalTitle: "✉️ Support & Feedback",
         supportModalDesc: "Möchtest du ein Rezept ändern, ein neues Getränk hinzufügen oder hast du einen Verbesserungsvorschlag? Sende direkt eine Nachricht an den Entwickler (Tomas Kardos).",
@@ -461,7 +462,7 @@
         seasonMenuBtnText: "Select Season...",
         seasonModalTitle: "📅 Select Season & Archive",
         seasonModalDesc: "Choose the active season or archive to view the corresponding drinks:",
-        archiveBadgeText: "Season:",
+        archiveBadgeText: "Active Season:",
         langMenuLabel: "Language",
         exportText: "CSV Export",
         supportText: "Support / Feedback",
@@ -597,7 +598,7 @@
     }
 
     function getAllSeasons() {
-      let seasons = ['current', '01.09.2026 – 01.11.2026'];
+      let seasons = ['current', '01.09.2026 – 31.10.2026', '01.11.2026 – 31.12.2026'];
       allDrinks.forEach(d => {
         if (d.season && !seasons.includes(d.season)) {
           seasons.push(d.season);
@@ -606,12 +607,53 @@
       return seasons;
     }
 
+    // Automatically check which season matches today's date (format: "DD.MM.YYYY – DD.MM.YYYY")
+    function determineActiveSeasonAutomatically() {
+      const now = new Date();
+      let matchedSeason = 'current';
+
+      allDrinks.forEach(d => {
+        if (d.season && d.season !== 'current' && d.season.includes('–')) {
+          let parts = d.season.split('–').map(s => s.trim());
+          if (parts.length === 2) {
+            let [startDay, startMonth, startYear] = parts[0].split('.').map(Number);
+            let [endDay, endMonth, endYear] = parts[1].split('.').map(Number);
+
+            if (startYear && endYear && startMonth && endMonth && startDay && endDay) {
+              let startDate = new Date(startYear, startMonth - 1, startDay);
+              let endDate = new Date(endYear, endMonth - 1, endDay, 23, 59, 59);
+
+              if (now >= startDate && now <= endDate) {
+                matchedSeason = d.season;
+              }
+            }
+          }
+        }
+      });
+
+      return matchedSeason;
+    }
+
+    function updateActiveSeasonBadgeUI() {
+      const badge = document.getElementById('activeSeasonBadge');
+      const seasonNameEl = document.getElementById('activeSeasonName');
+
+      if (currentSeasonFilter === 'current') {
+        badge.classList.remove('flex');
+        badge.classList.add('hidden');
+      } else {
+        badge.classList.remove('hidden');
+        badge.classList.add('flex');
+        seasonNameEl.innerText = currentSeasonFilter;
+      }
+    }
+
     function renderSeasonModalList() {
       const seasons = getAllSeasons();
       const listContainer = document.getElementById('seasonModalList');
       
       listContainer.innerHTML = seasons.map(s => {
-        let label = s === 'current' ? '✨ Aktuelle Saison (Standard)' : `📦 Saison / Archiv: ${s}`;
+        let label = s === 'current' ? '✨ Aktuelle Saison (Standard)' : `📦 Saison: ${s}`;
         let activeClass = currentSeasonFilter === s ? 'border-amber-400 bg-amber-500/10' : 'bg-slate-800 border-slate-700 hover:bg-slate-700';
         return `
           <button onclick="selectSeason('${s}')" class="p-3 rounded-xl ${activeClass} border text-left transition flex items-center justify-between group">
@@ -641,7 +683,7 @@
 
     function handleSeasonSelectChange(selectEl) {
       if (selectEl.value === 'addNew') {
-        let newSeasonName = prompt(currentLang === 'de' ? 'Bitte geben Sie den Namen/Zeitraum der neuen Saison ein:' : 'Please enter the name/period of the new season:');
+        let newSeasonName = prompt(currentLang === 'de' ? 'Bitte geben Sie den Zeitraum ein (z. B. 01.11.2026 – 31.12.2026):' : 'Please enter the period (e.g. 01.11.2026 – 31.12.2026):');
         if (newSeasonName && newSeasonName.trim() !== '') {
           let formattedName = newSeasonName.trim();
           let select = document.getElementById('dSeason');
@@ -660,19 +702,7 @@
     function selectSeason(seasonKey) {
       currentSeasonFilter = seasonKey;
       closeSeasonModal();
-
-      const badge = document.getElementById('activeSeasonBadge');
-      const seasonNameEl = document.getElementById('activeSeasonName');
-
-      if (seasonKey === 'current') {
-        badge.classList.remove('flex');
-        badge.classList.add('hidden');
-      } else {
-        badge.classList.remove('hidden');
-        badge.classList.add('flex');
-        seasonNameEl.innerText = seasonKey;
-      }
-
+      updateActiveSeasonBadgeUI();
       renderCategories();
       renderDrinks();
     }
@@ -890,6 +920,11 @@
       const { data, error } = await _supabase.from('drinks').select('*').order('created_at', { ascending: false });
       if (error) { console.error(error); return; }
       allDrinks = data || [];
+      
+      // Automatically determine active season based on today's date upon first load
+      currentSeasonFilter = determineActiveSeasonAutomatically();
+      updateActiveSeasonBadgeUI();
+
       renderSeasonFormSelect(document.getElementById('dSeason').value);
       renderCategories();
       renderDrinks();
@@ -1333,7 +1368,7 @@
     async function saveDrink() {
       const t = i18n[currentLang];
       const id = document.getElementById('editingId').value;
-      const name = document.getElementById('dName').value;
+      const name = document.getElementById('dName'].value;
       
       let category = '';
       const radios = document.getElementsByName('dCatRadio');
