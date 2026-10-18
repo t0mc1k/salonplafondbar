@@ -372,13 +372,13 @@
     </div>
   </div>
 
-  <!-- Motivation / Spruch des Tages Modal Dialog (Nové okno pre náhodné nemecké hlášky) -->
+  <!-- Motivation / Spruch des Tages Modal Dialog -->
   <div id="motivationModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
     <div class="card max-w-md w-full bg-slate-900 border-amber-500/50 p-6 relative flex flex-col gap-4 text-center shadow-2xl">
       <button onclick="closeMotivationModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
       <div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-2xl mx-auto flex items-center justify-center text-3xl border border-amber-500/30">🍸</div>
       <h3 class="text-xl font-bold text-amber-400">Salonplafond Motivation</h3>
-      <div id="motivationTextContainer" class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-sm text-slate-200 italic min-h-[80px] flex items-center justify-center">
+      <div id="motivationTextContainer" class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-sm text-slate-200 italic min-h-[90px] flex items-center justify-center">
         <!-- Sem sa náhodne načíta text -->
       </div>
       <div class="flex gap-2 mt-2">
@@ -436,8 +436,9 @@
       }
     });
 
-    // Zoznam skvelých nemeckých motivačných a barových hlášok pre personál
+    // Zoznam nemeckých motivačných a špeciálnych hlášok pre tím
     const motivationalQuotes = [
+      "„Weißt du, wer der beste Spüler im Salonplafond ist? Natürlich Tomas, der auch diese App für euch erstellt hat, um euch die Arbeit zu erleichtern! Er grüßt euch und freut sich, dass ihr diese App nutzt, da ihn die Programmierung viel Arbeit gekostet hat!“ 🧽✨",
       "„Wer nie vom Weg abkommt, bleibt auf der Strecke. Weitermachen, Team!“ 🚀",
       "„Gute Getränke heben die Laune, aber ein starkes Team rockt den ganzen Abend!“ 🍸",
       "„Auch der längste Shift geht einmal vorbei. Tschakka, du schaffst das!“ 💪",
@@ -446,8 +447,7 @@
       "„Wer heute gaaaanz entspannt bleibt, kriegt den Rush locker gebacken!“ 🧊",
       "„Kleine Schritte führen zum Ziel. Und heute Abend rocken wir den Laden!“ 🔥",
       "„Der frühe Vogel fängt den Wurm, aber der Barkeeper rettet den Abend!“ 🍋",
-      "„Lass dich nicht stressen, du bist der Star hinter der Theke!“ ⭐",
-      "„Jeder Gast verlässt das Salonplafond glücklicher dank eurer Magie!“ 🪄"
+      "„Lass dich nicht stressen, du bist der Star hinter der Theke!“ ⭐"
     ];
 
     function showRandomMotivation(event) {
