@@ -53,7 +53,7 @@
         <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs font-bold bg-slate-700/50 hover:bg-slate-700 w-4 h-4 rounded-full items-center justify-center">&times;</button>
       </div>
 
-      <!-- Settings Dropdown Menu (Language, Export & Support Modal Trigger) -->
+      <!-- Settings Dropdown Menu -->
       <div class="relative">
         <button onclick="toggleSettingsMenu(event)" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-semibold border border-slate-700 text-slate-300 flex items-center gap-1">
           ⚙️ <span id="menuText">Menü</span>
@@ -192,7 +192,7 @@
 
   <!-- Footer Credit -->
   <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-    Salonplafond BAR App v1.8.2 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+    Salonplafond BAR App v1.8.3 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
   </footer>
 
   <!-- Modal Detail View -->
@@ -765,7 +765,7 @@
         html += '</div>';
       }
 
-      // Last updated info & Manager buttons
+      // Last updated info & Action buttons (Edit always available, prompts password if not admin)
       html += '<div class="mt-6 pt-4 border-t border-slate-700 flex flex-wrap items-center justify-between gap-2">';
       if (d.updated_at) {
         let dateStr = new Date(d.updated_at).toLocaleDateString();
@@ -774,13 +774,13 @@
         html += '<span></span>';
       }
 
+      html += '<div class="flex gap-2 no-print">';
+      html += '<button onclick="event.stopPropagation(); duplicateDrink(\'' + d.id + '\')" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-lg border border-slate-700 transition">📄 ' + t.duplicateBtn + '</button>';
+      html += '<button onclick="event.stopPropagation(); requestEditDrink(\'' + d.id + '\')" class="px-3 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-semibold rounded-lg border border-amber-500/20 transition">✏️ ' + t.editBtn + '</button>';
       if (isAdmin) {
-        html += '<div class="flex gap-2 no-print">';
-        html += '<button onclick="event.stopPropagation(); duplicateDrink(\'' + d.id + '\')" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-lg border border-slate-700 transition">📄 ' + t.duplicateBtn + '</button>';
-        html += '<button onclick="event.stopPropagation(); editDrink(\'' + d.id + '\')" class="px-3 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-semibold rounded-lg border border-amber-500/20 transition">' + t.editBtn + '</button>';
         html += '<button onclick="event.stopPropagation(); deleteDrink(\'' + d.id + '\')" class="px-3 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold rounded-lg border border-red-500/20 transition">' + t.deleteBtn + '</button>';
-        html += '</div>';
       }
+      html += '</div>';
       html += '</div>';
 
       document.getElementById('modalContent').innerHTML = html;
@@ -813,6 +813,22 @@
       renderDrinks();
     }
 
+    function requestEditDrink(id) {
+      const t = i18n[currentLang];
+      if (!isAdmin) {
+        let pass = prompt(t.passPrompt);
+        if (pass === null) return;
+        if (pass !== MANAGER_PASSWORD) {
+          alert(t.passWrong);
+          return;
+        }
+        isAdmin = true;
+        document.getElementById('modeBtn').innerText = t.managerMode;
+        document.getElementById('adminForm').classList.remove('hidden');
+      }
+      editDrink(id);
+    }
+
     function editDrink(id) {
       const d = allDrinks.find(item => item.id === id);
       if (!d) return;
@@ -841,14 +857,7 @@
       const t = i18n[currentLang];
       document.getElementById('formTitle').innerText = t.formTitleEdit;
       document.getElementById('cancelEditBtn').classList.remove('hidden');
-      
-      if (!isAdmin) {
-        let pass = prompt(t.passPrompt);
-        if (pass !== MANAGER_PASSWORD) { alert(t.passWrong); return; }
-        isAdmin = true;
-        document.getElementById('modeBtn').innerText = t.managerMode;
-        document.getElementById('adminForm').classList.remove('hidden');
-      }
+      document.getElementById('adminForm').classList.remove('hidden');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -886,8 +895,8 @@
         if (pass !== MANAGER_PASSWORD) { alert(t.passWrong); return; }
         isAdmin = true;
         document.getElementById('modeBtn').innerText = t.managerMode;
-        document.getElementById('adminForm').classList.remove('hidden');
       }
+      document.getElementById('adminForm').classList.remove('hidden');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
