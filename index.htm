@@ -67,14 +67,17 @@
 
   <!-- Categories & Special Filters -->
   <div class="flex flex-col gap-3 mb-6">
-    <div id="categories" class="flex gap-2 overflow-x-auto pb-2"></div>
+    <div class="flex items-center gap-2 overflow-x-auto pb-2">
+      <span class="text-xs text-slate-400 font-semibold mr-1 shrink-0" id="catLabel">Kategorie:</span>
+      <div id="categories" class="flex gap-2"></div>
+    </div>
     <div class="flex gap-2 items-center overflow-x-auto text-xs">
-      <span class="text-slate-400 font-semibold mr-1" id="filterLabel">Filter:</span>
-      <button onclick="toggleSpecialFilter('featured')" id="filterFeatured" class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 hover:border-amber-400 flex items-center gap-1">⭐ TOP / Highlight</button>
-      <button onclick="toggleSpecialFilter('vegan')" id="filterVegan" class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 hover:border-amber-400">🌱 Vegan</button>
-      <button onclick="toggleSpecialFilter('glutenfree')" id="filterGluten" class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 hover:border-amber-400">🌾 Glutenfrei</button>
-      <button onclick="toggleSpecialFilter('lactosefree')" id="filterLactose" class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 hover:border-amber-400">🥛 Laktosefrei</button>
-      <button onclick="toggleSpecialFilter('nonalcoholic')" id="filterNonAlc" class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 hover:border-amber-400">🚫 Alkoholfrei</button>
+      <span class="text-slate-400 font-semibold mr-1 shrink-0" id="filterLabel">Filter:</span>
+      <button onclick="toggleSpecialFilter('featured')" id="filterFeatured" class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 hover:border-amber-400 flex items-center gap-1 whitespace-nowrap">⭐ TOP / Highlight</button>
+      <button onclick="toggleSpecialFilter('vegan')" id="filterVegan" class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 hover:border-amber-400 whitespace-nowrap">🌱 Vegan</button>
+      <button onclick="toggleSpecialFilter('glutenfree')" id="filterGluten" class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 hover:border-amber-400 whitespace-nowrap">🌾 Glutenfrei</button>
+      <button onclick="toggleSpecialFilter('lactosefree')" id="filterLactose" class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 hover:border-amber-400 whitespace-nowrap">🥛 Laktosefrei</button>
+      <button onclick="toggleSpecialFilter('nonalcoholic')" id="filterNonAlc" class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 hover:border-amber-400 whitespace-nowrap">🚫 Alkoholfrei</button>
     </div>
   </div>
 
@@ -191,6 +194,7 @@
         uploading: "Wird hochgeladen...",
         uploadSuccess: "✔ Foto erfolgreich hochgeladen!",
         fullscreen: "Vollbild",
+        catLabel: "Kategorie:",
         filterLabel: "Filter:"
       },
       en: {
@@ -229,6 +233,7 @@
         uploading: "Uploading...",
         uploadSuccess: "✔ Photo successfully uploaded!",
         fullscreen: "Fullscreen",
+        catLabel: "Category:",
         filterLabel: "Filter:"
       }
     };
@@ -261,6 +266,7 @@
       document.getElementById('searchInput').placeholder = t.searchPlaceholder;
       document.getElementById('modeBtn').innerText = isAdmin ? t.managerMode : t.waiterMode;
       document.getElementById('fsText').innerText = t.fullscreen;
+      document.getElementById('catLabel').innerText = t.catLabel;
       document.getElementById('filterLabel').innerText = t.filterLabel;
       
       const editingId = document.getElementById('editingId').value;
@@ -318,12 +324,12 @@
 
       Object.values(filterButtons).forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.className = 'px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 hover:border-amber-400';
+        if (el) el.className = 'px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 hover:border-amber-400 whitespace-nowrap';
       });
 
       if (activeSpecialFilter && filterButtons[activeSpecialFilter]) {
         const activeEl = document.getElementById(filterButtons[activeSpecialFilter]);
-        if (activeEl) activeEl.className = 'px-3 py-1 rounded-full bg-amber-500 text-slate-950 font-bold border border-amber-400';
+        if (activeEl) activeEl.className = 'px-3 py-1 rounded-full bg-amber-500 text-slate-950 font-bold border border-amber-400 whitespace-nowrap';
       }
 
       renderDrinks();
