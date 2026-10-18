@@ -40,8 +40,8 @@
       }
       #modalContent { color: black !important; }
       #modalContent h2 { color: black !important; }
-      #modalContent .bg-slate-800\/60 { background: #f8fafc !important; border: 1px solid #cbd5e1 !important; color: black !important; }
-      #modalContent p, #modalContent span { color: #1e293b !important; }
+      #modalContent .print-box { background: #f8fafc !important; border: 1px solid #cbd5e1 !important; color: black !important; }
+      #modalContent .print-box p, #modalContent .print-box span { color: #1e293b !important; }
       .no-print { display: none !important; }
     }
   </style>
@@ -125,7 +125,7 @@
       </div>
 
       <textarea id="dIng" placeholder="Zutaten (z. B. 6 cl Prosecco, 4 cl Aperol, 2 cl Soda)" class="p-3 rounded bg-slate-900 border border-slate-700 text-white md:col-span-2"></textarea>
-      <textarea id="dAllergens" placeholder="Allergene (z. B. Enthält Sulfite, Nüsse...)" class="p-3 rounded bg-slate-900 border border-slate-700 text-white md:col-span-2"></textarea>
+      <textarea id="dAllergens" placeholder="Allergene (z. B. Enthält Sulfite...)" class="p-3 rounded bg-slate-900 border border-slate-700 text-white md:col-span-2"></textarea>
       <textarea id="dRecipe" placeholder="Zubereitung Schritt für Schritt..." class="p-3 rounded bg-slate-900 border border-slate-700 text-white md:col-span-2"></textarea>
       <input type="text" id="dVideo" placeholder="Video-URL (YouTube / MP4)" class="p-3 rounded bg-slate-900 border border-slate-700 text-white md:col-span-2">
 
@@ -151,7 +151,7 @@
 
   <!-- Footer Credit -->
   <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-    Salonplafond BAR App v1.7 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+    Salonplafond BAR App v1.7.1 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
   </footer>
 
   <!-- Modal Detail View -->
@@ -527,38 +527,38 @@
         html += '<img src="' + d.photo_url + '" class="w-full h-64 object-cover rounded-xl mb-4 shadow" alt="">';
       }
       html += '<div class="flex items-center gap-2 mb-2">';
-      html += '<span class="text-xs font-semibold px-2.5 py-1 rounded bg-amber-500/10 text-amber-600 border border-amber-500/20">' + (d.category || t.defaultDrinkCat) + '</span>';
+      html += '<span class="text-xs font-semibold px-2.5 py-1 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">' + (d.category || t.defaultDrinkCat) + '</span>';
       if (d.is_featured) html += '<span class="text-xs font-bold px-2 py-0.5 rounded bg-amber-500 text-slate-950">⭐ TOP Highlight</span>';
       html += '</div>';
 
-      html += '<h2 class="text-3xl font-bold text-slate-900 mb-4">' + d.name + '</h2>';
+      html += '<h2 class="text-3xl font-bold text-white mb-4">' + d.name + '</h2>';
 
       let tags = [];
       if (d.is_vegan) tags.push('🌱 Vegan');
       if (d.is_glutenfree) tags.push('🌾 Glutenfrei');
       if (d.is_lactosefree) tags.push('🥛 Laktosefrei');
       if (tags.length > 0) {
-        html += '<div class="flex gap-2 mb-4 text-xs text-slate-700">' + tags.map(tg => '<span class="px-2 py-0.5 bg-slate-100 rounded-md border border-slate-200">' + tg + '</span>').join('') + '</div>';
+        html += '<div class="flex gap-2 mb-4 text-xs text-slate-300">' + tags.map(tg => '<span class="px-2 py-0.5 bg-slate-800 rounded-md border border-slate-700">' + tg + '</span>').join('') + '</div>';
       }
 
       if (d.ingredients) {
-        html += '<div class="mb-4 bg-slate-50 p-4 rounded-xl border border-slate-200">';
-        html += '<p class="text-sm text-slate-900 font-bold mb-1">' + t.ingredientsLabel + '</p>';
-        html += '<p class="text-sm text-slate-700">' + d.ingredients + '</p>';
+        html += '<div class="print-box mb-4 bg-slate-800/60 p-4 rounded-xl border border-slate-700 text-white">';
+        html += '<p class="text-sm font-bold mb-1 text-amber-400">' + t.ingredientsLabel + '</p>';
+        html += '<p class="text-sm text-slate-200">' + d.ingredients + '</p>';
         html += '</div>';
       }
 
       if (d.allergens) {
-        html += '<div class="mb-4 bg-amber-50/50 p-4 rounded-xl border border-amber-200/60">';
-        html += '<p class="text-sm text-amber-900 font-bold mb-1">' + t.allergensLabel + '</p>';
-        html += '<p class="text-sm text-amber-800">' + d.allergens + '</p>';
+        html += '<div class="print-box mb-4 bg-amber-500/10 p-4 rounded-xl border border-amber-500/30 text-white">';
+        html += '<p class="text-sm font-bold mb-1 text-amber-400">' + t.allergensLabel + '</p>';
+        html += '<p class="text-sm text-slate-200">' + d.allergens + '</p>';
         html += '</div>';
       }
 
       if (d.recipe) {
-        html += '<div class="mb-4 bg-slate-50 p-4 rounded-xl border border-slate-200">';
-        html += '<p class="text-sm text-slate-900 font-bold mb-1">' + t.recipeLabel + '</p>';
-        html += '<p class="text-sm text-slate-700 whitespace-pre-line">' + d.recipe + '</p>';
+        html += '<div class="print-box mb-4 bg-slate-800/60 p-4 rounded-xl border border-slate-700 text-white">';
+        html += '<p class="text-sm font-bold mb-1 text-amber-400">' + t.recipeLabel + '</p>';
+        html += '<p class="text-sm text-slate-200 whitespace-pre-line">' + d.recipe + '</p>';
         html += '</div>';
       }
 
@@ -574,9 +574,9 @@
       }
 
       if (isAdmin) {
-        html += '<div class="mt-6 pt-4 border-t border-slate-200 flex justify-end gap-2 no-print">';
-        html += '<button onclick="event.stopPropagation(); editDrink(\'' + d.id + '\')" class="px-4 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 text-xs font-semibold rounded-lg border border-amber-500/20 transition">' + t.editBtn + '</button>';
-        html += '<button onclick="event.stopPropagation(); deleteDrink(\'' + d.id + '\')" class="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-600 text-xs font-semibold rounded-lg border border-red-500/20 transition">' + t.deleteBtn + '</button>';
+        html += '<div class="mt-6 pt-4 border-t border-slate-700 flex justify-end gap-2 no-print">';
+        html += '<button onclick="event.stopPropagation(); editDrink(\'' + d.id + '\')" class="px-4 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-semibold rounded-lg border border-amber-500/20 transition">' + t.editBtn + '</button>';
+        html += '<button onclick="event.stopPropagation(); deleteDrink(\'' + d.id + '\')" class="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold rounded-lg border border-red-500/20 transition">' + t.deleteBtn + '</button>';
         html += '</div>';
       }
 
