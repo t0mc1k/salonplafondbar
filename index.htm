@@ -10,6 +10,13 @@
     body { background-color: #0f172a; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
     .card { background: #1e293b; border: 1px solid #334155; border-radius: 1rem; transition: transform 0.2s; }
     .card:hover { transform: translateY(-4px); border-color: #f59e0b; }
+    @media print {
+      body * { visibility: hidden; }
+      #drinkModal, #drinkModal * { visibility: visible; }
+      #drinkModal { position: absolute; left: 0; top: 0; width: 100%; background: white !important; color: black !important; }
+      #modalContent { color: black !important; }
+      .no-print { display: none !important; }
+    }
   </style>
 </head>
 <body class="p-4 md:p-8 max-w-6xl mx-auto pb-24">
@@ -23,10 +30,16 @@
       </div>
       <div>
         <h1 class="text-3xl font-bold tracking-tight text-amber-400">Salonplafond BAR</h1>
-        <span class="text-xs text-slate-400 font-medium">Erstellt von © T0mc1k</span>
+        <span class="text-xs text-slate-400 font-medium">Erstellt von © T0mc1k (Tomas Kardos)</span>
       </div>
     </div>
     <div class="flex flex-wrap items-center gap-2">
+      <!-- Fullscreen Toggle -->
+      <button onclick="toggleFullscreen()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-semibold border border-slate-700 text-slate-300 flex items-center gap-1">
+        ⛶ <span id="fsText">Vollbild</span>
+      </button>
+
+      <!-- Language Toggle -->
       <div class="flex bg-slate-800 rounded-lg p-1 border border-slate-700">
         <button onclick="setLang('de')" id="langDe" class="px-2.5 py-1 text-xs font-bold rounded bg-amber-500 text-slate-950">DE</button>
         <button onclick="setLang('en')" id="langEn" class="px-2.5 py-1 text-xs font-bold rounded text-slate-400 hover:text-white">EN</button>
@@ -34,7 +47,7 @@
 
       <!-- Search Box with Clear Button (x) -->
       <div class="relative w-48 md:w-64">
-        <input type="text" id="searchInput" oninput="onSearchInput()" placeholder="🔍 Suchen..." class="px-4 py-2 pr-8 rounded-lg bg-slate-800 border border-slate-700 text-white w-full focus:outline-none focus:border-amber-400">
+        <input type="text" id="searchInput" oninput="onSearchInput()" placeholder="🔍 Suchen..." class="px-4 py-2 pr-8 rounded-lg bg-slate-800 border border-slate-700 text-white w-full focus:outline-none focus:border-amber-400 text-sm">
         <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-sm font-bold bg-slate-700/50 hover:bg-slate-700 w-5 h-5 rounded-full items-center justify-center">&times;</button>
       </div>
 
@@ -44,8 +57,18 @@
 
   <p id="subTitle" class="text-sm text-slate-400 mb-6 -mt-4">Salonplafond • Rezepte & Getränkehandbuch</p>
 
-  <!-- Categories -->
-  <div id="categories" class="flex gap-2 overflow-x-auto pb-4 mb-6"></div>
+  <!-- Categories & Special Filters -->
+  <div class="flex flex-col gap-3 mb-6">
+    <div id="categories" class="flex gap-2 overflow-x-auto pb-2"></div>
+    <div class="flex gap-2 items-center overflow-x-auto text-xs">
+      <span class="text-slate-400 font-semibold mr-1" id="filterLabel">Filter:</span>
+      <button onclick="toggleSpecialFilter('featured')" id="filterFeatured" class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 hover:border-amber-400 flex items-center gap-1">⭐ TOP / Highlight</button>
+      <button onclick="toggleSpecialFilter('vegan')" id="filterVegan" class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 hover:border-amber-400">🌱 Vegan</button>
+      <button onclick="toggleSpecialFilter('glutenfree')" id="filterGluten" class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 hover:border-amber-400">🌾 Glutenfrei</button>
+      <button onclick="toggleSpecialFilter('lactosefree')" id="filterLactose" class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 hover:border-amber-400">🥛 Laktosefrei</button>
+      <button onclick="toggleSpecialFilter('nonalcoholic')" id="filterNonAlc" class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 hover:border-amber-400">🚫 Alkoholfrei</button>
+    </div>
+  </div>
 
   <!-- Manager Add / Edit Form -->
   <div id="adminForm" class="hidden card p-6 mb-8 border-amber-500/50">
@@ -68,7 +91,16 @@
       <textarea id="dIng" placeholder="Zutaten & Allergene (z. B. Prosecco 9cl, Aperol 6cl, Soda 3cl)" class="p-3 rounded bg-slate-900 border border-slate-700 text-white md:col-span-2"></textarea>
       <textarea id="dRecipe" placeholder="Zubereitung Schritt für Schritt..." class="p-3 rounded bg-slate-900 border border-slate-700 text-white md:col-span-2"></textarea>
       <input type="text" id="dVideo" placeholder="Video-URL (YouTube / MP4)" class="p-3 rounded bg-slate-900 border border-slate-700 text-white md:col-span-2">
+
+      <!-- Checkboxes for Special Tags -->
+      <div class="md:col-span-2 flex flex-wrap gap-4 p-3 bg-slate-900 rounded border border-slate-800 text-xs text-slate-300">
+        <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="dFeatured" class="accent-amber-500"> ⭐ <span id="lblFeatured">Als Bestseller / Highlight markieren</span></label>
+        <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="dVegan" class="accent-amber-500"> 🌱 Vegan</label>
+        <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="dGluten" class="accent-amber-500"> 🌾 Glutenfrei</label>
+        <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="dLactose" class="accent-amber-500"> 🥛 Laktosefrei</label>
+      </div>
     </div>
+
     <div class="flex gap-3 mt-4">
       <button onclick="saveDrink()" id="saveBtn" class="px-6 py-3 bg-amber-500 hover:bg-amber-600 font-bold text-slate-950 rounded-lg">Getränk speichern</button>
       <button onclick="resetForm()" id="cancelEditBtn" class="hidden px-6 py-3 bg-slate-700 hover:bg-slate-600 font-bold text-white rounded-lg">Abbrechen</button>
@@ -82,18 +114,21 @@
 
   <!-- Footer Credit -->
   <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-    Salonplafond BAR App v1.5 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k</span>
+    Salonplafond BAR App v1.6 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
   </footer>
 
   <!-- Modal Detail View -->
   <div id="drinkModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
     <div class="card max-w-2xl w-full max-h-[90vh] overflow-y-auto bg-slate-900 border-slate-700 p-6 relative flex flex-col justify-between">
       <div>
-        <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
+        <button onclick="closeModal()" class="no-print absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
         <div id="modalContent"></div>
       </div>
-      <div class="mt-6 pt-4 border-t border-slate-800">
-        <button onclick="closeModal()" id="closeModalBtn" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition text-sm">Schließen</button>
+      <div class="mt-6 pt-4 border-t border-slate-800 flex gap-2 no-print">
+        <button onclick="window.print()" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold rounded-xl transition text-sm flex items-center justify-center gap-2 border border-slate-700">
+          🖨️ <span id="printBtnText">Drucken / PDF</span>
+        </button>
+        <button onclick="closeModal()" id="closeModalBtn" class="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition text-sm">Schließen</button>
       </div>
     </div>
   </div>
@@ -106,6 +141,7 @@
     let currentLang = 'de';
     let allDrinks = [];
     let selectedCat = 'All';
+    let activeSpecialFilter = null;
     let isAdmin = false;
     const MANAGER_PASSWORD = "salon123";
 
@@ -124,9 +160,11 @@
         recipePlaceholder: "Zubereitung Schritt für Schritt...",
         photoLabel: "📸 Foto des Getränks (Direkt hochladen oder URL eingeben):",
         videoPlaceholder: "Video-URL (YouTube / MP4)",
+        lblFeatured: "Als Bestseller / Highlight markieren",
         saveBtn: "Getränk speichern",
         cancelBtn: "Abbrechen",
         closeBtn: "Schließen",
+        printBtn: "Drucken / PDF",
         loading: "Lade Getränke aus der Datenbank...",
         noDrinksFound: "Keine Getränke gefunden.",
         addFirstDrink: "Fügen Sie oben das erste Getränk hinzu!",
@@ -142,7 +180,9 @@
         clickToView: "Klicken für Rezept",
         noPhoto: "Kein Bild",
         uploading: "Wird hochgeladen...",
-        uploadSuccess: "✔ Foto erfolgreich hochgeladen!"
+        uploadSuccess: "✔ Foto erfolgreich hochgeladen!",
+        fullscreen: "Vollbild",
+        filterLabel: "Filter:"
       },
       en: {
         subTitle: "Salonplafond • Recipes & Drinks Manual",
@@ -158,9 +198,11 @@
         recipePlaceholder: "Preparation step by step...",
         photoLabel: "📸 Drink Photo (Upload directly or enter URL):",
         videoPlaceholder: "Video URL (YouTube / MP4)",
+        lblFeatured: "Mark as Bestseller / Highlight",
         saveBtn: "Save Drink",
         cancelBtn: "Cancel",
         closeBtn: "Close",
+        printBtn: "Print / PDF",
         loading: "Loading drinks from database...",
         noDrinksFound: "No drinks found.",
         addFirstDrink: "Add the first drink using the form above!",
@@ -176,7 +218,9 @@
         clickToView: "Click for recipe",
         noPhoto: "No photo",
         uploading: "Uploading...",
-        uploadSuccess: "✔ Photo successfully uploaded!"
+        uploadSuccess: "✔ Photo successfully uploaded!",
+        fullscreen: "Fullscreen",
+        filterLabel: "Filter:"
       }
     };
 
@@ -187,11 +231,21 @@
       updateUI();
     }
 
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    }
+
     function updateUI() {
       const t = i18n[currentLang];
       document.getElementById('subTitle').innerText = t.subTitle;
       document.getElementById('searchInput').placeholder = t.searchPlaceholder;
       document.getElementById('modeBtn').innerText = isAdmin ? t.managerMode : t.waiterMode;
+      document.getElementById('fsText').innerText = t.fullscreen;
+      document.getElementById('filterLabel').innerText = t.filterLabel;
       
       const editingId = document.getElementById('editingId').value;
       document.getElementById('formTitle').innerText = editingId ? t.formTitleEdit : t.formTitleAdd;
@@ -202,9 +256,11 @@
       document.getElementById('dRecipe').placeholder = t.recipePlaceholder;
       document.getElementById('photoLabel').innerText = t.photoLabel;
       document.getElementById('dVideo').placeholder = t.videoPlaceholder;
+      document.getElementById('lblFeatured').innerText = t.lblFeatured;
       document.getElementById('saveBtn').innerText = t.saveBtn;
       document.getElementById('cancelEditBtn').innerText = t.cancelBtn;
       document.getElementById('closeModalBtn').innerText = t.closeBtn;
+      document.getElementById('printBtnText').innerText = t.printBtn;
       renderCategories();
       renderDrinks();
     }
@@ -227,6 +283,30 @@
       input.value = '';
       onSearchInput();
       input.focus();
+    }
+
+    function toggleSpecialFilter(filterType) {
+      if (activeSpecialFilter === filterType) {
+        activeSpecialFilter = null;
+      } else {
+        activeSpecialFilter = filterType;
+      }
+      
+      ['featured', 'vegan', 'gluten', 'lactose', 'nonalc'].forEach(f => {
+        const el = document.getElementById('filter' + f.charAt(0).toUpperCase() + f.slice(1));
+        if (el) el.className = 'px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 hover:border-amber-400';
+      });
+
+      if (activeSpecialFilter) {
+        let activeId = 'filter' + activeSpecialFilter.charAt(0).toUpperCase() + activeSpecialFilter.slice(1);
+        if (activeSpecialFilter === 'glutenfree') activeId = 'filterGluten';
+        if (activeSpecialFilter === 'lactosefree') activeId = 'filterLactose';
+        if (activeSpecialFilter === 'nonalcoholic') activeId = 'filterNonAlc';
+        const el = document.getElementById(activeId);
+        if (el) el.className = 'px-3 py-1 rounded-full bg-amber-500 text-slate-950 font-bold border border-amber-400';
+      }
+
+      renderDrinks();
     }
 
     async function uploadImageToSupabase(event) {
@@ -273,23 +353,33 @@
 
       const container = document.getElementById('categories');
       container.innerHTML = cats.map(c => `
-        <button onclick="setCategory('${c}')" class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${selectedCat === c ? 'bg-amber-500 text-slate-950' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}">${c}</button>
+        <button onclick="setCategory('${c}')" class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${selectedCat === c ? 'bg-amber-500 text-slate-950 font-bold' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}">${c}</button>
       `).join('');
     }
 
     function setCategory(cat) { selectedCat = cat; renderDrinks(); renderCategories(); }
-    function filterDrinks() { renderDrinks(); }
 
     function renderDrinks() {
       const t = i18n[currentLang];
       const search = document.getElementById('searchInput').value.toLowerCase();
       const allLabel = t.allCategories;
 
-      const filtered = allDrinks.filter(d => {
+      let filtered = allDrinks.filter(d => {
         const matchesCat = selectedCat === allLabel || d.category === selectedCat;
         const matchesSearch = d.name.toLowerCase().includes(search) || (d.ingredients && d.ingredients.toLowerCase().includes(search));
-        return matchesCat && matchesSearch;
+        
+        let matchesFilter = true;
+        if (activeSpecialFilter === 'featured') matchesFilter = d.is_featured;
+        if (activeSpecialFilter === 'vegan') matchesFilter = d.is_vegan;
+        if (activeSpecialFilter === 'glutenfree') matchesFilter = d.is_glutenfree;
+        if (activeSpecialFilter === 'lactosefree') matchesFilter = d.is_lactosefree;
+        if (activeSpecialFilter === 'nonalcoholic') matchesFilter = d.category && d.category.toLowerCase().includes('alkoholfrei');
+
+        return matchesCat && matchesSearch && matchesFilter;
       });
+
+      // Sort featured drinks to top
+      filtered.sort((a, b) => (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0));
 
       const container = document.getElementById('drinksGrid');
       if (filtered.length === 0) {
@@ -302,12 +392,22 @@
           ? '<img src="' + d.photo_url + '" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="">' 
           : '<div class="flex items-center justify-center h-full text-slate-500 text-xs">' + t.noPhoto + '</div>';
 
+        let badgeHtml = d.is_featured 
+          ? '<span class="absolute top-2 right-2 text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500 text-slate-950 shadow">⭐ TOP</span>' 
+          : '';
+
+        let tagsHtml = '';
+        if (d.is_vegan) tagsHtml += '🌱 ';
+        if (d.is_glutenfree) tagsHtml += '🌾 ';
+        if (d.is_lactosefree) tagsHtml += '🥛 ';
+
         return '<div onclick="openDrinkModal(\'' + d.id + '\')" class="card overflow-hidden cursor-pointer flex flex-col justify-between group">' +
-               '<div class="relative h-48 bg-slate-800">' + photoHtml +
+               '<div class="relative h-48 bg-slate-800">' + photoHtml + badgeHtml +
                '<span class="absolute top-2 left-2 text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-900/80 backdrop-blur text-amber-400 border border-amber-500/30">' + (d.category || t.defaultDrinkCat) + '</span>' +
                '</div>' +
                '<div class="p-4 text-center">' +
                '<h3 class="text-lg font-bold text-white group-hover:text-amber-400 transition">' + d.name + '</h3>' +
+               (tagsHtml ? '<div class="text-xs mt-1">' + tagsHtml + '</div>' : '') +
                '<span class="text-xs text-slate-400 mt-1 inline-block">' + t.clickToView + '</span>' +
                '</div>' +
                '</div>';
@@ -323,9 +423,7 @@
         } else if (url.includes('watch?v=')) {
           videoId = url.split('watch?v=')[1].split('&')[0];
         }
-        if (videoId) {
-          return 'https://www.youtube.com/embed/' + videoId;
-        }
+        if (videoId) return 'https://www.youtube.com/embed/' + videoId;
       }
       return url;
     }
@@ -339,8 +437,20 @@
       if (d.photo_url) {
         html += '<img src="' + d.photo_url + '" class="w-full h-64 object-cover rounded-xl mb-4" alt="">';
       }
+      html += '<div class="flex items-center gap-2 mb-2">';
       html += '<span class="text-xs font-semibold px-2.5 py-1 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">' + (d.category || t.defaultDrinkCat) + '</span>';
-      html += '<h2 class="text-2xl font-bold mt-2 text-white">' + d.name + '</h2>';
+      if (d.is_featured) html += '<span class="text-xs font-bold px-2 py-0.5 rounded bg-amber-500 text-slate-950">⭐ TOP Highlight</span>';
+      html += '</div>';
+
+      html += '<h2 class="text-2xl font-bold text-white">' + d.name + '</h2>';
+
+      let tags = [];
+      if (d.is_vegan) tags.push('🌱 Vegan');
+      if (d.is_glutenfree) tags.push('🌾 Glutenfrei');
+      if (d.is_lactosefree) tags.push('🥛 Laktosefrei');
+      if (tags.length > 0) {
+        html += '<div class="flex gap-2 mt-2 text-xs text-slate-300">' + tags.map(tg => '<span class="px-2 py-0.5 bg-slate-800 rounded-md border border-slate-700">' + tg + '</span>').join('') + '</div>';
+      }
 
       if (d.ingredients) {
         html += '<div class="mt-4 bg-slate-800/60 p-4 rounded-xl border border-slate-700">';
@@ -358,7 +468,7 @@
 
       if (d.video_url) {
         let embed = getEmbedUrl(d.video_url);
-        html += '<div class="mt-4"><p class="text-sm text-slate-200 font-medium mb-2">▶ Video:</p>';
+        html += '<div class="mt-4 no-print"><p class="text-sm text-slate-200 font-medium mb-2">▶ Video:</p>';
         if (embed.includes('youtube.com/embed')) {
           html += '<div class="relative w-full aspect-video rounded-xl overflow-hidden bg-black"><iframe src="' + embed + '" class="w-full h-full" frameborder="0" allowfullscreen></iframe></div>';
         } else {
@@ -368,7 +478,7 @@
       }
 
       if (isAdmin) {
-        html += '<div class="mt-6 pt-4 border-t border-slate-800 flex justify-end gap-2">';
+        html += '<div class="mt-6 pt-4 border-t border-slate-800 flex justify-end gap-2 no-print">';
         html += '<button onclick="event.stopPropagation(); editDrink(\'' + d.id + '\')" class="px-4 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-semibold rounded-lg border border-amber-500/20 transition">' + t.editBtn + '</button>';
         html += '<button onclick="event.stopPropagation(); deleteDrink(\'' + d.id + '\')" class="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold rounded-lg border border-red-500/20 transition">' + t.deleteBtn + '</button>';
         html += '</div>';
@@ -417,6 +527,11 @@
       document.getElementById('dPhoto').value = d.photo_url || '';
       document.getElementById('dVideo').value = d.video_url || '';
       
+      document.getElementById('dFeatured').checked = !!d.is_featured;
+      document.getElementById('dVegan').checked = !!d.is_vegan;
+      document.getElementById('dGluten').checked = !!d.is_glutenfree;
+      document.getElementById('dLactose').checked = !!d.is_lactosefree;
+      
       const t = i18n[currentLang];
       document.getElementById('formTitle').innerText = t.formTitleEdit;
       document.getElementById('cancelEditBtn').classList.remove('hidden');
@@ -442,6 +557,11 @@
       document.getElementById('imageFile').value = '';
       document.getElementById('uploadStatus').innerText = '';
       
+      document.getElementById('dFeatured').checked = false;
+      document.getElementById('dVegan').checked = false;
+      document.getElementById('dGluten').checked = false;
+      document.getElementById('dLactose').checked = false;
+      
       const t = i18n[currentLang];
       document.getElementById('formTitle').innerText = t.formTitleAdd;
       document.getElementById('cancelEditBtn').classList.add('hidden');
@@ -457,12 +577,19 @@
       const photo_url = document.getElementById('dPhoto').value;
       const video_url = document.getElementById('dVideo').value;
 
+      const is_featured = document.getElementById('dFeatured').checked;
+      const is_vegan = document.getElementById('dVegan').checked;
+      const is_glutenfree = document.getElementById('dGluten').checked;
+      const is_lactosefree = document.getElementById('dLactose').checked;
+
       if (!name || !category) { alert(t.alertFill); return; }
 
+      const drinkObj = { name, category, ingredients, recipe, photo_url, video_url, is_featured, is_vegan, is_glutenfree, is_lactosefree };
+
       if (id) {
-        await _supabase.from('drinks').update({ name, category, ingredients, recipe, photo_url, video_url }).eq('id', id);
+        await _supabase.from('drinks').update(drinkObj).eq('id', id);
       } else {
-        await _supabase.from('drinks').insert([{ name, category, ingredients, recipe, photo_url, video_url }]);
+        await _supabase.from('drinks').insert([drinkObj]);
       }
       
       resetForm();
