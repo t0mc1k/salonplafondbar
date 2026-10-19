@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.0</title>
+  <title>Salonplafond BAR v3.0.01</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import -->
@@ -32,19 +32,16 @@
     .card:hover { transform: translateY(-4px); border-color: #f59e0b; }
     .list-item { border-radius: 0.75rem; transition: background 0.2s; }
     
-    /* Splash Screen Animation */
-    #splashScreen {
-      transition: opacity 0.5s ease-out, visibility 0.5s;
-    }
-    .splash-logo-animate {
+    /* Animácia iba pre logo na prihlasovacej obrazovke */
+    .login-logo-pulse {
       animation: pulseLogo 1.2s ease-in-out infinite alternate;
     }
     @keyframes pulseLogo {
-      0% { transform: scale(0.95); opacity: 0.8; }
+      0% { transform: scale(0.95); opacity: 0.85; }
       100% { transform: scale(1.05); opacity: 1; }
     }
 
-    /* Interaktívne animované logo */
+    /* Interaktívne animované logo v hlavičke */
     .header-logo-container {
       position: relative;
       width: 3rem;
@@ -119,12 +116,12 @@
 </head>
 <body class="dark-mode p-4 md:p-8 max-w-6xl mx-auto pb-24" onclick="closeDropdowns(event)">
 
-  <!-- 1. PRIHLASOVACIA OBRAZOVKA (V ŠTÝLE PÔVODNÉHO SPLASH SCREENU) -->
+  <!-- 1. PRIHLASOVACIA OBRAZOVKA (Statická, pulzuje iba logo) -->
   <div id="authContainer" class="fixed inset-0 z-[200] bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
-    <div class="splash-logo-animate flex flex-col items-center gap-4 w-full max-w-md">
+    <div class="flex flex-col items-center gap-4 w-full max-w-md">
       
-      <!-- Animované logo Ō -->
-      <div class="w-20 h-20 bg-amber-400 rounded-2xl flex flex-col items-center justify-center shadow-2xl p-2 text-slate-950 font-bold select-none border-2 border-amber-300 mx-auto">
+      <!-- Animované iba logo Ō -->
+      <div class="login-logo-pulse w-20 h-20 bg-amber-400 rounded-2xl flex flex-col items-center justify-center shadow-2xl p-2 text-slate-950 font-bold select-none border-2 border-amber-300 mx-auto">
         <div class="text-[10px] font-black tracking-widest -mb-1">¯</div>
         <div class="text-4xl font-black leading-none">Ō</div>
         <div class="text-[10px] font-black leading-none mt-1">•</div>
@@ -133,14 +130,14 @@
       <div>
         <h1 class="text-xl md:text-2xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-2xl md:text-3xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-400 font-medium mt-1 block">v3.0.0 • Sichere Authentifizierung</span>
+        <span class="text-xs text-slate-400 font-medium mt-1 block">v3.0.01 • Sichere Authentifizierung</span>
       </div>
 
-      <!-- Login formulár -->
+      <!-- Login formulár bez predvyplneného e-mailu -->
       <form id="loginForm" onsubmit="handleLogin(event)" class="w-full bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl space-y-4 text-left mt-2">
         <div>
           <label class="block text-xs font-semibold uppercase mb-1 text-slate-300">E-Mail</label>
-          <input type="email" id="loginEmail" required placeholder="amim@salonplafond.wien" class="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400">
+          <input type="email" id="loginEmail" required placeholder="name@salonplafond.wien" class="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400">
         </div>
         <div>
           <label class="block text-xs font-semibold uppercase mb-1 text-slate-300">Passwort</label>
@@ -153,7 +150,7 @@
       </form>
 
       <div class="mt-4 text-center">
-        <span class="text-xs text-slate-400 font-bold block">Erstellt von © T0mc1k (Tomas Kardos)</span>
+        <span class="text-xs text-slate-300 font-extrabold block">Erstellt von © T0mc1k (Tomas Kardos)</span>
       </div>
     </div>
   </div>
@@ -170,7 +167,7 @@
         </div>
         <div>
           <h1 class="text-3xl font-bold tracking-tight text-amber-400">Salonplafond BAR</h1>
-          <span class="text-xs text-slate-400 font-medium">v3.0.0 • Angemeldet: <span id="currentUserEmail" class="text-amber-300 font-bold"></span></span>
+          <span class="text-xs text-slate-400 font-medium">v3.0.01 • Angemeldet: <span id="currentUserEmail" class="text-amber-300 font-bold"></span></span>
         </div>
       </div>
 
@@ -442,7 +439,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.0 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.01 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div> <!-- /Koniec appContainer -->
