@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.04</title>
+  <title>Salonplafond BAR v3.0.05</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import -->
@@ -132,7 +132,7 @@
       <div>
         <h1 id="authTitle" class="text-xl md:text-2xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-2xl md:text-3xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span id="authVersion" class="text-xs text-slate-400 font-medium mt-1 block">v3.0.04 • Sichere Authentifizierung</span>
+        <span id="authVersion" class="text-xs text-slate-400 font-medium mt-1 block">v3.0.05 • Sichere Authentifizierung</span>
       </div>
 
       <form id="loginForm" onsubmit="handleLogin(event)" class="w-full bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl space-y-4 text-left mt-2">
@@ -172,7 +172,7 @@
         </div>
         <div>
           <h1 class="text-3xl font-bold tracking-tight text-amber-400">Salonplafond BAR</h1>
-          <span class="text-xs text-slate-400 font-medium"><span id="versionLabelText">v3.0.04</span> • <span id="loggedInLabelText">Angemeldet</span>: <span id="currentUserEmail" class="text-amber-300 font-bold"></span></span>
+          <span class="text-xs text-slate-400 font-medium"><span id="versionLabelText">v3.0.05</span> • <span id="loggedInLabelText">Angemeldet</span>: <span id="currentUserEmail" class="text-amber-300 font-bold"></span></span>
         </div>
       </div>
 
@@ -303,7 +303,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.04 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.05 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div> <!-- /Koniec appContainer -->
@@ -598,7 +598,6 @@
 
     let pendingAuthCallback = null;
 
-    // Auth & Session Check pri štarte
     window.addEventListener("DOMContentLoaded", async () => {
       updateUI();
       const { data: { session } } = await _supabase.auth.getSession();
@@ -665,7 +664,6 @@
       loadDrinks();
     }
 
-    /* Bezpečné modálne overenie manažéra cez Supabase */
     function checkManagerAuth(callback) {
       if (isAdmin) {
         if (callback) callback();
@@ -717,7 +715,6 @@
       }
     }
 
-    /* MOTIVAČNÉ HLÁŠKY */
     const motivationalQuotes = [
       "„Frau gut? Ruhe bitte!“ 🤫",
       "„Keine Zeit!“ ⏱️",
@@ -834,7 +831,7 @@
         catLabel: "Kategorie:",
         filterLabel: "Filter:",
         authTitle: "Anmeldung",
-        authVersion: "v3.0.04 • Sichere Authentifizierung",
+        authVersion: "v3.0.05 • Sichere Authentifizierung",
         lblLoginEmail: "E-Mail",
         lblLoginPass: "Passwort",
         loginBtnText: "Einloggen",
@@ -939,7 +936,7 @@
         catLabel: "Category:",
         filterLabel: "Filter:",
         authTitle: "Sign In",
-        authVersion: "v3.0.04 • Secure Authentication",
+        authVersion: "v3.0.05 • Secure Authentication",
         lblLoginEmail: "E-Mail",
         lblLoginPass: "Password",
         loginBtnText: "Sign In",
@@ -1636,7 +1633,6 @@
       }
     }
 
-    /* Otvorenie modálneho okna pre pridanie nového drinku */
     function openAddDrinkModal() {
       checkManagerAuth(() => {
         resetForm();
@@ -1718,6 +1714,10 @@
         document.getElementsByName('dCatRadio').forEach(r => { if (r.checked) category = r.value; });
         if (!name || !category) return alert(i18n[currentLang].alertFill);
 
+        // Bezpečné ošetrenie číselných cien aby nedošlo k chybe typu numeric
+        const rawCost = document.getElementById('dCost').value;
+        const rawPrice = document.getElementById('dPrice').value;
+
         const drinkObj = {
           name, category,
           season: document.getElementById('dSeason').value,
@@ -1726,8 +1726,8 @@
           ice: document.getElementById('dIce').value,
           garnish: document.getElementById('dGarnish').value,
           ingredients_json: getIngredientsData(),
-          cost_price: parseFloat(document.getElementById('dCost').value) || null,
-          selling_price: parseFloat(document.getElementById('dPrice').value) || null,
+          cost_price: rawCost !== '' ? parseFloat(rawCost) || null : null,
+          selling_price: rawPrice !== '' ? parseFloat(rawPrice) || null : null,
           allergens: document.getElementById('dAllergens').value,
           recipe: document.getElementById('dRecipe').value,
           photo_url: document.getElementById('dPhoto').value,
@@ -1743,7 +1743,6 @@
       });
     }
 
-    /* Univerzálny Excel Sprievodca Importom */
     function openImportModal() {
       document.getElementById('settingsDropdown').classList.add('hidden');
       checkManagerAuth(() => {
@@ -1841,7 +1840,9 @@
           if (col1.startsWith("Preis") || col1.startsWith("Price")) {
             if (currentDrink) {
               currentDrink.garnish = col0;
-              currentDrink.selling_price = col1.replace("Preis", "").replace("Price", "").replace(",", ".").trim();
+              let rawPrice = col1.replace("Preis", "").replace("Price", "").replace(",", ".").trim();
+              let parsedPrice = parseFloat(rawPrice);
+              currentDrink.selling_price = !isNaN(parsedPrice) ? parsedPrice : null;
               parsedDrinks.push(currentDrink);
               currentDrink = null;
             }
