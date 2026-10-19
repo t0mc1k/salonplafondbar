@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.05</title>
+  <title>Salonplafond BAR v3.0.06</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import -->
@@ -132,7 +132,7 @@
       <div>
         <h1 id="authTitle" class="text-xl md:text-2xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-2xl md:text-3xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span id="authVersion" class="text-xs text-slate-400 font-medium mt-1 block">v3.0.05 • Sichere Authentifizierung</span>
+        <span id="authVersion" class="text-xs text-slate-400 font-medium mt-1 block">v3.0.06 • Sichere Authentifizierung</span>
       </div>
 
       <form id="loginForm" onsubmit="handleLogin(event)" class="w-full bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl space-y-4 text-left mt-2">
@@ -172,7 +172,7 @@
         </div>
         <div>
           <h1 class="text-3xl font-bold tracking-tight text-amber-400">Salonplafond BAR</h1>
-          <span class="text-xs text-slate-400 font-medium"><span id="versionLabelText">v3.0.05</span> • <span id="loggedInLabelText">Angemeldet</span>: <span id="currentUserEmail" class="text-amber-300 font-bold"></span></span>
+          <span class="text-xs text-slate-400 font-medium"><span id="versionLabelText">v3.0.06</span> • <span id="loggedInLabelText">Angemeldet</span>: <span id="currentUserEmail" class="text-amber-300 font-bold"></span></span>
         </div>
       </div>
 
@@ -303,7 +303,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.05 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.06 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div> <!-- /Koniec appContainer -->
@@ -831,7 +831,7 @@
         catLabel: "Kategorie:",
         filterLabel: "Filter:",
         authTitle: "Anmeldung",
-        authVersion: "v3.0.05 • Sichere Authentifizierung",
+        authVersion: "v3.0.06 • Sichere Authentifizierung",
         lblLoginEmail: "E-Mail",
         lblLoginPass: "Passwort",
         loginBtnText: "Einloggen",
@@ -936,7 +936,7 @@
         catLabel: "Category:",
         filterLabel: "Filter:",
         authTitle: "Sign In",
-        authVersion: "v3.0.05 • Secure Authentication",
+        authVersion: "v3.0.06 • Secure Authentication",
         lblLoginEmail: "E-Mail",
         lblLoginPass: "Password",
         loginBtnText: "Sign In",
@@ -1156,6 +1156,34 @@
       }
     }
 
+    /* Funkcia na premenovanie celej sezóny */
+    async function renameSeason(oldSeasonName, event) {
+      if (event) event.stopPropagation();
+      checkManagerAuth(async () => {
+        const promptText = currentLang === 'de' 
+          ? `Neuen Namen für die Saison "${oldSeasonName}" eingeben:`
+          : `Enter new name for season "${oldSeasonName}":`;
+        const newSeasonName = prompt(promptText, oldSeasonName);
+        
+        if (!newSeasonName || newSeasonName.trim() === '' || newSeasonName.trim() === oldSeasonName) {
+          return;
+        }
+
+        const formattedNewName = newSeasonName.trim();
+        const { error } = await _supabase.from('drinks').update({ season: formattedNewName }).eq('season', oldSeasonName);
+        
+        if (error) {
+          alert((currentLang === 'de' ? "Fehler beim Umbenennen: " : "Error renaming: ") + error.message);
+          return;
+        }
+
+        alert(currentLang === 'de' ? `Saison erfolgreich in "${formattedNewName}" umbenannt!` : `Season successfully renamed to "${formattedNewName}"!`);
+        currentSeasonFilter = formattedNewName;
+        loadDrinks();
+        closeSeasonModal();
+      });
+    }
+
     async function deleteEntireSeason(seasonKey, event) {
       if (event) event.stopPropagation();
       checkManagerAuth(async () => {
@@ -1184,9 +1212,12 @@
       listContainer.innerHTML = seasons.map(s => {
         let label = `📦 ${currentLang === 'de' ? 'Saison' : 'Season'}: ${s}`;
         let activeClass = currentSeasonFilter === s ? 'border-amber-400 bg-amber-500/10' : 'bg-slate-800 border-slate-700 hover:bg-slate-700';
-        let deleteBtnHtml = `<button onclick="deleteEntireSeason('${s}', event)" class="p-1.5 px-2 bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white rounded-lg transition text-xs font-bold border border-red-500/30 ml-2" title="${currentLang === 'de' ? 'Saison komplett löschen' : 'Delete entire season'}">🗑️ ${currentLang === 'de' ? 'Löschen' : 'Delete'}</button>`;
+        
+        // Tlačidlá pre správcu (premenovať a vymazať)
+        let renameBtnHtml = `<button onclick="renameSeason('${s}', event)" class="p-1.5 px-2 bg-amber-500/20 hover:bg-amber-500 text-amber-400 hover:text-slate-950 rounded-lg transition text-xs font-bold border border-amber-500/30 ml-2" title="${currentLang === 'de' ? 'Saison umbenennen' : 'Rename season'}">✏️ ${currentLang === 'de' ? 'Umbenennen' : 'Rename'}</button>`;
+        let deleteBtnHtml = `<button onclick="deleteEntireSeason('${s}', event)" class="p-1.5 px-2 bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white rounded-lg transition text-xs font-bold border border-red-500/30 ml-1.5" title="${currentLang === 'de' ? 'Saison komplett löschen' : 'Delete entire season'}">🗑️ ${currentLang === 'de' ? 'Löschen' : 'Delete'}</button>`;
 
-        return `<div class="p-3 rounded-xl ${activeClass} border transition flex items-center justify-between group cursor-pointer" onclick="selectSeason('${s}')"><div><div class="text-sm font-bold text-white group-hover:text-amber-400">${label}</div></div><div class="flex items-center"><span class="text-xs text-amber-400 font-semibold mr-1">${currentSeasonFilter === s ? (currentLang === 'de' ? 'Aktiv ✓' : 'Active ✓') : (currentLang === 'de' ? 'Öffnen →' : 'Open →')}</span>${deleteBtnHtml}</div></div>`;
+        return `<div class="p-3 rounded-xl ${activeClass} border transition flex items-center justify-between group cursor-pointer" onclick="selectSeason('${s}')"><div><div class="text-sm font-bold text-white group-hover:text-amber-400">${label}</div></div><div class="flex items-center"><span class="text-xs text-amber-400 font-semibold mr-2">${currentSeasonFilter === s ? (currentLang === 'de' ? 'Aktiv ✓' : 'Active ✓') : (currentLang === 'de' ? 'Öffnen →' : 'Open →')}</span>${renameBtnHtml}${deleteBtnHtml}</div></div>`;
       }).join('');
     }
 
@@ -1714,7 +1745,6 @@
         document.getElementsByName('dCatRadio').forEach(r => { if (r.checked) category = r.value; });
         if (!name || !category) return alert(i18n[currentLang].alertFill);
 
-        // Bezpečné ošetrenie číselných cien aby nedošlo k chybe typu numeric
         const rawCost = document.getElementById('dCost').value;
         const rawPrice = document.getElementById('dPrice').value;
 
