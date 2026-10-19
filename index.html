@@ -4,7 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Salonplafond BAR v3.0.0</title>
+  <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- SheetJS pre Excel Import -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body { font-family: system-ui, -apple-system, sans-serif; transition: background-color 0.2s, color 0.2s; }
@@ -149,7 +153,7 @@
       </form>
 
       <div class="mt-4 text-center">
-        <span class="text-xs text-slate-500 block">Erstellt von © T0mc1k (Tomas Kardos)</span>
+        <span class="text-xs text-slate-400 font-bold block">Erstellt von © T0mc1k (Tomas Kardos)</span>
       </div>
     </div>
   </div>
@@ -228,6 +232,12 @@
             <button onclick="exportToCSV()" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-2">
               📊 <span id="exportText">Export CSV</span>
             </button>
+
+            <!-- Tlačidlo pre Excel import priamo v menu pre manažéra -->
+            <button onclick="triggerExcelImport()" id="btnMenuImportExcel" class="hidden w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-700 text-xs font-bold text-emerald-400 items-center gap-2">
+              📥 <span>Winterkarte Excel Import</span>
+            </button>
+            <input type="file" id="excelFileInput" accept=".xlsx, .xls" class="hidden" onchange="handleExcelImport(event)">
 
             <button onclick="openSupportModal()" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-700 text-xs font-semibold text-amber-400 flex items-center gap-2">
               ✉️ <span id="supportMenuText">Support / Feedback</span>
@@ -573,9 +583,33 @@
       }
       
       document.getElementById('modeStatusText').innerText = isAdmin ? i18n[currentLang].managerMode : i18n[currentLang].waiterMode;
-      document.getElementById('adminForm').classList.toggle('hidden', !isAdmin);
       
+      // Zobraziť/skryť Excel import tlačidlo v menu pre manažéra
+      const btnMenuImport = document.getElementById('btnMenuImportExcel');
+      if (isAdmin) {
+        btnMenuImport.classList.remove('hidden');
+        btnMenuImport.classList.add('flex');
+      } else {
+        btnMenuImport.classList.add('hidden');
+        btnMenuImport.classList.remove('flex');
+      }
+
       loadDrinks();
+    }
+
+    /* Funkcia na rýchle vyžiadanie manažérskeho prístupu (prompt) pre čašníkov */
+    function checkManagerAuth() {
+      if (isAdmin) return true;
+      let pass = prompt("Manager-Berechtigung erforderlich. Bitte Passwort oder E-Mail eingeben:");
+      if (pass === "salon123" || pass === "amim@salonplafond.wien") {
+        isAdmin = true;
+        document.getElementById('modeStatusText').innerText = i18n[currentLang].managerMode;
+        alert("Erfolgreich als Manager autorisiert!");
+        return true;
+      } else if (pass !== null) {
+        alert("Falsches Passwort / E-Mail!");
+      }
+      return false;
     }
 
     /* MOTIVAČNÉ HLÁŠKY */
@@ -913,7 +947,7 @@
       allDrinks.forEach(d => {
         if (d.season && d.season !== 'current' && !seasons.includes(d.season)) seasons.push(d.season);
       });
-      if (seasons.length === 0) seasons.push('16.11.2026 - 16.03.2027');
+      if (!seasons.includes('16.11.2026 - 16.03.2027')) seasons.push('16.11.2026 - 16.03.2027');
       return seasons;
     }
 
@@ -939,10 +973,7 @@
     async function deleteEntireSeason(seasonKey, event) {
       if (event) event.stopPropagation();
       
-      if (!isAdmin) {
-        alert("Nur der Manager kann ganze Saisons löschen.");
-        return;
-      }
+      if (!checkManagerAuth()) return;
 
       if (!confirm(`Möchten Sie wirklich die gesamte Saison "${seasonKey}" und alle darin enthaltenen Getränke löschen?`)) {
         return;
@@ -965,7 +996,7 @@
       listContainer.innerHTML = seasons.map(s => {
         let label = `📦 Saison: ${s}`;
         let activeClass = currentSeasonFilter === s ? 'border-amber-400 bg-amber-500/10' : 'bg-slate-800 border-slate-700 hover:bg-slate-700';
-        let deleteBtnHtml = isAdmin ? `<button onclick="deleteEntireSeason('${s}', event)" class="p-1.5 px-2 bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white rounded-lg transition text-xs font-bold border border-red-500/30 ml-2" title="Saison komplett löschen">🗑️ Löschen</button>` : '';
+        let deleteBtnHtml = `<button onclick="deleteEntireSeason('${s}', event)" class="p-1.5 px-2 bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white rounded-lg transition text-xs font-bold border border-red-500/30 ml-2" title="Saison komplett löschen">🗑️ Löschen</button>`;
 
         return `<div class="p-3 rounded-xl ${activeClass} border transition flex items-center justify-between group cursor-pointer" onclick="selectSeason('${s}')"><div><div class="text-sm font-bold text-white group-hover:text-amber-400">${label}</div></div><div class="flex items-center"><span class="text-xs text-amber-400 font-semibold mr-1">${currentSeasonFilter === s ? 'Aktiv ✓' : 'Öffnen →'}</span>${deleteBtnHtml}</div></div>`;
       }).join('');
@@ -985,7 +1016,7 @@
 
     function handleSeasonSelectChange(selectEl) {
       if (selectEl.value === 'addNew') {
-        let newSeasonName = prompt(currentLang === 'de' ? 'Zeitraum eingeben (z. B. 01.11.2026 – 31.12.2026):' : 'Enter period:');
+        let newSeasonName = prompt(currentLang === 'de' ? 'Zeitraum eingeben (z. B. 01.04.2027 – 30.09.2027):' : 'Enter period:');
         if (newSeasonName && newSeasonName.trim() !== '') {
           let formattedName = newSeasonName.trim();
           let select = document.getElementById('dSeason');
@@ -1319,7 +1350,7 @@
       document.getElementById('modalContent').innerHTML = html;
       
       let isFav = shiftFavorites.includes(d.id);
-      document.getElementById('favBtnText').innerText = isFav ? 'Favorit ✓' : 'Schicht-Favorit';
+      document.getElementById('modalFavBtn').innerText = isFav ? 'Favorit ✓' : 'Schicht-Favorit';
 
       document.getElementById('modalFavBtn').onclick = function() {
         toggleShiftFavorite(d.id);
@@ -1346,22 +1377,28 @@
     function toggleMode() {
       const t = i18n[currentLang];
       if (!isAdmin) {
-        alert("Der Manager-Modus ist über die Anmeldung (amim@salonplafond.wien) geschützt.");
-        return;
+        if (!checkManagerAuth()) return;
+      } else {
+        isAdmin = false;
       }
-      isAdmin = !isAdmin;
       document.getElementById('modeStatusText').innerText = isAdmin ? t.managerMode : t.waiterMode;
       document.getElementById('adminForm').classList.toggle('hidden', !isAdmin);
+      
+      const btnMenuImport = document.getElementById('btnMenuImportExcel');
+      if (isAdmin) {
+        btnMenuImport.classList.remove('hidden');
+        btnMenuImport.classList.add('flex');
+      } else {
+        btnMenuImport.classList.add('hidden');
+        btnMenuImport.classList.remove('flex');
+      }
+
       if (!isAdmin) resetForm();
       renderDrinks();
     }
 
     function requestEditDrink(id) {
-      const t = i18n[currentLang];
-      if (!isAdmin) {
-        alert("Nur der Manager (amim@salonplafond.wien) kann Getränke bearbeiten.");
-        return;
-      }
+      if (!checkManagerAuth()) return;
       editDrink(id);
     }
 
@@ -1390,10 +1427,7 @@
 
     async function deleteDrinkConfirm(id) {
       const t = i18n[currentLang];
-      if (!isAdmin) {
-        alert("Nur der Manager kann Getränke löschen.");
-        return;
-      }
+      if (!checkManagerAuth()) return;
 
       if (confirm(t.confirmDelete)) {
         const { error } = await _supabase.from('drinks').delete().eq('id', id);
@@ -1432,10 +1466,7 @@
     }
 
     async function saveDrink() {
-      if (!isAdmin) {
-        alert("Keine Berechtigung.");
-        return;
-      }
+      if (!checkManagerAuth()) return;
       const name = document.getElementById('dName').value;
       let category = '';
       document.getElementsByName('dCatRadio').forEach(r => { if (r.checked) category = r.value; });
@@ -1463,6 +1494,96 @@
 
       resetForm();
       loadDrinks();
+    }
+
+    /* Funkcie pre Excel Import pre zimnú kartu */
+    function triggerExcelImport() {
+      if (!checkManagerAuth()) return;
+      document.getElementById('excelFileInput').click();
+    }
+
+    function handleExcelImport(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+        const importedSeason = "16.11.2026 - 16.03.2027";
+        let parsedDrinks = [];
+        let currentDrink = null;
+        let currentCat = "Cocktails";
+
+        for (let i = 0; i < rows.length; i++) {
+          const row = rows[i];
+          if (!row || row.length === 0) continue;
+
+          const col0 = row[0] ? String(row[0]).trim() : "";
+          const col1 = row[1] ? String(row[1]).trim() : "";
+
+          if (["APERITTIF", "MOCKTAILS", "Cocktails", "After Dinner Drinks", "Salonplafond Classic"].includes(col1)) {
+            currentCat = col1;
+            continue;
+          }
+
+          if (col0.startsWith("Glass:")) {
+            if (currentDrink) {
+              currentDrink.glass_type = col0.replace("Glass:", "").trim();
+              if (col1.startsWith("Method:")) currentDrink.method = col1.replace("Method:", "").trim();
+            }
+            continue;
+          }
+
+          if (col0.startsWith("Ice:")) {
+            if (currentDrink) currentDrink.ice = col0.replace("Ice:", "").trim();
+            continue;
+          }
+
+          if (col0 === "Garnish:") continue;
+
+          if (col1.startsWith("Preis")) {
+            if (currentDrink) {
+              currentDrink.garnish = col0;
+              currentDrink.selling_price = col1.replace("Preis", "").replace(",", ".").trim();
+              parsedDrinks.push(currentDrink);
+              currentDrink = null;
+            }
+            continue;
+          }
+
+          if (col0 && !col0.startsWith("Ingredients:") && !currentDrink) {
+            currentDrink = {
+              name: col0,
+              category: currentCat,
+              season: importedSeason,
+              ingredients_json: [],
+              is_active: true
+            };
+            continue;
+          }
+
+          if (currentDrink && col0 && col0 !== "Ingredients:") {
+            currentDrink.ingredients_json.push({ name: col0, amount: col1 });
+          }
+        }
+
+        if (parsedDrinks.length > 0) {
+          const { error } = await _supabase.from("drinks").insert(parsedDrinks);
+          if (error) {
+            alert("Fehler beim Import: " + error.message);
+          } else {
+            alert(`Erfolg! ${parsedDrinks.length} Drinks für die Wintersaison (${importedSeason}) importiert.`);
+            loadDrinks();
+          }
+        } else {
+          alert("Keine Drinks in der Datei gefunden.");
+        }
+      };
+      reader.readAsArrayBuffer(file);
     }
   </script>
 </body>
