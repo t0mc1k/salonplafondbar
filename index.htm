@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v2.2.0</title>
+  <title>Salonplafond BAR v2.2.1</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -13,7 +13,7 @@
     .list-item { background: #1e293b; border: 1px solid #334155; border-radius: 0.75rem; transition: background 0.2s; }
     .list-item:hover { background: #554133; border-color: #f59e0b; }
     
-    /* Splash Screen Animation - skrátená na 2.5s */
+    /* Splash Screen Animation */
     #splashScreen {
       transition: opacity 0.5s ease-out, visibility 0.5s;
     }
@@ -101,7 +101,7 @@
 </head>
 <body class="p-4 md:p-8 max-w-6xl mx-auto pb-24" onclick="closeDropdowns(event)">
 
-  <!-- Splash Screen (2.5 sekundy) -->
+  <!-- Úvodná animácia (Splash Screen) -->
   <div id="splashScreen" class="fixed inset-0 z-[100] bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
     <div class="splash-logo-animate flex flex-col items-center gap-4">
       <div class="w-24 h-24 bg-amber-400 rounded-2xl flex flex-col items-center justify-center shadow-2xl p-2 text-slate-950 font-bold select-none border-2 border-amber-300">
@@ -112,17 +112,17 @@
       <div>
         <h1 class="text-2xl md:text-3xl font-black tracking-wider text-white uppercase">Willkommen bei</h1>
         <h2 class="text-3xl md:text-4xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
+        <!-- Verzia s väčším písmom a podpis priamo pod názvom -->
+        <div class="mt-3">
+          <span class="text-sm md:text-base font-bold text-amber-300 block">v2.2.1</span>
+          <span class="text-xs md:text-sm text-slate-400 font-medium mt-0.5 block">Erstellt von © T0mc1k (Tomas Kardos)</span>
+        </div>
       </div>
     </div>
     
     <div class="mt-8 flex flex-col items-center gap-2">
       <div class="w-8 h-8 border-4 border-amber-500/20 border-t-amber-400 rounded-full animate-spin"></div>
       <span class="text-xs font-semibold text-slate-400 tracking-widest uppercase">Lade Rezeptdatenbank...</span>
-    </div>
-
-    <div class="absolute bottom-6 text-center">
-      <span class="text-xs font-semibold text-amber-400/80 block">v2.2.0</span>
-      <span class="text-[11px] text-slate-500 font-medium">Erstellt von © T0mc1k (Tomas Kardos)</span>
     </div>
   </div>
 
@@ -135,7 +135,7 @@
       </div>
       <div>
         <h1 class="text-3xl font-bold tracking-tight text-amber-400">Salonplafond BAR</h1>
-        <span class="text-xs text-slate-400 font-medium">v2.2.0 • Erstellt von © T0mc1k (Tomas Kardos)</span>
+        <span class="text-xs text-slate-400 font-medium">v2.2.1 • Erstellt von © T0mc1k (Tomas Kardos)</span>
       </div>
     </div>
 
@@ -197,19 +197,18 @@
 
   <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 mb-6 -mt-4">
     <p id="subTitle" class="text-sm text-slate-400">Salonplafond • Rezepte & Getränkehandbuch</p>
-    <div id="activeSeasonBadge" class="hidden px-3 py-1 bg-amber-500/10 border border-amber-500/30 rounded-full text-amber-400 text-xs font-semibold flex items-center gap-1.5">
+    <!-- Kliknutím na odznak vpravo hore sa otvorí výber sezóny -->
+    <div id="activeSeasonBadge" onclick="openSeasonModal()" title="Klicken, um Saison zu wechseln" class="hidden cursor-pointer px-3 py-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-full text-amber-400 text-xs font-semibold flex items-center gap-1.5 transition">
       <span>📦 <span id="archiveBadgeText">Aktive Saison:</span></span> <span id="activeSeasonName"></span>
     </div>
   </div>
 
-  <!-- Kategorien & Vysúvací Filter -->
   <div class="flex flex-col gap-3 mb-6">
     <div class="flex items-center gap-2 overflow-x-auto pb-2">
       <span class="text-xs text-slate-400 font-semibold mr-1 shrink-0" id="catLabel">Kategorie:</span>
       <div id="categories" class="flex gap-2"></div>
     </div>
     
-    <!-- Vysúvacie tlačidlo pre filtre -->
     <div class="flex flex-col gap-2">
       <div class="flex items-center gap-2">
         <button onclick="toggleFilterDrawer()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-amber-400 text-xs font-bold flex items-center gap-1.5 transition">
@@ -218,7 +217,6 @@
         <span class="text-[11px] text-slate-500" id="activeFilterSummary"></span>
       </div>
 
-      <!-- Vysúvacia časť s filtrami -->
       <div id="filterDrawer" class="hidden flex-col gap-3 p-3 bg-slate-900 border border-slate-800 rounded-xl transition-all">
         <div>
           <span class="text-xs text-slate-400 font-semibold mb-1.5 block" id="filterLabel">Ernährung & Bestseller:</span>
@@ -246,6 +244,17 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <input type="text" id="dName" placeholder="Getränkename (z. B. Strawberry Kiss)" class="p-3 rounded bg-slate-900 border border-slate-700 text-white md:col-span-2">
       
+      <!-- Sezóna presunutá hneď pod názov nápoja -->
+      <div class="md:col-span-2 bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col gap-2">
+        <label class="text-xs text-slate-400 font-semibold" id="seasonLabel">📅 Saison / Zeitraum:</label>
+        <select id="dSeason" onchange="handleSeasonSelectChange(this)" class="p-3 rounded bg-slate-950 border border-slate-800 text-white text-xs">
+          <option value="current">✨ Aktuelle Saison (Standard)</option>
+          <option value="01.09.2026 – 31.10.2026">📦 Archiv: 01.09.2026 – 31.10.2026</option>
+          <option value="01.11.2026 – 31.12.2026">📦 Zukünftig: 01.11.2026 – 31.12.2026</option>
+          <option value="addNew">➕ Neue Saison erstellen...</option>
+        </select>
+      </div>
+
       <div class="md:col-span-2 bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col gap-2">
         <label class="text-xs text-slate-400 font-semibold" id="catSelectLabel">🏷️ Kategorie auswählen:</label>
         <div class="flex flex-wrap gap-3 text-xs text-slate-200" id="categoryRadios">
@@ -257,7 +266,6 @@
         </div>
       </div>
 
-      <!-- Glas, Method, Ice, Garnish (S rýchlymi tlačidlami pre sklo a ľad) -->
       <div class="md:col-span-2 bg-slate-900 p-4 rounded-xl border border-slate-700 grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label class="text-xs text-slate-400 font-semibold mb-1 block" id="lblGlass">🍸 Glas-Typ / Equipment:</label>
@@ -301,7 +309,19 @@
         <div id="ingredientRowsContainer" class="flex flex-col gap-2"></div>
       </div>
 
-      <!-- OPRAVENÉ ALLERGÉNY (S ikonami na tlačidlách a bez spodných duplicitných políčok) -->
+      <!-- POSTUP PRÍPRAVY (Zubereitung) - Ako akordeón/rozbaľovacia možnosť s nadpisom, umiestnený HNEĎ NAD ALERGÉNMI -->
+      <div class="md:col-span-2 bg-slate-900 border border-slate-700/80 rounded-xl overflow-hidden">
+        <button type="button" onclick="document.getElementById('recipeCollapse').classList.toggle('hidden')" class="w-full p-3 text-left font-bold text-amber-400 text-xs flex justify-between items-center bg-slate-800/80 hover:bg-slate-800 transition">
+          <span>📖 Zubereitung / Schritt für Schritt (Optional)</span>
+          <span class="text-slate-400 text-xs">▼ <span class="lblShowHide">Anzeigen / Verbergen</span></span>
+        </button>
+        
+        <div id="recipeCollapse" class="hidden p-4 border-t border-slate-700/60 bg-slate-950/50">
+          <textarea id="dRecipe" placeholder="Detaillierte Zubereitung Schritt für Schritt eingeben..." class="p-3 rounded bg-slate-900 border border-slate-700 text-white text-xs w-full" rows="3"></textarea>
+        </div>
+      </div>
+
+      <!-- ALERGÉNY -->
       <div class="md:col-span-2 bg-slate-900 border border-slate-700/80 rounded-xl overflow-hidden">
         <button type="button" onclick="document.getElementById('allergensCollapse').classList.toggle('hidden')" class="w-full p-3 text-left font-bold text-amber-400 text-xs flex justify-between items-center bg-slate-800/80 hover:bg-slate-800 transition">
           <span id="lblAllergensTitle">⚠️ Allergene (Optional)</span>
@@ -311,7 +331,6 @@
         <div id="allergensCollapse" class="hidden p-4 flex flex-col gap-3 border-t border-slate-700/60 bg-slate-950/50">
           <div>
             <label class="text-[11px] text-slate-400 font-semibold mb-1.5 block" id="lblQuickAllergens">Häufige Allergene auswählen:</label>
-            <!-- Pridané ikony ku všetkým zaškrtávacím tlačidlám -->
             <div class="flex flex-wrap items-center gap-2 text-xs text-slate-300">
               <label class="flex items-center gap-1.5 bg-slate-900 px-3 py-2 rounded-lg border border-slate-800 cursor-pointer"><input type="checkbox" onchange="togglePresetAllergen('🍷 Sulfite', this.checked)" class="preset-alg accent-amber-500"> 🍷 Sulfite</label>
               <label class="flex items-center gap-1.5 bg-slate-900 px-3 py-2 rounded-lg border border-slate-800 cursor-pointer"><input type="checkbox" onchange="togglePresetAllergen('🌾 Gluten', this.checked)" class="preset-alg accent-amber-500"> 🌾 Gluten</label>
@@ -323,21 +342,10 @@
           </div>
 
           <textarea id="dAllergens" placeholder="Allergene (z. B. Enthält Sulfite...)" class="p-3 rounded bg-slate-900 border border-slate-700 text-white text-xs w-full" rows="2"></textarea>
-          <!-- Spodný riadok bol odstránený tak, ako ste chceli -->
         </div>
       </div>
 
-      <div class="md:col-span-2 bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col gap-2">
-        <label class="text-xs text-slate-400 font-semibold" id="seasonLabel">📅 Saison / Zeitraum:</label>
-        <select id="dSeason" onchange="handleSeasonSelectChange(this)" class="p-3 rounded bg-slate-950 border border-slate-800 text-white text-xs">
-          <option value="current">✨ Aktuelle Saison (Standard)</option>
-          <option value="01.09.2026 – 31.10.2026">📦 Archiv: 01.09.2026 – 31.10.2026</option>
-          <option value="01.11.2026 – 31.12.2026">📦 Zukünftig: 01.11.2026 – 31.12.2026</option>
-          <option value="addNew">➕ Neue Saison erstellen...</option>
-        </select>
-      </div>
-
-      <!-- CENY (Rozbaľovacia možnosť ako pri alergénoch) -->
+      <!-- CENY (Rozbaľovacia možnosť) -->
       <div class="md:col-span-2 bg-slate-900 border border-slate-700/80 rounded-xl overflow-hidden">
         <button type="button" onclick="document.getElementById('pricesCollapse').classList.toggle('hidden')" class="w-full p-3 text-left font-bold text-amber-400 text-xs flex justify-between items-center bg-slate-800/80 hover:bg-slate-800 transition">
           <span>💶 Preis & Wareneinsatz (Optional)</span>
@@ -365,8 +373,6 @@
         <input type="text" id="dPhoto" placeholder="Bild-URL..." class="p-3 rounded bg-slate-950 border border-slate-800 text-white text-xs mt-1">
       </div>
 
-      <textarea id="dRecipe" placeholder="Optionale Zubereitung Schritt für Schritt..." class="p-3 rounded bg-slate-900 border border-slate-700 text-white md:col-span-2 text-xs" rows="3"></textarea>
-
       <div class="md:col-span-2 flex items-center p-3 bg-slate-900 rounded border border-slate-800 text-xs text-slate-300">
         <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="dFeatured" class="accent-amber-500"> ⭐ <span id="lblFeatured">Als Bestseller / Highlight markieren</span></label>
       </div>
@@ -385,7 +391,7 @@
   </div>
 
   <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-    Salonplafond BAR App v2.2.0 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+    Salonplafond BAR App v2.2.1 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
   </footer>
 
   <!-- Modal Detail View -->
@@ -459,7 +465,6 @@
     const SUPABASE_KEY = "sb_publishable_2tw50zmlzxDClPx7zwnT3g_k2WiaUuL";
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Splash Screen: skrátený na presne 2.5 sekundy
     window.addEventListener('DOMContentLoaded', () => {
       const splash = document.getElementById('splashScreen');
       if (splash) {
@@ -778,7 +783,6 @@
       }
     }
 
-    /* MAZANIE SEZÓNY - LEN PRE MANAŽÉRA */
     async function deleteEntireSeason(seasonKey, event) {
       if (event) event.stopPropagation();
       if (seasonKey === 'current') {
@@ -786,7 +790,6 @@
         return;
       }
       
-      // Ak nie je prihlásený manažér, vypýta heslo
       if (!isAdmin) {
         let pass = prompt(i18n[currentLang].passPrompt);
         if (pass !== MANAGER_PASSWORD) {
@@ -820,7 +823,6 @@
         let label = s === 'current' ? '✨ Aktuelle Saison (Standard)' : `📦 Saison: ${s}`;
         let activeClass = currentSeasonFilter === s ? 'border-amber-400 bg-amber-500/10' : 'bg-slate-800 border-slate-700 hover:bg-slate-700';
         
-        // Tlačidlo na vymazanie sa zobrazí vždy, ale ak klikne neprihlásený, opýta sa na heslo
         let deleteBtnHtml = (s !== 'current') ? `<button onclick="deleteEntireSeason('${s}', event)" class="p-1.5 px-2 bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white rounded-lg transition text-xs font-bold border border-red-500/30 ml-2" title="Saison komplett löschen">🗑️ Löschen</button>` : '';
 
         return `<div class="p-3 rounded-xl ${activeClass} border transition flex items-center justify-between group cursor-pointer" onclick="selectSeason('${s}')"><div><div class="text-sm font-bold text-white group-hover:text-amber-400">${label}</div></div><div class="flex items-center"><span class="text-xs text-amber-400 font-semibold mr-1">${currentSeasonFilter === s ? 'Aktiv ✓' : 'Öffnen →'}</span>${deleteBtnHtml}</div></div>`;
@@ -1096,7 +1098,7 @@
         container.className = 'flex flex-col gap-3';
         container.innerHTML = filtered.map(d => {
           let photoHtml = d.photo_url ? `<img src="${d.photo_url}" class="w-14 h-14 object-cover rounded-lg shrink-0" alt="">` : `<div class="w-14 h-14 bg-slate-800 rounded-lg shrink-0 flex items-center justify-center text-[10px] text-slate-500">No Pic</div>`;
-          let badgeHtml = d.is_featured ? '<span class="text-xs font-bold px-2 py-0.5 rounded bg-amber-500 text-slate-950">⭐ TOP</span>' : '';
+          let badgeHtml = d.is_featured ? '<span class="text-xs font-bold px-2 py-0.5 rounded bg-amber-500 text-slate-950">⭐ TOP</span>';
           let priceText = d.selling_price ? ` (${parseFloat(d.selling_price).toFixed(2)} €)` : '';
           return `<div onclick="openDrinkModal('${d.id}')" class="list-item p-3 cursor-pointer flex items-center justify-between gap-4 group"><div class="flex items-center gap-4 min-w-0">${photoHtml}<div class="min-w-0"><div class="flex items-center gap-2 flex-wrap"><h3 class="text-base font-bold text-white group-hover:text-amber-400 transition truncate">${d.name}${priceText}</h3>${badgeHtml}</div><p class="text-xs text-slate-400 truncate mt-0.5">${d.method ? 'Method: ' + d.method : (d.category || '')}</p></div></div><span class="text-xs font-semibold px-2.5 py-1 rounded bg-slate-800 text-amber-400 border border-slate-700 shrink-0">${d.category || t.defaultDrinkCat}</span></div>`;
         }).join('');
