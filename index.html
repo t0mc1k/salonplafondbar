@@ -3,1439 +3,424 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v2.3.1</title>
+  <title>Salonplafond BAR v3.0.0</title>
+  <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- SheetJS pre Excel Import -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; transition: background-color 0.2s, color 0.2s; }
-    
-    /* Tmavý režim (štandard) */
+    body { font-family: system-ui, -apple-system, sans-serif; }
     body.dark-mode { background-color: #0f172a; color: #f8fafc; }
-    body.dark-mode .card { background: #1e293b; border: 1px solid #334155; }
-    body.dark-mode .list-item { background: #1e293b; border: 1px solid #334155; }
-    body.dark-mode .list-item:hover { background: #554133; border-color: #f59e0b; }
-    body.dark-mode .modal-bg { background: rgba(0,0,0,0.8); }
-
-    /* Svetlý režim */
+    body.dark-mode .card { background-color: #1e293b; border-color: #334155; }
     body.light-mode { background-color: #f1f5f9; color: #0f172a; }
-    body.light-mode .card { background: #ffffff; border: 1px solid #cbd5e1; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-    body.light-mode .list-item { background: #ffffff; border: 1px solid #cbd5e1; }
-    body.light-mode .list-item:hover { background: #fef3c7; border-color: #f59e0b; }
-    body.light-mode input, body.light-mode select, body.light-mode textarea { background-color: #f8fafc !important; color: #0f172a !important; border-color: #cbd5e1 !important; }
-    body.light-mode .modal-bg { background: rgba(15,23,42,0.6); }
+    body.light-mode .card { background-color: #ffffff; border-color: #e2e8f0; }
 
-    .card { border-radius: 1rem; transition: transform 0.2s; }
-    .card:hover { transform: translateY(-4px); border-color: #f59e0b; }
-    .list-item { border-radius: 0.75rem; transition: background 0.2s; }
-    
-    /* Splash Screen Animation */
-    #splashScreen {
-      transition: opacity 0.5s ease-out, visibility 0.5s;
+    .drink-icon-spin {
+      display: inline-block;
+      transition: transform 0.4s ease-in-out;
     }
-    .splash-logo-animate {
-      animation: pulseLogo 1.2s ease-in-out infinite alternate;
-    }
-    @keyframes pulseLogo {
-      0% { transform: scale(0.95); opacity: 0.8; }
-      100% { transform: scale(1.05); opacity: 1; }
-    }
-
-    /* Interaktívne animované logo */
-    .header-logo-container {
-      position: relative;
-      width: 3rem;
-      height: 3rem;
-      background-color: #fbbf24;
-      border-radius: 0.75rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-      cursor: pointer;
-      user-select: none;
-      animation: salonLogoPlayful 7s ease-in-out infinite;
-      transition: transform 0.2s;
-    }
-    .header-logo-container:hover {
-      transform: scale(1.1) rotate(5deg);
-    }
-    
-    .logo-text, .logo-icon {
-      position: absolute;
-      transition: opacity 0.3s ease;
-    }
-
-    .logo-icon {
-      opacity: 0;
-      font-size: 1.25rem;
-    }
-
-    @keyframes salonLogoPlayful {
-      0% { transform: translateY(0) rotate(0deg) scale(1); }
-      10% { transform: translateY(-6px) rotate(-15deg) scale(1.1); }
-      20% { transform: translateY(0) rotate(360deg) scale(1); }
-      30% { transform: translateY(-10px) rotate(360deg) scale(1.15); }
-      40% { transform: translateY(0) rotate(360deg) scale(1); }
-      48% { transform: scale(0.8); opacity: 1; }
-      50% { transform: scale(1.2) rotate(15deg); }
-      55% { transform: scale(1) rotate(0deg); }
-      65% { transform: scale(1) rotate(0deg); }
-      72% { transform: scale(0.8); }
-      75% { transform: scale(1) rotate(0deg); }
-      100% { transform: translateY(0) rotate(0deg) scale(1); }
-    }
-
-    @keyframes showCocktail {
-      0%, 45%, 70%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
-      50%, 65% { opacity: 1; transform: scale(1) rotate(10deg); }
-    }
-
-    @keyframes hideLetterO {
-      0%, 45%, 70%, 100% { opacity: 1; }
-      50%, 65% { opacity: 0; }
-    }
-
-    .header-logo-container .logo-text {
-      animation: hideLetterO 7s ease-in-out infinite;
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #0f172a;
-    }
-
-    .header-logo-container .logo-icon {
-      animation: showCocktail 7s ease-in-out infinite;
-    }
-
-    @media print {
-      @page { size: portrait; margin: 10mm; }
-      body { background: white !important; color: black !important; padding: 0 !important; }
-      body > *:not(#drinkModal):not(#supportModal):not(#seasonModal):not(#motivationModal):not(#shoppingModal) { display: none !important; }
+    .drink-icon-spin:hover {
+      transform: rotate(360deg) scale(1.25);
     }
   </style>
 </head>
-<body class="dark-mode p-4 md:p-8 max-w-6xl mx-auto pb-24" onclick="closeDropdowns(event)">
+<body class="dark-mode min-h-screen pb-12 transition-colors duration-200">
 
-  <!-- Úvodná animácia (Splash Screen) -->
-  <div id="splashScreen" class="fixed inset-0 z-[100] bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
-    <div class="splash-logo-animate flex flex-col items-center gap-4">
-      <div class="w-24 h-24 bg-amber-400 rounded-2xl flex flex-col items-center justify-center shadow-2xl p-2 text-slate-950 font-bold select-none border-2 border-amber-300">
-        <div class="text-xs font-black tracking-widest -mb-1">¯</div>
-        <div class="text-5xl font-black leading-none">Ō</div>
-        <div class="text-xs font-black leading-none mt-1">•</div>
-      </div>
+  <!-- 1. PRIHLASOVACIA OBRAZOVKA (AUTH LOCK) -->
+  <div id="authContainer" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950">
+    <div class="card w-full max-w-md p-6 rounded-2xl shadow-2xl border text-center space-y-6 bg-slate-900 border-slate-800">
       <div>
-        <h1 class="text-2xl md:text-3xl font-black tracking-wider text-white uppercase">Willkommen bei</h1>
-        <h2 class="text-3xl md:text-4xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <div class="mt-3">
-          <span class="text-sm md:text-base font-bold text-amber-300 block">v2.3.1</span>
-          <span class="text-xs md:text-sm text-slate-400 font-medium mt-0.5 block">Erstellt von © T0mc1k (Tomas Kardos)</span>
-        </div>
-      </div>
-    </div>
-    
-    <div class="mt-8 flex flex-col items-center gap-2">
-      <div class="w-8 h-8 border-4 border-amber-500/20 border-t-amber-400 rounded-full animate-spin"></div>
-      <span class="text-xs font-semibold text-slate-400 tracking-widest uppercase">Lade Rezeptdatenbank...</span>
-    </div>
-  </div>
-
-  <!-- Header -->
-  <header class="flex flex-col md:flex-row justify-between items-center gap-4 mb-8 pb-4 border-b border-slate-700">
-    <div class="flex items-center gap-3">
-      <div class="header-logo-container" onclick="showRandomMotivation(event)" title="Klick mich für Osterei-Motivation! 🍸">
-        <span class="logo-text">Ō</span>
-        <span class="logo-icon">🍸</span>
-      </div>
-      <div>
-        <h1 class="text-3xl font-bold tracking-tight text-amber-400">Salonplafond BAR</h1>
-        <span class="text-xs text-slate-400 font-medium">v2.3.1 • Erstellt von © T0mc1k (Tomas Kardos)</span>
-      </div>
-    </div>
-
-    <div class="flex flex-wrap items-center gap-2">
-      <button onclick="refreshData()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-semibold border border-slate-700 text-slate-300 flex items-center gap-1 transition" title="Daten aktualisieren">
-        🔄 <span id="refreshText">Aktualisieren</span>
-      </button>
-
-      <button onclick="toggleFullscreen()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-semibold border border-slate-700 text-slate-300 flex items-center gap-1">
-        ⛶ <span id="fsText">Vollbild</span>
-      </button>
-
-      <div class="relative w-48 md:w-64">
-        <input type="text" id="searchInput" oninput="onSearchInput()" placeholder="🔍 Suchen..." class="px-4 py-1.5 pr-8 rounded-lg bg-slate-800 border border-slate-700 text-white w-full focus:outline-none focus:border-amber-400 text-xs">
-        <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs font-bold bg-slate-700/50 hover:bg-slate-700 w-4 h-4 rounded-full items-center justify-center">&times;</button>
+        <div id="authLogoIcon" class="text-6xl mb-2 cursor-pointer drink-icon-spin" onclick="rotateLogoIcon()">🍸</div>
+        <h1 class="text-2xl font-black tracking-wider text-amber-500 uppercase">Salonplafond BAR</h1>
+        <p class="text-xs text-slate-400 mt-1">Anmeldung erforderlich (v3.0.0)</p>
       </div>
 
-      <div class="relative">
-        <button onclick="toggleSettingsMenu(event)" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs flex items-center gap-1 shadow-lg transition">
-          ⚙️ <span id="menuText">Menü</span>
-        </button>
-        <div id="settingsDropdown" class="hidden absolute right-0 mt-2 w-56 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl p-2 z-50 flex flex-col gap-1.5">
-          
-          <button onclick="toggleMode()" id="modeBtn" class="w-full text-left px-2.5 py-2 rounded bg-slate-900 hover:bg-slate-700 text-xs font-bold text-amber-400 flex items-center justify-between border border-slate-700">
-            <span>👤 Modus:</span> <span id="modeStatusText">Kellner</span>
-          </button>
-
-          <button onclick="toggleThemeMode()" id="themeBtn" class="w-full text-left px-2.5 py-2 rounded bg-slate-900 hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center justify-between border border-slate-700">
-            <span>🎨 Design:</span> <span id="themeStatusText">Dunkel</span>
-          </button>
-
-          <div class="flex bg-slate-900 rounded-lg p-1 border border-slate-700 my-0.5">
-            <button onclick="setViewMode('grid')" id="viewGrid" class="flex-1 py-1 text-xs font-bold rounded bg-amber-500 text-slate-950 text-center">🖼️ Grid</button>
-            <button onclick="setViewMode('list')" id="viewList" class="flex-1 py-1 text-xs font-bold rounded text-slate-400 hover:text-white text-center">☰ Liste</button>
-          </div>
-
-          <div class="border-t border-slate-700 my-0.5"></div>
-
-          <div class="text-[10px] text-slate-400 font-bold px-2.5 pt-1" id="langMenuLabel">Sprache / Language</div>
-          <div class="grid grid-cols-2 gap-1 px-1">
-            <button onclick="setLang('de')" id="langDe" class="py-1 text-xs font-bold rounded bg-amber-500 text-slate-950 text-center">DE</button>
-            <button onclick="setLang('en')" id="langEn" class="py-1 text-xs font-bold rounded text-slate-400 hover:text-white text-center bg-slate-900">EN</button>
-          </div>
-
-          <div class="border-t border-slate-700 my-0.5"></div>
-
-          <button onclick="openSeasonModal()" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-2">
-            📅 <span id="seasonMenuBtnText">Saison wählen...</span>
-          </button>
-
-          <button onclick="openShoppingModal()" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-2">
-            🛒 <span id="shoppingMenuBtnText">Einkaufsliste / Inventur</span>
-          </button>
-          
-          <button onclick="exportToCSV()" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-2">
-            📊 <span id="exportText">Export CSV</span>
-          </button>
-
-          <button onclick="openSupportModal()" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-700 text-xs font-semibold text-amber-400 flex items-center gap-2">
-            ✉️ <span id="supportMenuText">Support / Feedback</span>
-          </button>
-
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 mb-6 -mt-4">
-    <p id="subTitle" class="text-sm text-slate-400">Salonplafond • Rezepte & Getränkehandbuch</p>
-    <div id="activeSeasonBadge" onclick="openSeasonModal()" title="Klicken, um Saison zu wechseln" class="hidden cursor-pointer px-3 py-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-full text-amber-400 text-xs font-semibold flex items-center gap-1.5 transition">
-      <span>📦 <span id="archiveBadgeText">Aktive Saison:</span></span> <span id="activeSeasonName"></span>
-    </div>
-  </div>
-
-  <div class="flex flex-col gap-3 mb-6">
-    <div class="flex items-center gap-2 overflow-x-auto pb-2">
-      <span class="text-xs text-slate-400 font-semibold mr-1 shrink-0" id="catLabel">Kategorie:</span>
-      <div id="categories" class="flex gap-2"></div>
-    </div>
-    
-    <div class="flex flex-col gap-2">
-      <div class="flex items-center gap-2">
-        <button onclick="toggleFilterDrawer()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-amber-400 text-xs font-bold flex items-center gap-1.5 transition">
-          ⚡ <span>Filter & Glasauswahl</span> <span id="filterArrow">▼</span>
-        </button>
-        <span class="text-[11px] text-slate-500" id="activeFilterSummary"></span>
-      </div>
-
-      <div id="filterDrawer" class="hidden flex-col gap-3 p-3 bg-slate-900 border border-slate-800 rounded-xl transition-all">
+      <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4 text-left">
         <div>
-          <span class="text-xs text-slate-400 font-semibold mb-1.5 block" id="filterLabel">Ernährung & Bestseller:</span>
-          <div class="flex gap-2 items-center overflow-x-auto text-xs">
-            <button onclick="toggleSpecialFilter('featured')" id="filterFeatured" class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 hover:border-amber-400 flex items-center gap-1 whitespace-nowrap">⭐ TOP / Highlight</button>
-            <button onclick="toggleSpecialFilter('vegan')" id="filterVegan" class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 hover:border-amber-400 whitespace-nowrap">🌱 Vegan</button>
-            <button onclick="toggleSpecialFilter('glutenfree')" id="filterGluten" class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 hover:border-amber-400 whitespace-nowrap">🌾 Glutenfrei</button>
-            <button onclick="toggleSpecialFilter('lactosefree')" id="filterLactose" class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 hover:border-amber-400 whitespace-nowrap">🥛 Laktosefrei</button>
-            <button onclick="toggleSpecialFilter('nonalcoholic')" id="filterNonAlc" class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 hover:border-amber-400 whitespace-nowrap">🚫 Alkoholfrei</button>
-            <button onclick="toggleSpecialFilter('favorites')" id="filterFavs" class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 hover:border-amber-400 whitespace-nowrap">❤️ Schicht-Favoriten</button>
-          </div>
+          <label class="block text-xs font-semibold uppercase mb-1 opacity-80 text-slate-300">E-Mail</label>
+          <input type="email" id="loginEmail" required placeholder="amim@salonplafond.wien" class="w-full p-3 rounded-xl outline-none focus:ring-2 focus:ring-amber-500 text-sm bg-slate-800 text-white border border-slate-700">
         </div>
-
         <div>
-          <span class="text-xs text-slate-400 font-semibold mb-1.5 block">🍸 Nach Glas-Typ filtern:</span>
-          <div id="glassFilterContainer" class="flex gap-1.5 flex-wrap text-xs"></div>
+          <label class="block text-xs font-semibold uppercase mb-1 opacity-80 text-slate-300">Passwort</label>
+          <input type="password" id="loginPassword" required class="w-full p-3 rounded-xl outline-none focus:ring-2 focus:ring-amber-500 text-sm bg-slate-800 text-white border border-slate-700">
         </div>
-      </div>
+        <div id="authError" class="text-xs text-red-400 hidden font-medium"></div>
+        <button type="submit" id="btnLogin" class="w-full py-3 bg-amber-500 hover:bg-amber-600 active:scale-[0.99] text-slate-950 font-extrabold rounded-xl transition shadow-lg">
+          Einloggen
+        </button>
+      </form>
     </div>
   </div>
 
-  <!-- Manager Add / Edit Form -->
-  <div id="adminForm" class="hidden card p-6 mb-8 border-amber-500/50">
-    <h2 id="formTitle" class="text-xl font-bold mb-4 text-amber-400">➕ Neues Getränk hinzufügen</h2>
-    <input type="hidden" id="editingId" value="">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <input type="text" id="dName" placeholder="Getränkename (z. B. Strawberry Kiss)" class="p-3 rounded bg-slate-900 border border-slate-700 text-white md:col-span-2">
-      
-      <div class="md:col-span-2 bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col gap-2">
-        <label class="text-xs text-slate-400 font-semibold" id="seasonLabel">📅 Saison / Zeitraum:</label>
-        <select id="dSeason" onchange="handleSeasonSelectChange(this)" class="p-3 rounded bg-slate-950 border border-slate-800 text-white text-xs">
-          <option value="01.09.2026 – 31.10.2026">📦 Archiv: 01.09.2026 – 31.10.2026</option>
-          <option value="01.11.2026 – 31.12.2026">📦 Zukünftig: 01.11.2026 – 31.12.2026</option>
-          <option value="addNew">➕ Neue Saison erstellen...</option>
+  <!-- 2. HLAVNÁ APLIKÁCIA -->
+  <div id="appContainer" class="hidden max-w-4xl mx-auto p-4 space-y-6">
+    
+    <!-- HEADER -->
+    <header class="flex items-center justify-between border-b border-slate-700/50 pb-4">
+      <div class="flex items-center space-x-3">
+        <span id="appLogoIcon" class="text-3xl cursor-pointer drink-icon-spin" onclick="rotateLogoIcon()">🍸</span>
+        <div>
+          <h1 class="text-xl font-black text-amber-500 tracking-wider">Salonplafond BAR</h1>
+          <p id="userStatus" class="text-xs opacity-70">Angemeldet: <span id="currentUserEmail" class="font-semibold text-amber-400"></span></p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2">
+        <button onclick="toggleDarkMode()" class="p-2 rounded-xl card border hover:opacity-80 text-sm">🌙 / ☀️</button>
+        <button onclick="handleLogout()" class="px-3 py-2 bg-red-600/80 hover:bg-red-600 text-white font-bold text-xs rounded-xl transition">Abmelden</button>
+      </div>
+    </header>
+
+    <!-- MOTIVAČNÝ BANNER (EASTER EGG) -->
+    <div id="motivationalBanner" class="p-3 bg-gradient-to-r from-amber-500/20 to-amber-700/20 border border-amber-500/30 rounded-xl text-center text-sm font-medium text-amber-300">
+      🍹 Shake it till you make it! 
+    </div>
+
+    <!-- SEZÓNY & SEARCH -->
+    <div class="space-y-3">
+      <div class="flex flex-col sm:flex-row gap-2">
+        <select id="seasonSelect" onchange="filterDrinks()" class="p-3 rounded-xl card border font-semibold text-sm outline-none focus:ring-2 focus:ring-amber-500 flex-1 bg-slate-800 text-white">
+          <option value="16.11.2026 - 16.03.2027">Winterkarte (16.11.2026 - 16.03.2027)</option>
+          <option value="Sommer 2026">Sommerkarte 2026</option>
+          <option value="ALL">Alle Saisons</option>
         </select>
+        <input type="text" id="searchInput" oninput="filterDrinks()" placeholder="Drink oder Zutaten suchen..." class="p-3 rounded-xl card border text-sm outline-none focus:ring-2 focus:ring-amber-500 flex-2 bg-slate-800 text-white">
+      </div>
+    </div>
+
+    <!-- MOŽNOSTI MANAŽÉRA & AKCIE -->
+    <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-700/40">
+      <button id="btnManagerMode" onclick="toggleManagerMode()" class="px-3 py-2 bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 border border-amber-500/40 text-xs font-bold rounded-xl transition">🔑 Manager-Modus</button>
+      <button id="btnImportExcel" onclick="triggerExcelImport()" class="hidden px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition">📥 Winterkarte 2026 Excel Importieren</button>
+      <input type="file" id="excelFileInput" accept=".xlsx, .xls" class="hidden" onchange="handleExcelImport(event)">
+    </div>
+
+    <!-- ZOZNAM DRINKOV -->
+    <div id="drinksList" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <!-- Načítané drinky -->
+    </div>
+
+  </div>
+
+  <!-- MODAL: DETAIL DRINKU -->
+  <div id="drinkDetailModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div class="card w-full max-w-lg p-6 rounded-2xl shadow-2xl border space-y-4 max-h-[90vh] overflow-y-auto bg-slate-900 border-slate-700">
+      <div class="flex justify-between items-start">
+        <h2 id="detailName" class="text-2xl font-black text-amber-500"></h2>
+        <span id="detailCategory" class="px-2.5 py-1 bg-amber-500/20 text-amber-400 text-xs font-bold rounded-lg border border-amber-500/30"></span>
       </div>
 
-      <div class="md:col-span-2 bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col gap-2">
-        <label class="text-xs text-slate-400 font-semibold" id="catSelectLabel">🏷️ Kategorie auswählen:</label>
-        <div class="flex flex-wrap gap-3 text-xs text-slate-200" id="categoryRadios">
-          <label class="flex items-center gap-1.5 cursor-pointer bg-slate-950 px-3 py-2 rounded-lg border border-slate-800"><input type="radio" name="dCatRadio" value="Cocktails" class="accent-amber-500"> Cocktails</label>
-          <label class="flex items-center gap-1.5 cursor-pointer bg-slate-950 px-3 py-2 rounded-lg border border-slate-800"><input type="radio" name="dCatRadio" value="Mocktails" class="accent-amber-500"> Mocktails</label>
-          <label class="flex items-center gap-1.5 cursor-pointer bg-slate-950 px-3 py-2 rounded-lg border border-slate-800"><input type="radio" name="dCatRadio" value="Salonplafond Classics" class="accent-amber-500"> Salonplafond Classics</label>
-          <label class="flex items-center gap-1.5 cursor-pointer bg-slate-950 px-3 py-2 rounded-lg border border-slate-800"><input type="radio" name="dCatRadio" value="After Dinner Drinks" class="accent-amber-500"> After Dinner Drinks</label>
-          <label class="flex items-center gap-1.5 cursor-pointer bg-slate-950 px-3 py-2 rounded-lg border border-slate-800"><input type="radio" name="dCatRadio" value="Aperitif" class="accent-amber-500"> Aperitif</label>
-        </div>
-      </div>
-
-      <div class="md:col-span-2 bg-slate-900 p-4 rounded-xl border border-slate-700 grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="text-xs text-slate-400 font-semibold mb-1 block" id="lblGlass">🍸 Glas-Typ / Equipment:</label>
-          <div class="flex flex-wrap gap-1.5 mb-2 text-xs">
-            <button type="button" onclick="setQuickVal('dGlass', 'Coupette')" class="px-2 py-1 bg-slate-950 border border-slate-800 hover:border-amber-400 rounded">Coupette</button>
-            <button type="button" onclick="setQuickVal('dGlass', 'Highball')" class="px-2 py-1 bg-slate-950 border border-slate-800 hover:border-amber-400 rounded">Highball</button>
-            <button type="button" onclick="setQuickVal('dGlass', 'Tumbler')" class="px-2 py-1 bg-slate-950 border border-slate-800 hover:border-amber-400 rounded">Tumbler</button>
-            <button type="button" onclick="setQuickVal('dGlass', 'Rocks')" class="px-2 py-1 bg-slate-950 border border-slate-800 hover:border-amber-400 rounded">Rocks</button>
-            <button type="button" onclick="setQuickVal('dGlass', 'Martini')" class="px-2 py-1 bg-slate-950 border border-slate-800 hover:border-amber-400 rounded">Martini</button>
-          </div>
-          <input type="text" id="dGlass" placeholder="oder selbst eingeben..." class="p-2.5 rounded bg-slate-950 border border-slate-800 text-white text-xs w-full">
-        </div>
-
-        <div>
-          <label class="text-xs text-slate-400 font-semibold mb-1 block" id="lblMethod">🥄 Method (Zubereitungsmethode):</label>
-          <input type="text" id="dMethod" placeholder="z. B. Shake & fine strain, Stir, Build" class="p-2.5 rounded bg-slate-950 border border-slate-800 text-white text-xs w-full mt-7 md:mt-7">
-        </div>
-
-        <div>
-          <label class="text-xs text-slate-400 font-semibold mb-1 block" id="lblIce">🧊 Ice (Eis):</label>
-          <div class="flex flex-wrap gap-1.5 mb-2 text-xs">
-            <button type="button" onclick="setQuickVal('dIce', 'Cubed')" class="px-2 py-1 bg-slate-950 border border-slate-800 hover:border-amber-400 rounded">Cubed</button>
-            <button type="button" onclick="setQuickVal('dIce', 'Crushed')" class="px-2 py-1 bg-slate-950 border border-slate-800 hover:border-amber-400 rounded">Crushed</button>
-            <button type="button" onclick="setQuickVal('dIce', 'Ice Ball')" class="px-2 py-1 bg-slate-950 border border-slate-800 hover:border-amber-400 rounded">Ice Ball</button>
-            <button type="button" onclick="setQuickVal('dIce', 'None')" class="px-2 py-1 bg-slate-950 border border-slate-800 hover:border-amber-400 rounded">None</button>
-          </div>
-          <input type="text" id="dIce" placeholder="oder selbst eingeben..." class="p-2.5 rounded bg-slate-950 border border-slate-800 text-white text-xs w-full">
+      <div class="space-y-3 text-sm">
+        <div class="grid grid-cols-2 gap-2 p-3 bg-slate-800/60 rounded-xl border border-slate-700/50">
+          <div><span class="text-xs opacity-60 uppercase block">Glas</span> <strong id="detailGlass">-</strong></div>
+          <div><span class="text-xs opacity-60 uppercase block">Methode</span> <strong id="detailMethod">-</strong></div>
+          <div class="col-span-2"><span class="text-xs opacity-60 uppercase block">Eis</span> <strong id="detailIce">-</strong></div>
         </div>
 
         <div>
-          <label class="text-xs text-slate-400 font-semibold mb-1 block" id="lblGarnish">🍋 Garnish (Garnitur):</label>
-          <input type="text" id="dGarnish" placeholder="z. B. Dried strawberry, Mint sprig" class="p-2.5 rounded bg-slate-950 border border-slate-800 text-white text-xs w-full mt-7 md:mt-7">
+          <h4 class="text-xs font-bold uppercase text-amber-400 mb-1">Zutaten</h4>
+          <ul id="detailIngredients" class="space-y-1 pl-1"></ul>
+        </div>
+
+        <div>
+          <h4 class="text-xs font-bold uppercase text-amber-400 mb-1">Garnitur</h4>
+          <p id="detailGarnish" class="text-sm font-medium opacity-90"></p>
+        </div>
+
+        <div>
+          <h4 class="text-xs font-bold uppercase text-amber-400 mb-1">Zubereitung</h4>
+          <p id="detailPreparation" class="text-sm whitespace-pre-line opacity-90"></p>
+        </div>
+
+        <div id="managerCostSection" class="hidden p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl space-y-1">
+          <div class="flex justify-between text-xs"><span>Verkaufspreis:</span> <strong id="detailPrice">-</strong></div>
+          <div class="flex justify-between text-xs"><span>Wareneinsatz:</span> <strong id="detailCost">-</strong></div>
         </div>
       </div>
 
-      <div class="md:col-span-2 bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col gap-3">
-        <div class="flex justify-between items-center">
-          <label class="text-xs text-slate-400 font-semibold" id="lblIngHeader">📋 Zutaten & Mengen:</label>
-          <button type="button" onclick="addIngredientRow()" id="btnAddIngredient" class="px-3 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 font-bold rounded-lg text-xs border border-amber-500/30">+ Zutat hinzufügen</button>
-        </div>
-        <div id="ingredientRowsContainer" class="flex flex-col gap-2"></div>
-      </div>
-
-      <!-- ZUBEREITUNG -->
-      <div class="md:col-span-2 bg-slate-900 border border-slate-700/80 rounded-xl overflow-hidden">
-        <button type="button" onclick="document.getElementById('recipeCollapse').classList.toggle('hidden')" class="w-full p-3 text-left font-bold text-amber-400 text-xs flex justify-between items-center bg-slate-800/80 hover:bg-slate-800 transition">
-          <span>📖 Zubereitung / Schritt für Schritt (Optional)</span>
-          <span class="text-slate-400 text-xs">▼ <span class="lblShowHide">Anzeigen / Verbergen</span></span>
+      <!-- VYLEPŠENÉ VÝRAZNÉ TLAČIDLO SCHLIEßEN -->
+      <div class="pt-4 border-t border-slate-700/50 space-y-3">
+        <button onclick="closeDrinkDetail()" class="w-full py-3.5 bg-slate-800 hover:bg-slate-700 active:scale-[0.99] text-amber-400 font-extrabold text-sm rounded-xl border-2 border-amber-500/50 transition shadow-lg tracking-wide">
+          ✕ Schließen
         </button>
-        
-        <div id="recipeCollapse" class="hidden p-4 border-t border-slate-700/60 bg-slate-950/50">
-          <textarea id="dRecipe" placeholder="Detaillierte Zubereitung Schritt für Schritt eingeben..." class="p-3 rounded bg-slate-900 border border-slate-700 text-white text-xs w-full" rows="3"></textarea>
-        </div>
-      </div>
-
-      <!-- ALERGÉNY -->
-      <div class="md:col-span-2 bg-slate-900 border border-slate-700/80 rounded-xl overflow-hidden">
-        <button type="button" onclick="document.getElementById('allergensCollapse').classList.toggle('hidden')" class="w-full p-3 text-left font-bold text-amber-400 text-xs flex justify-between items-center bg-slate-800/80 hover:bg-slate-800 transition">
-          <span id="lblAllergensTitle">⚠️ Allergene (Optional)</span>
-          <span class="text-slate-400 text-xs">▼ <span class="lblShowHide">Anzeigen / Verbergen</span></span>
-        </button>
-        
-        <div id="allergensCollapse" class="hidden p-4 flex flex-col gap-3 border-t border-slate-700/60 bg-slate-950/50">
-          <div>
-            <label class="text-[11px] text-slate-400 font-semibold mb-1.5 block" id="lblQuickAllergens">Häufige Allergene auswählen:</label>
-            <div class="flex flex-wrap items-center gap-2 text-xs text-slate-300">
-              <label class="flex items-center gap-1.5 bg-slate-900 px-3 py-2 rounded-lg border border-slate-800 cursor-pointer"><input type="checkbox" onchange="togglePresetAllergen('🍷 Sulfite', this.checked)" class="preset-alg accent-amber-500"> 🍷 Sulfite</label>
-              <label class="flex items-center gap-1.5 bg-slate-900 px-3 py-2 rounded-lg border border-slate-800 cursor-pointer"><input type="checkbox" onchange="togglePresetAllergen('🌾 Gluten', this.checked)" class="preset-alg accent-amber-500"> 🌾 Gluten</label>
-              <label class="flex items-center gap-1.5 bg-slate-900 px-3 py-2 rounded-lg border border-slate-800 cursor-pointer"><input type="checkbox" onchange="togglePresetAllergen('🥛 Laktose', this.checked)" class="preset-alg accent-amber-500"> 🥛 Laktose</label>
-              <label class="flex items-center gap-1.5 bg-slate-900 px-3 py-2 rounded-lg border border-slate-800 cursor-pointer"><input type="checkbox" onchange="togglePresetAllergen('🥚 Ei', this.checked)" class="preset-alg accent-amber-500"> 🥚 Ei</label>
-              <label class="flex items-center gap-1.5 bg-slate-900 px-3 py-2 rounded-lg border border-slate-800 cursor-pointer"><input type="checkbox" onchange="togglePresetAllergen('🥜 Nüsse', this.checked)" class="preset-alg accent-amber-500"> 🥜 Nüsse</label>
-              <label class="flex items-center gap-1.5 bg-slate-900 px-3 py-2 rounded-lg border border-slate-800 cursor-pointer"><input type="checkbox" onchange="togglePresetAllergen('🫘 Soja', this.checked)" class="preset-alg accent-amber-500"> 🫘 Soja</label>
-            </div>
-          </div>
-
-          <textarea id="dAllergens" placeholder="Allergene (z. B. Enthält Sulfite...)" class="p-3 rounded bg-slate-900 border border-slate-700 text-white text-xs w-full" rows="2"></textarea>
-        </div>
-      </div>
-
-      <!-- CENY -->
-      <div class="md:col-span-2 bg-slate-900 border border-slate-700/80 rounded-xl overflow-hidden">
-        <button type="button" onclick="document.getElementById('pricesCollapse').classList.toggle('hidden')" class="w-full p-3 text-left font-bold text-amber-400 text-xs flex justify-between items-center bg-slate-800/80 hover:bg-slate-800 transition">
-          <span>💶 Preis & Wareneinsatz (Optional)</span>
-          <span class="text-slate-400 text-xs">▼ <span class="lblShowHide">Anzeigen / Verbergen</span></span>
-        </button>
-        
-        <div id="pricesCollapse" class="hidden p-4 grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-slate-700/60 bg-slate-950/50">
-          <div>
-            <label class="text-xs text-slate-400 font-semibold mb-1 block" id="costLabel">💶 Wareneinsatz (€):</label>
-            <input type="number" step="0.10" id="dCost" placeholder="0.00" class="p-3 rounded bg-slate-900 border border-slate-800 text-white w-full text-xs">
-          </div>
-          <div>
-            <label class="text-xs text-slate-400 font-semibold mb-1 block" id="priceLabel">🏷️ Verkaufspreis (€):</label>
-            <input type="number" step="0.10" id="dPrice" placeholder="0.00" class="p-3 rounded bg-slate-900 border border-slate-800 text-white w-full text-xs">
-          </div>
-        </div>
-      </div>
-
-      <div class="md:col-span-2 bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col gap-2">
-        <label class="text-xs text-slate-400 font-semibold" id="photoLabel">📸 Foto des Getränks:</label>
-        <div class="flex gap-2 items-center">
-          <input type="file" id="imageFile" accept="image/*" onchange="uploadImageToSupabase(event)" class="text-xs text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-600 cursor-pointer">
-          <span id="uploadStatus" class="text-xs text-amber-400 font-medium"></span>
-        </div>
-        <input type="text" id="dPhoto" placeholder="Bild-URL..." class="p-3 rounded bg-slate-950 border border-slate-800 text-white text-xs mt-1">
-      </div>
-
-      <div class="md:col-span-2 flex items-center p-3 bg-slate-900 rounded border border-slate-800 text-xs text-slate-300">
-        <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="dFeatured" class="accent-amber-500"> ⭐ <span id="lblFeatured">Als Bestseller / Highlight markieren</span></label>
-      </div>
-    </div>
-
-    <div class="flex flex-wrap gap-3 mt-4">
-      <button onclick="saveDrink()" id="saveBtn" class="px-6 py-3 bg-amber-500 hover:bg-amber-600 font-bold text-slate-950 rounded-lg text-sm">Getränk speichern</button>
-      <button onclick="deleteDrinkFromForm()" id="deleteFormBtn" class="hidden px-6 py-3 bg-red-600 hover:bg-red-500 font-bold text-white rounded-lg text-sm border border-red-500/30">🗑️ Getränk löschen</button>
-      <button onclick="closeAdminForm()" id="closeFormBtn" class="px-6 py-3 bg-slate-800 hover:bg-slate-700 font-bold text-white rounded-lg text-sm border border-slate-700">Schließen</button>
-      <button onclick="resetForm()" id="cancelEditBtn" class="hidden px-6 py-3 bg-slate-700 hover:bg-slate-600 font-bold text-white rounded-lg text-sm">Abbrechen</button>
-    </div>
-  </div>
-
-  <div id="drinksGrid">
-    <p id="loadingTxt" class="col-span-full text-slate-400">Lade Getränke aus der Datenbank...</p>
-  </div>
-
-  <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-    Salonplafond BAR App v2.3.1 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
-  </footer>
-
-  <!-- Modal Detail View -->
-  <div id="drinkModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-    <div class="card max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 relative flex flex-col justify-between">
-      <div>
-        <button onclick="closeModal()" class="no-print absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
-        <div id="modalContent"></div>
-      </div>
-      <div class="mt-6 pt-4 border-t border-slate-800 flex gap-2 no-print items-center flex-wrap">
-        <button id="modalFavBtn" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold rounded-xl transition text-sm flex items-center justify-center gap-2 border border-slate-700">
-          ❤️ <span id="favBtnText">Schicht-Favorit</span>
-        </button>
-        <button id="modalEditBtn" class="px-4 py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl transition text-sm flex items-center justify-center gap-2">
-          ✏️ <span id="editBtnText">Bearbeiten</span>
-        </button>
-        <button id="modalDeleteBtn" class="px-4 py-3 bg-red-600/80 hover:bg-red-600 text-white font-bold rounded-xl transition text-sm flex items-center justify-center gap-2">
-          🗑️ <span>Löschen</span>
-        </button>
-        <button onclick="window.print()" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold rounded-xl transition text-sm flex items-center justify-center gap-2 border border-slate-700">
-          🖨️ <span id="printBtnText">Drucken / PDF</span>
-        </button>
-        <button onclick="closeModal()" id="closeModalBtn" class="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition text-sm">Schließen</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Shopping List / Inventory Modal -->
-  <div id="shoppingModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-    <div class="card max-w-lg w-full p-6 relative flex flex-col gap-4 max-h-[85vh] overflow-y-auto">
-      <button onclick="closeShoppingModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
-      <h3 class="text-xl font-bold text-amber-400">🛒 Zutaten-Einkaufsliste / Inventur</h3>
-      <p class="text-xs text-slate-300">Alle benötigten Zutaten für die aktuell aktive Saison (<span id="shoppingSeasonName" class="font-bold text-amber-400"></span>):</p>
-      <div id="shoppingListContainer" class="flex flex-col gap-1.5 mt-2 bg-slate-950/40 p-3 rounded-xl border border-slate-800 text-xs"></div>
-      <div class="flex justify-end mt-2">
-        <button onclick="closeShoppingModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 font-bold text-white rounded-lg text-xs transition">Schließen</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Motivation Modal (Osterei) -->
-  <div id="motivationModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-    <div class="card max-w-md w-full border-amber-500/50 p-6 relative flex flex-col gap-4 text-center shadow-2xl">
-      <button onclick="closeMotivationModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
-      <div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-2xl mx-auto flex items-center justify-center text-3xl border border-amber-500/30">🍸</div>
-      <h3 class="text-xl font-bold text-amber-400">Salonplafond Osterei 🐣</h3>
-      <div id="motivationTextContainer" class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-sm text-slate-200 italic min-h-[90px] flex items-center justify-center"></div>
-      <div class="flex gap-2 mt-2">
-        <button onclick="showRandomMotivation()" class="flex-1 py-2.5 bg-amber-500 hover:bg-amber-600 font-bold text-slate-950 rounded-lg text-xs transition">🔄 Noch ein Spruch</button>
-        <button onclick="closeMotivationModal()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 font-bold text-white rounded-lg text-xs transition">Schließen</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Season Selection Modal Dialog -->
-  <div id="seasonModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-    <div class="card max-w-md w-full p-6 relative flex flex-col gap-4">
-      <button onclick="closeSeasonModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
-      <h3 class="text-xl font-bold text-amber-400" id="seasonModalTitle">📅 Saison & Archiv wählen</h3>
-      <p class="text-xs text-slate-300" id="seasonModalDesc">Wähle die aktive Saison oder das Archiv aus:</p>
-      <div id="seasonModalList" class="flex flex-col gap-2 mt-2"></div>
-      <div class="mt-4 pt-3 border-t border-slate-800 flex justify-end">
-        <button onclick="closeSeasonModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 font-bold text-white rounded-lg text-xs transition">Schließen</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Support Modal -->
-  <div id="supportModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-    <div class="card max-w-lg w-full p-6 relative flex flex-col gap-4">
-      <button onclick="closeSupportModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
-      <h3 class="text-xl font-bold text-amber-400" id="supportModalTitle">✉️ Support & Feedback</h3>
-      <p class="text-xs text-slate-300" id="supportModalDesc">Sende direkt eine Nachricht an den Entwickler (Tomas Kardos).</p>
-      <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs text-slate-300 flex items-center justify-between">
-        <span>📧 <b>kdstom@outlook.com</b></span>
-      </div>
-      <textarea id="supportMessage" rows="4" placeholder="Schreibe deine Nachricht hier..." class="p-3 rounded bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400"></textarea>
-      <div class="flex gap-2">
-        <button onclick="sendSupportEmail()" id="sendSupportBtn" class="flex-1 py-2.5 bg-amber-500 hover:bg-amber-600 font-bold text-slate-950 rounded-lg text-xs transition">Nachricht senden</button>
-        <button onclick="closeSupportModal()" id="closeSupportBtn" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 font-bold text-white rounded-lg text-xs transition">Schließen</button>
       </div>
     </div>
   </div>
 
   <script>
+    // SUPABASE PRIPOJENIE
     const SUPABASE_URL = "https://asrrkjcxqqvxzlikdkaq.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_2tw50zmlzxDClPx7zwnT3g_k2WiaUuL";
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const SUPABASE_ANON_KEY = "sb_publishable_2tw50zmlzxDClPx7zwnT3g_k2WiaUuL";
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    function initSplash() {
-      const splash = document.getElementById('splashScreen');
-      if (splash) {
-        setTimeout(() => {
-          splash.style.opacity = '0';
-          setTimeout(() => { splash.style.display = 'none'; }, 500);
-        }, 2500);
-      }
-    }
+    const LOGO_ICONS = ["🍸", "🍹", "🥂", "🥃", "🍷", "🍺"];
+    let currentIconIdx = 0;
+    let allDrinks = [];
+    let isManager = false;
 
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initSplash);
-    } else {
-      initSplash();
-    }
-
-    /* AKTUALIZOVANÝ ZOZNAM MOTIVAČNÝCH HLÁŠOK */
-    const motivationalQuotes = [
-      "„Frau gut? Ruhe bitte!“ 🤫",
-      "„Keine Zeit!“ ⏱️",
-      "„Shaken, einschenken, lächeln! Ihr macht das großartig!“ 🍸✨",
-      "„Kein Stress hinter der Bar – die Drinks schmecken besser mit Gelassenheit!“ 🧊",
-      "„Ein perfekter Drink ist wie Kunst. Und ihr seid die Künstler heute Abend!“ 🎨🍾",
-      "„Fokus, Teamwork und ein guter Cocktail – das Erfolgsrezept für jeden Abend!“ 🔥",
-      "„Egal wie lang die Schlange ist: Einen Drink nach dem anderen. Du schaffst das!“ 💪",
-      "„Weißt du, wer der beste Spüler im Salonplafond ist? Natürlich Tomas, der auch diese App für euch erstellt hat, um euch die Arbeit zu erleichtern! Er grüßt euch und freut sich, dass ihr diese App nutzt, da ihn die Programmierung viel Arbeit gekostet hat!“ 🧽✨",
-      "„Wer nie vom Weg abkommt, bleibt auf der Strecke. Weitermachen, Team!“ 🚀",
-      "„Gute Getränke heben die Laune, aber ein starkes Team rockt den ganzen Abend!“ 🍸",
-      "„Auch der längste Shift geht einmal vorbei. Tschakka, du schaffst das!“ 💪",
-      "„Perfektion ist kein Zufall, sondern harte Arbeit. Danke für euren Einsatz im Salonplafond!“ ✨",
-      "„Ein Lächeln ist das beste Gewürz hinter der Bar. Prost auf euch!“ 🥂",
-      "„Wer heute gaaaanz entspannt bleibt, kriegt den Rush locker gebacken!“ 🧊",
-      "„Kleine Schritte führen zum Ziel. Und heute Abend rocken wir den Laden!“ 🔥",
-      "„Der frühe Vogel fängt den Wurm, aber der Barkeeper rettet den Abend!“ 🍋",
-      "„Lass dich nicht stressen, du bist der Star hinter der Theke!“ ⭐"
+    const MOTIVATIONAL_PHRASES = [
+      "🍹 Shake it till you make it!",
+      "❄️ Bereit für die Wintersaison 16.11.2026 - 16.03.2027!",
+      "🥂 Lächeln, einschenken, glänzen!",
+      "🍋 Vergiss die Garnitur nicht!",
+      "🔥 Ein gutes Team macht die besten Drinks!",
+      "🧊 Immer genug Eis im Bin behalten!"
     ];
 
-    function showRandomMotivation(event) {
-      if (event) event.stopPropagation();
-      const randomIndex = Math.floor(Math.random() * motivationalQuotes.length);
-      document.getElementById('motivationTextContainer').innerText = motivationalQuotes[randomIndex];
-      const modal = document.getElementById('motivationModal');
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
+    function rotateLogoIcon() {
+      currentIconIdx = (currentIconIdx + 1) % LOGO_ICONS.length;
+      document.getElementById("authLogoIcon").innerText = LOGO_ICONS[currentIconIdx];
+      document.getElementById("appLogoIcon").innerText = LOGO_ICONS[currentIconIdx];
     }
 
-    function closeMotivationModal() {
-      const modal = document.getElementById('motivationModal');
-      modal.classList.remove('flex');
-      modal.classList.add('hidden');
-    }
-
-    let currentLang = 'de';
-    let viewMode = 'grid';
-    let themeMode = 'dark';
-    let allDrinks = [];
-    let selectedCat = 'All';
-    let activeSpecialFilter = null;
-    let selectedGlassFilter = null;
-    let currentSeasonFilter = null;
-    let isAdmin = false;
-    let shiftFavorites = JSON.parse(localStorage.getItem('salon_shift_favorites') || '[]');
-    const MANAGER_PASSWORD = "salon123";
-
-    const i18n = {
-      de: {
-        subTitle: "Salonplafond • Rezepte & Getränkehandbuch",
-        searchPlaceholder: "🔍 Getränk oder Rezept suchen...",
-        waiterMode: "Kellner",
-        managerMode: "Manager",
-        allCategories: "Alle",
-        menuText: "Menü",
-        refreshText: "Aktualisieren",
-        seasonMenuBtnText: "Saison wählen...",
-        shoppingMenuBtnText: "Einkaufsliste / Inventur",
-        seasonModalTitle: "📅 Saison & Archiv wählen",
-        seasonModalDesc: "Wähle die aktive Saison oder das Archiv aus:",
-        archiveBadgeText: "Aktive Saison:",
-        langMenuLabel: "Sprache / Language",
-        exportText: "Export CSV",
-        supportText: "Support / Feedback",
-        supportModalTitle: "✉️ Support & Feedback",
-        supportModalDesc: "Möchtest du ein Rezept ändern, ein neues Getränk hinzufügen oder hast du einen Verbesserungsvorschlag? Sende direkt eine Nachricht an den Entwickler (Tomas Kardos).",
-        supportPlaceholder: "Schreibe deine Nachricht hier...",
-        sendSupportBtn: "Nachricht senden",
-        formTitleAdd: "➕ Neues Getränk hinzufügen",
-        formTitleEdit: "✏️ Getränk bearbeiten",
-        namePlaceholder: "Getränkename (z. B. Strawberry Kiss)",
-        catSelectLabel: "🏷️ Kategorie auswählen:",
-        lblGlass: "🍸 Glas-Typ / Equipment:",
-        lblMethod: "🥄 Method (Zubereitungsmethode):",
-        lblIce: "🧊 Ice (Eis):",
-        lblGarnish: "🍋 Garnish (Garnitur):",
-        lblIngHeader: "📋 Zutaten & Mengen:",
-        btnAddIngredient: "+ Zutat hinzufügen",
-        ingNamePlaceholder: "Zutat (z. B. Tequila)",
-        ingAmountPlaceholder: "Menge (z. B. 5cL, 2 Dashes)",
-        lblAllergensTitle: "⚠️ Allergene (Optional)",
-        lblQuickAllergens: "Häufige Allergene auswählen:",
-        allergensPlaceholder: "Allergene (z. B. Enthält Sulfite...)",
-        seasonLabel: "📅 Saison / Zeitraum:",
-        costLabel: "💶 Wareneinsatz (€):",
-        priceLabel: "🏷️ Verkaufspreis (€):",
-        photoLabel: "📸 Foto des Getränks:",
-        lblFeatured: "Als Bestseller / Highlight markieren",
-        saveBtn: "Getränk speichern",
-        closeFormBtn: "Schließen",
-        cancelBtn: "Abbrechen",
-        closeBtn: "Schließen",
-        printBtn: "Drucken / PDF",
-        editBtnText: "Bearbeiten",
-        loading: "Lade Getränke aus der Datenbank...",
-        noDrinksFound: "Keine Getränke in dieser Saison gefunden.",
-        addFirstDrink: "Fügen Sie oben das erste Getränk hinzu!",
-        ingredientsLabel: "📋 Ingredients / Zutaten:",
-        allergensLabel: "⚠️ Allergene:",
-        recipeLabel: "Zubereitung",
-        toggleShowHide: "Anzeigen / Verbergen",
-        lastUpdated: "Zuletzt aktualisiert:",
-        deleteBtn: "Getränk löschen",
-        editBtn: "Getränk bearbeiten",
-        alertFill: "Bitte geben Sie den Namen und wählen Sie eine Kategorie aus.",
-        confirmDelete: "Möchten Sie dieses Getränk wirklich löschen?",
-        passPrompt: "Bitte geben Sie das Manager-Passwort ein:",
-        passWrong: "Falsches Passwort!",
-        defaultDrinkCat: "Getränk",
-        clickToView: "Klicken für Rezept",
-        noPhoto: "Kein Bild",
-        uploading: "Wird hochgeladen...",
-        uploadSuccess: "✔ Foto erfolgreich hochgeladen!",
-        fullscreen: "Vollbild",
-        catLabel: "Kategorie:",
-        filterLabel: "Filter:"
-      },
-      en: {
-        subTitle: "Salonplafond • Recipes & Drinks Manual",
-        searchPlaceholder: "🔍 Search drink or recipe...",
-        waiterMode: "Waiter",
-        managerMode: "Manager",
-        allCategories: "All",
-        menuText: "Menu",
-        refreshText: "Refresh",
-        seasonMenuBtnText: "Select Season...",
-        shoppingMenuBtnText: "Shopping List / Inventory",
-        seasonModalTitle: "📅 Select Season & Archive",
-        seasonModalDesc: "Choose the active season or archive to view the corresponding drinks:",
-        archiveBadgeText: "Active Season:",
-        langMenuLabel: "Language",
-        exportText: "CSV Export",
-        supportText: "Support / Feedback",
-        supportModalTitle: "✉️ Support & Feedback",
-        supportModalDesc: "Would you like to change a recipe, add a new drink, or do you have a suggestion? Send a message directly to the developer (Tomas Kardos).",
-        supportPlaceholder: "Write your message here...",
-        sendSupportBtn: "Send Message",
-        formTitleAdd: "➕ Add New Drink",
-        formTitleEdit: "✏️ Edit Drink",
-        namePlaceholder: "Drink name (e.g. Strawberry Kiss)",
-        catSelectLabel: "🏷️ Select Category:",
-        lblGlass: "🍸 Glass Type / Equipment:",
-        lblMethod: "🥄 Method:",
-        lblIce: "🧊 Ice:",
-        lblGarnish: "🍋 Garnish:",
-        lblIngHeader: "📋 Ingredients & Amounts:",
-        btnAddIngredient: "+ Add Ingredient",
-        ingNamePlaceholder: "Ingredient (e.g. Tequila)",
-        ingAmountPlaceholder: "Amount (e.g. 5cL, 2 Dashes)",
-        lblAllergensTitle: "⚠️ Allergens (Optional)",
-        lblQuickAllergens: "Select common allergens:",
-        allergensPlaceholder: "Allergens (e.g. Contains sulfites...)",
-        seasonLabel: "📅 Season / Period:",
-        costLabel: "💶 Cost Price (€):",
-        priceLabel: "🏷️ Selling Price (€):",
-        photoLabel: "📸 Drink Photo:",
-        lblFeatured: "Mark as Bestseller / Highlight",
-        saveBtn: "Save Drink",
-        closeFormBtn: "Close",
-        cancelBtn: "Cancel",
-        closeBtn: "Close",
-        printBtn: "Print / PDF",
-        editBtnText: "Edit",
-        loading: "Loading drinks from database...",
-        noDrinksFound: "No drinks found in this season.",
-        addFirstDrink: "Add the first drink using the form above!",
-        ingredientsLabel: "📋 Ingredients:",
-        allergensLabel: "⚠️ Allergens:",
-        recipeLabel: "Preparation",
-        toggleShowHide: "Show / Hide",
-        lastUpdated: "Last updated:",
-        deleteBtn: "Delete Drink",
-        editBtn: "Edit Drink",
-        alertFill: "Please enter the drink name and select a category.",
-        confirmDelete: "Do you really want to delete this drink?",
-        passPrompt: "Please enter the manager password:",
-        passWrong: "Wrong password!",
-        defaultDrinkCat: "Drink",
-        clickToView: "Click for recipe",
-        noPhoto: "No photo",
-        uploading: "Uploading...",
-        uploadSuccess: "✔ Photo successfully uploaded!",
-        fullscreen: "Fullscreen",
-        catLabel: "Category:",
-        filterLabel: "Filter:"
+    window.addEventListener("DOMContentLoaded", async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        showApp(session.user);
       }
-    };
+      setRandomMotivationalPhrase();
+    });
 
-    function refreshData() { loadDrinks(); }
-
-    function setQuickVal(fieldId, value) {
-      document.getElementById(fieldId).value = value;
+    function setRandomMotivationalPhrase() {
+      const phrase = MOTIVATIONAL_PHRASES[Math.floor(Math.random() * MOTIVATIONAL_PHRASES.length)];
+      document.getElementById("motivationalBanner").innerText = phrase;
     }
 
-    function toggleThemeMode() {
-      const root = document.getElementById('htmlRoot');
-      const body = document.body;
-      const statusText = document.getElementById('themeStatusText');
-      if (themeMode === 'dark') {
-        themeMode = 'light';
-        body.classList.remove('dark-mode');
-        body.classList.add('light-mode');
-        statusText.innerText = 'Hell';
-      } else {
-        themeMode = 'dark';
-        body.classList.remove('light-mode');
-        body.classList.add('dark-mode');
-        statusText.innerText = 'Dunkel';
-      }
-      document.getElementById('settingsDropdown').classList.add('hidden');
-    }
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById("loginEmail").value;
+      const password = document.getElementById("loginPassword").value;
+      const errDiv = document.getElementById("authError");
+      errDiv.classList.add("hidden");
 
-    function toggleFilterDrawer() {
-      const drawer = document.getElementById('filterDrawer');
-      const arrow = document.getElementById('filterArrow');
-      if (drawer.classList.contains('hidden')) {
-        drawer.classList.remove('hidden');
-        drawer.classList.add('flex');
-        arrow.innerText = '▲';
-      } else {
-        drawer.classList.remove('flex');
-        drawer.classList.add('hidden');
-        arrow.innerText = '▼';
-      }
-    }
-
-    function togglePresetAllergen(allergenName, isChecked) {
-      const textarea = document.getElementById('dAllergens');
-      let currentVal = textarea.value.trim();
-      let list = currentVal ? currentVal.split(',').map(s => s.trim()).filter(Boolean) : [];
-      if (isChecked) {
-        if (!list.includes(allergenName)) list.push(allergenName);
-      } else {
-        list = list.filter(item => item !== allergenName);
-      }
-      textarea.value = list.join(', ');
-    }
-
-    function addIngredientRow(name = '', amount = '') {
-      const container = document.getElementById('ingredientRowsContainer');
-      const rowId = 'ing_row_' + Date.now() + '_' + Math.random().toString(36).substring(2, 5);
-      const t = i18n[currentLang];
-      const div = document.createElement('div');
-      div.id = rowId;
-      div.className = 'flex gap-2 items-center';
-      div.innerHTML = `
-        <input type="text" placeholder="${t.ingNamePlaceholder}" value="${name}" class="ing-name flex-1 p-2 rounded bg-slate-950 border border-slate-800 text-white text-xs">
-        <input type="text" placeholder="${t.ingAmountPlaceholder}" value="${amount}" class="ing-amount w-36 p-2 rounded bg-slate-950 border border-slate-800 text-white text-xs">
-        <button type="button" onclick="document.getElementById('${rowId}').remove()" class="text-red-400 hover:text-red-300 p-2 text-base font-bold">&times;</button>
-      `;
-      container.appendChild(div);
-    }
-
-    function getIngredientsData() {
-      const rows = document.querySelectorAll('#ingredientRowsContainer > div');
-      let ingredients = [];
-      rows.forEach(row => {
-        let name = row.querySelector('.ing-name').value.trim();
-        let amount = row.querySelector('.ing-amount').value.trim();
-        if (name) ingredients.push({ name, amount });
-      });
-      return ingredients;
-    }
-
-    function populateIngredientRows(ingredientsArr) {
-      const container = document.getElementById('ingredientRowsContainer');
-      container.innerHTML = '';
-      if (Array.isArray(ingredientsArr) && ingredientsArr.length > 0) {
-        ingredientsArr.forEach(item => addIngredientRow(item.name, item.amount));
-      } else {
-        addIngredientRow('', '');
-      }
-    }
-
-    function toggleSettingsMenu(event) {
-      event.stopPropagation();
-      document.getElementById('settingsDropdown').classList.toggle('hidden');
-    }
-
-    function closeDropdowns(event) {
-      const dropdown = document.getElementById('settingsDropdown');
-      if (dropdown && !dropdown.contains(event.target)) dropdown.classList.add('hidden');
-    }
-
-    function openSeasonModal() {
-      document.getElementById('settingsDropdown').classList.add('hidden');
-      renderSeasonModalList();
-      document.getElementById('seasonModal').classList.remove('hidden');
-      document.getElementById('seasonModal').classList.add('flex');
-    }
-
-    function closeSeasonModal() {
-      document.getElementById('seasonModal').classList.remove('flex');
-      document.getElementById('seasonModal').classList.add('hidden');
-    }
-
-    function openShoppingModal() {
-      document.getElementById('settingsDropdown').classList.add('hidden');
-      document.getElementById('shoppingSeasonName').innerText = currentSeasonFilter;
-      
-      let activeDrinks = allDrinks.filter(d => (d.season || '') === currentSeasonFilter);
-      let ingredientsMap = {};
-      activeDrinks.forEach(d => {
-        if (Array.isArray(d.ingredients_json)) {
-          d.ingredients_json.forEach(ing => {
-            let key = ing.name.toLowerCase().trim();
-            if (!ingredientsMap[key]) {
-              ingredientsMap[key] = { name: ing.name, amounts: [] };
-            }
-            if (ing.amount) ingredientsMap[key].amounts.push(`${ing.amount} (${d.name})`);
-          });
-        }
-      });
-
-      let container = document.getElementById('shoppingListContainer');
-      let keys = Object.keys(ingredientsMap);
-      if (keys.length === 0) {
-        container.innerHTML = '<p class="text-slate-500 italic">Keine Zutaten in dieser Saison gefunden.</p>';
-      } else {
-        container.innerHTML = keys.map(k => {
-          let item = ingredientsMap[k];
-          return `<div class="p-2 rounded bg-slate-900 border border-slate-800 flex justify-between items-center"><span class="font-bold text-amber-400">📦 ${item.name}</span><span class="text-[11px] text-slate-400 text-right">${item.amounts.join(', ')}</span></div>`;
-        }).join('');
-      }
-
-      document.getElementById('shoppingModal').classList.remove('hidden');
-      document.getElementById('shoppingModal').classList.add('flex');
-    }
-
-    function closeShoppingModal() {
-      document.getElementById('shoppingModal').classList.remove('flex');
-      document.getElementById('shoppingModal').classList.add('hidden');
-    }
-
-    function getAllSeasons() {
-      let seasons = [];
-      allDrinks.forEach(d => {
-        if (d.season && d.season !== 'current' && !seasons.includes(d.season)) seasons.push(d.season);
-      });
-      if (seasons.length === 0) seasons.push('01.09.2026 – 31.10.2026');
-      return seasons;
-    }
-
-    function determineActiveSeasonAutomatically() {
-      const now = new Date();
-      let seasons = getAllSeasons();
-      let matchedSeason = seasons[0];
-
-      seasons.forEach(s => {
-        if (s.includes('–')) {
-          let parts = s.split('–').map(item => item.trim());
-          if (parts.length === 2) {
-            let [startDay, startMonth, startYear] = parts[0].split('.').map(Number);
-            let [endDay, endMonth, endYear] = parts[1].split('.').map(Number);
-            if (startYear && endYear && startMonth && endMonth && startDay && endDay) {
-              let startDate = new Date(startYear, startMonth - 1, startDay);
-              let endDate = new Date(endYear, endMonth - 1, endDay, 23, 59, 59);
-              if (now >= startDate && now <= endDate) matchedSeason = s;
-            }
-          }
-        }
-      });
-      return matchedSeason;
-    }
-
-    function updateActiveSeasonBadgeUI() {
-      const badge = document.getElementById('activeSeasonBadge');
-      const seasonNameEl = document.getElementById('activeSeasonName');
-      if (!currentSeasonFilter) {
-        badge.classList.remove('flex');
-        badge.classList.add('hidden');
-      } else {
-        badge.classList.remove('hidden');
-        badge.classList.add('flex');
-        seasonNameEl.innerText = currentSeasonFilter;
-      }
-    }
-
-    async function deleteEntireSeason(seasonKey, event) {
-      if (event) event.stopPropagation();
-      
-      if (!isAdmin) {
-        let pass = prompt(i18n[currentLang].passPrompt);
-        if (pass !== MANAGER_PASSWORD) {
-          alert(i18n[currentLang].passWrong);
-          return;
-        }
-        isAdmin = true;
-        document.getElementById('modeStatusText').innerText = i18n[currentLang].managerMode;
-      }
-
-      if (!confirm(`Möchten Sie wirklich die gesamte Saison "${seasonKey}" und alle darin enthaltenen Getränke löschen?`)) {
-        return;
-      }
-
-      const { error } = await _supabase.from('drinks').delete().eq('season', seasonKey);
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
-        alert("Fehler beim Löschen: " + error.message);
-        return;
-      }
-
-      alert(`Saison "${seasonKey}" wurde erfolgreich gelöscht!`);
-      loadDrinks();
-      closeSeasonModal();
-    }
-
-    function renderSeasonModalList() {
-      const seasons = getAllSeasons();
-      const listContainer = document.getElementById('seasonModalList');
-      listContainer.innerHTML = seasons.map(s => {
-        let label = `📦 Saison: ${s}`;
-        let activeClass = currentSeasonFilter === s ? 'border-amber-400 bg-amber-500/10' : 'bg-slate-800 border-slate-700 hover:bg-slate-700';
-        let deleteBtnHtml = `<button onclick="deleteEntireSeason('${s}', event)" class="p-1.5 px-2 bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white rounded-lg transition text-xs font-bold border border-red-500/30 ml-2" title="Saison komplett löschen">🗑️ Löschen</button>`;
-
-        return `<div class="p-3 rounded-xl ${activeClass} border transition flex items-center justify-between group cursor-pointer" onclick="selectSeason('${s}')"><div><div class="text-sm font-bold text-white group-hover:text-amber-400">${label}</div></div><div class="flex items-center"><span class="text-xs text-amber-400 font-semibold mr-1">${currentSeasonFilter === s ? 'Aktiv ✓' : 'Öffnen →'}</span>${deleteBtnHtml}</div></div>`;
-      }).join('');
-    }
-
-    function renderSeasonFormSelect(selectedVal = '') {
-      const seasons = getAllSeasons();
-      const select = document.getElementById('dSeason');
-      let html = '';
-      seasons.forEach(s => {
-        html += `<option value="${s}" ${selectedVal === s ? 'selected' : ''}>📦 ${s}</option>`;
-      });
-      html += `<option value="addNew">➕ Neue Saison erstellen...</option>`;
-      select.innerHTML = html;
-      if (selectedVal) select.value = selectedVal;
-    }
-
-    function handleSeasonSelectChange(selectEl) {
-      if (selectEl.value === 'addNew') {
-        let newSeasonName = prompt(currentLang === 'de' ? 'Zeitraum eingeben (z. B. 01.11.2026 – 31.12.2026):' : 'Enter period:');
-        if (newSeasonName && newSeasonName.trim() !== '') {
-          let formattedName = newSeasonName.trim();
-          let select = document.getElementById('dSeason');
-          let opt = document.createElement('option');
-          opt.value = formattedName;
-          opt.text = `📦 ${formattedName}`;
-          select.insertBefore(opt, select.lastElementChild);
-          select.value = formattedName;
-        } else {
-          selectEl.value = getAllSeasons()[0];
-        }
-      }
-    }
-
-    function selectSeason(seasonKey) {
-      currentSeasonFilter = seasonKey;
-      closeSeasonModal();
-      updateActiveSeasonBadgeUI();
-      renderCategories();
-      renderDrinks();
-    }
-
-    function openSupportModal() {
-      document.getElementById('settingsDropdown').classList.add('hidden');
-      document.getElementById('supportModal').classList.remove('hidden');
-      document.getElementById('supportModal').classList.add('flex');
-    }
-
-    function closeSupportModal() {
-      document.getElementById('supportModal').classList.remove('flex');
-      document.getElementById('supportModal').classList.add('hidden');
-    }
-
-    function sendSupportEmail() {
-      const msg = document.getElementById('supportMessage').value;
-      window.location.href = `mailto:kdstom@outlook.com?subject=Support&body=${encodeURIComponent(msg)}`;
-      closeSupportModal();
-    }
-
-    function setLang(lang) {
-      currentLang = lang;
-      document.getElementById('langDe').className = lang === 'de' ? 'py-1 text-xs font-bold rounded bg-amber-500 text-slate-950 text-center' : 'py-1 text-xs font-bold rounded text-slate-400 hover:text-white text-center bg-slate-900';
-      document.getElementById('langEn').className = lang === 'en' ? 'py-1 text-xs font-bold rounded bg-amber-500 text-slate-950 text-center' : 'py-1 text-xs font-bold rounded text-slate-400 hover:text-white text-center bg-slate-900';
-      updateUI();
-    }
-
-    function setViewMode(mode) {
-      viewMode = mode;
-      document.getElementById('viewGrid').className = mode === 'grid' ? 'flex-1 py-1 text-xs font-bold rounded bg-amber-500 text-slate-950 text-center' : 'flex-1 py-1 text-xs font-bold rounded text-slate-400 hover:text-white text-center';
-      document.getElementById('viewList').className = mode === 'list' ? 'flex-1 py-1 text-xs font-bold rounded bg-amber-500 text-slate-950 text-center' : 'flex-1 py-1 text-xs font-bold rounded text-slate-400 hover:text-white text-center';
-      renderDrinks();
-    }
-
-    function toggleFullscreen() {
-      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
-      else if (document.exitFullscreen) document.exitFullscreen();
-    }
-
-    function updateUI() {
-      const t = i18n[currentLang];
-      document.getElementById('subTitle').innerText = t.subTitle;
-      document.getElementById('searchInput').placeholder = t.searchPlaceholder;
-      document.getElementById('refreshText').innerText = t.refreshText;
-      document.getElementById('modeStatusText').innerText = isAdmin ? t.managerMode : t.waiterMode;
-      document.getElementById('fsText').innerText = t.fullscreen;
-      document.getElementById('menuText').innerText = t.menuText;
-      document.getElementById('seasonMenuBtnText').innerText = t.seasonMenuBtnText;
-      document.getElementById('shoppingMenuBtnText').innerText = t.shoppingMenuBtnText;
-      document.getElementById('seasonModalTitle').innerText = t.seasonModalTitle;
-      document.getElementById('seasonModalDesc').innerText = t.seasonModalDesc;
-      document.getElementById('archiveBadgeText').innerText = t.archiveBadgeText;
-      document.getElementById('langMenuLabel').innerText = t.langMenuLabel;
-      document.getElementById('exportText').innerText = t.exportText;
-      document.getElementById('supportMenuText').innerText = t.supportText;
-      document.getElementById('supportModalTitle').innerText = t.supportModalTitle;
-      document.getElementById('supportModalDesc').innerText = t.supportModalDesc;
-      document.getElementById('supportMessage').placeholder = t.supportPlaceholder;
-      document.getElementById('sendSupportBtn').innerText = t.sendSupportBtn;
-      document.getElementById('catLabel').innerText = t.catLabel;
-      document.getElementById('filterLabel').innerText = t.filterLabel;
-      document.getElementById('catSelectLabel').innerText = t.catSelectLabel;
-      document.getElementById('lblGlass').innerText = t.lblGlass;
-      document.getElementById('lblMethod').innerText = t.lblMethod;
-      document.getElementById('lblIce').innerText = t.lblIce;
-      document.getElementById('lblGarnish').innerText = t.lblGarnish;
-      document.getElementById('lblIngHeader').innerText = t.lblIngHeader;
-      document.getElementById('btnAddIngredient').innerText = t.btnAddIngredient;
-      document.getElementById('lblAllergensTitle').innerText = t.lblAllergensTitle;
-      document.getElementById('lblQuickAllergens').innerText = t.lblQuickAllergens;
-      document.getElementById('dAllergens').placeholder = t.allergensPlaceholder;
-      document.querySelectorAll('.lblShowHide').forEach(el => el.innerText = t.toggleShowHide);
-      document.getElementById('seasonLabel').innerText = t.seasonLabel;
-      document.getElementById('costLabel').innerText = t.costLabel;
-      document.getElementById('priceLabel').innerText = t.priceLabel;
-      
-      const editingId = document.getElementById('editingId').value;
-      document.getElementById('formTitle').innerText = editingId ? t.formTitleEdit : t.formTitleAdd;
-      document.getElementById('dName').placeholder = t.namePlaceholder;
-      document.getElementById('photoLabel').innerText = t.photoLabel;
-      document.getElementById('lblFeatured').innerText = t.lblFeatured;
-      document.getElementById('saveBtn').innerText = t.saveBtn;
-      document.getElementById('closeFormBtn').innerText = t.closeFormBtn;
-      document.getElementById('cancelEditBtn').innerText = t.cancelBtn;
-      document.getElementById('closeModalBtn').innerText = t.closeBtn;
-      document.getElementById('printBtnText').innerText = t.printBtn;
-      document.getElementById('editBtnText').innerText = t.editBtnText;
-      renderCategories();
-      renderDrinks();
-    }
-
-    function onSearchInput() {
-      const val = document.getElementById('searchInput').value;
-      const clearBtn = document.getElementById('clearSearchBtn');
-      if (val.length > 0) { clearBtn.classList.remove('hidden'); clearBtn.classList.add('flex'); }
-      else { clearBtn.classList.add('hidden'); clearBtn.classList.remove('flex'); }
-      renderDrinks();
-    }
-
-    function clearSearch() {
-      document.getElementById('searchInput').value = '';
-      onSearchInput();
-    }
-
-    function toggleSpecialFilter(filterType) {
-      if (activeSpecialFilter === filterType) activeSpecialFilter = null;
-      else activeSpecialFilter = filterType;
-      
-      const filterButtons = { featured: 'filterFeatured', vegan: 'filterVegan', glutenfree: 'filterGluten', lactosefree: 'filterLactose', nonalcoholic: 'filterNonAlc', favorites: 'filterFavs' };
-      Object.values(filterButtons).forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.className = 'px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 hover:border-amber-400 whitespace-nowrap';
-      });
-      if (activeSpecialFilter && filterButtons[activeSpecialFilter]) {
-        const activeEl = document.getElementById(filterButtons[activeSpecialFilter]);
-        if (activeEl) activeEl.className = 'px-3 py-1 rounded-full bg-amber-500 text-slate-950 font-bold border border-amber-400 whitespace-nowrap';
-      }
-      renderDrinks();
-    }
-
-    function toggleGlassFilter(glassType) {
-      if (selectedGlassFilter === glassType) selectedGlassFilter = null;
-      else selectedGlassFilter = glassType;
-      renderGlassFilterButtons();
-      renderDrinks();
-    }
-
-    function renderGlassFilterButtons() {
-      let glasses = [];
-      allDrinks.forEach(d => {
-        if (d.glass_type && !glasses.includes(d.glass_type.trim())) glasses.push(d.glass_type.trim());
-      });
-      const container = document.getElementById('glassFilterContainer');
-      if (glasses.length === 0) {
-        container.innerHTML = '<span class="text-slate-500 italic">Keine Glas-Typen vorhanden</span>';
-        return;
-      }
-      container.innerHTML = glasses.map(g => {
-        let active = selectedGlassFilter === g ? 'bg-amber-500 text-slate-950 font-bold' : 'bg-slate-800 text-slate-300 hover:bg-slate-700';
-        return `<button onclick="toggleGlassFilter('${g}')" class="px-2.5 py-1 rounded-lg border border-slate-700 text-xs ${active}">${g}</button>`;
-      }).join('');
-    }
-
-    function toggleShiftFavorite(id, event) {
-      if (event) event.stopPropagation();
-      let index = shiftFavorites.indexOf(id);
-      if (index > -1) {
-        shiftFavorites.splice(index, 1);
+        errDiv.innerText = "Fehler: " + error.message;
+        errDiv.classList.remove("hidden");
       } else {
-        shiftFavorites.push(id);
+        showApp(data.user);
       }
-      localStorage.setItem('salon_shift_favorites', JSON.stringify(shiftFavorites));
-      renderDrinks();
-      const d = allDrinks.find(item => item.id === id);
-      if (d) openDrinkModal(id);
     }
 
-    function exportToCSV() {
-      if (!allDrinks || allDrinks.length === 0) return alert("Keine Getränke.");
-      let csvContent = "data:text/csv;charset=utf-8,Name;Category;Season;SellingPrice;CostPrice\r\n";
-      allDrinks.forEach(d => {
-        csvContent += `"${(d.name || '').replace(/"/g, '""')}";"${(d.category || '').replace(/"/g, '""')}";"${(d.season || '')}";${d.selling_price || 0};${d.cost_price || 0}\r\n`;
+    async function handleLogout() {
+      await supabase.auth.signOut();
+      document.getElementById("appContainer").classList.add("hidden");
+      document.getElementById("authContainer").classList.remove("hidden");
+    }
+
+    function showApp(user) {
+      document.getElementById("authContainer").classList.add("hidden");
+      document.getElementById("appContainer").classList.remove("hidden");
+      document.getElementById("currentUserEmail").innerText = user.email;
+      
+      if (user.email.includes("amim") || user.email.includes("manager")) {
+        isManager = true;
+        toggleManagerModeUI(true);
+      } else {
+        isManager = false;
+        toggleManagerModeUI(false);
+      }
+
+      fetchDrinks();
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark-mode");
+      document.body.classList.toggle("light-mode");
+    }
+
+    function toggleManagerMode() {
+      isManager = !isManager;
+      toggleManagerModeUI(isManager);
+      filterDrinks();
+    }
+
+    function toggleManagerModeUI(active) {
+      const btn = document.getElementById("btnManagerMode");
+      const btnImport = document.getElementById("btnImportExcel");
+      if (active) {
+        btn.classList.add("bg-amber-500", "text-slate-950");
+        btnImport.classList.remove("hidden");
+      } else {
+        btn.classList.remove("bg-amber-500", "text-slate-950");
+        btnImport.classList.add("hidden");
+      }
+    }
+
+    async function fetchDrinks() {
+      const { data, error } = await supabase.from("drinks").select("*");
+      if (!error && data) {
+        allDrinks = data;
+        filterDrinks();
+      }
+    }
+
+    function filterDrinks() {
+      const seasonVal = document.getElementById("seasonSelect").value;
+      const searchVal = document.getElementById("searchInput").value.toLowerCase();
+
+      let filtered = allDrinks.filter(drink => {
+        const matchesSeason = seasonVal === "ALL" || (drink.season && drink.season === seasonVal);
+        const matchesSearch = drink.name.toLowerCase().includes(searchVal) || 
+                              (drink.ingredients_json && JSON.stringify(drink.ingredients_json).toLowerCase().includes(searchVal));
+        return matchesSeason && matchesSearch;
       });
-      let link = document.createElement("a");
-      link.setAttribute("href", encodeURI(csvContent));
-      link.setAttribute("download", `salonplafond_export.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+
+      renderDrinks(filtered);
     }
 
-    async function uploadImageToSupabase(event) {
+    function renderDrinks(drinks) {
+      const container = document.getElementById("drinksList");
+      container.innerHTML = "";
+
+      if (drinks.length === 0) {
+        container.innerHTML = `<p class="col-span-2 text-center text-sm opacity-60 py-8">Keine Drinks für diese Auswahl gefunden.</p>`;
+        return;
+      }
+
+      drinks.forEach(drink => {
+        const card = document.createElement("div");
+        card.className = "card p-4 rounded-xl border cursor-pointer hover:border-amber-500/50 transition flex justify-between items-center bg-slate-800/80 border-slate-700";
+        card.onclick = () => openDrinkDetail(drink);
+        card.innerHTML = `
+          <div>
+            <h3 class="font-bold text-base text-amber-400">${drink.name}</h3>
+            <p class="text-xs opacity-60">${drink.category || 'Cocktail'} • ${drink.glass_type || '-'}</p>
+          </div>
+          <span class="text-xs px-2 py-1 bg-slate-700/80 rounded-lg font-mono text-amber-300">${drink.selling_price ? '€ ' + drink.selling_price : ''}</span>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function openDrinkDetail(drink) {
+      document.getElementById("detailName").innerText = drink.name;
+      document.getElementById("detailCategory").innerText = drink.category || "Cocktail";
+      document.getElementById("detailGlass").innerText = drink.glass_type || "-";
+      document.getElementById("detailMethod").innerText = drink.method || "-";
+      document.getElementById("detailIce").innerText = drink.ice || "-";
+      document.getElementById("detailGarnish").innerText = drink.garnish || "-";
+      document.getElementById("detailPreparation").innerText = drink.recipe || "Keine Zubereitung angegeben.";
+
+      const ingList = document.getElementById("detailIngredients");
+      ingList.innerHTML = "";
+      
+      let ings = drink.ingredients_json;
+      if (typeof ings === "string") {
+        try { ings = JSON.parse(ings); } catch(e){}
+      }
+
+      if (Array.isArray(ings)) {
+        ings.forEach(i => {
+          ingList.innerHTML += `<li class="text-xs opacity-90">• <strong>${i.amount || ''}</strong> ${i.name || i}</li>`;
+        });
+      } else if (ings) {
+        ingList.innerHTML = `<li class="text-xs opacity-90">${ings}</li>`;
+      }
+
+      if (isManager) {
+        document.getElementById("managerCostSection").classList.remove("hidden");
+        document.getElementById("detailPrice").innerText = drink.selling_price ? '€ ' + drink.selling_price : '-';
+        document.getElementById("detailCost").innerText = drink.cost_price ? '€ ' + drink.cost_price : '-';
+      } else {
+        document.getElementById("managerCostSection").classList.add("hidden");
+      }
+
+      document.getElementById("drinkDetailModal").classList.remove("hidden");
+    }
+
+    function closeDrinkDetail() {
+      document.getElementById("drinkDetailModal").classList.add("hidden");
+    }
+
+    function triggerExcelImport() {
+      document.getElementById("excelFileInput").click();
+    }
+
+    function handleExcelImport(event) {
       const file = event.target.files[0];
       if (!file) return;
-      const status = document.getElementById('uploadStatus');
-      status.innerText = i18n[currentLang].uploading;
-      const fileName = `${Date.now()}_${file.name}`;
-      let { error } = await _supabase.storage.from('drinks').upload(fileName, file);
-      if (error) { status.innerText = 'Error'; return; }
-      const { data } = _supabase.storage.from('drinks').getPublicUrl(fileName);
-      if (data && data.publicUrl) {
-        document.getElementById('dPhoto').value = data.publicUrl;
-        status.innerText = i18n[currentLang].uploadSuccess;
-      }
-    }
 
-    async function loadDrinks() {
-      const { data, error } = await _supabase.from('drinks').select('*').order('created_at', { ascending: false });
-      if (error) { console.error(error); return; }
-      allDrinks = data || [];
-      if (!currentSeasonFilter) {
-        currentSeasonFilter = determineActiveSeasonAutomatically();
-      }
-      updateActiveSeasonBadgeUI();
-      renderSeasonFormSelect(currentSeasonFilter);
-      renderCategories();
-      renderGlassFilterButtons();
-      renderDrinks();
-    }
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-    function renderCategories() {
-      const t = i18n[currentLang];
-      const fixedCategories = [t.allCategories, 'Cocktails', 'Mocktails', 'Salonplafond Classics', 'After Dinner Drinks', 'Aperitif'];
-      if (!fixedCategories.includes(selectedCat)) selectedCat = t.allCategories;
-      document.getElementById('categories').innerHTML = fixedCategories.map(c => `
-        <button onclick="setCategory('${c}')" class="px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap ${selectedCat === c ? 'bg-amber-500 text-slate-950 font-bold' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}">${c}</button>
-      `).join('');
-    }
+        const importedSeason = "16.11.2026 - 16.03.2027";
+        let parsedDrinks = [];
+        let currentDrink = null;
+        let currentCat = "Cocktails";
 
-    function setCategory(cat) { selectedCat = cat; renderDrinks(); renderCategories(); }
+        for (let i = 0; i < rows.length; i++) {
+          const row = rows[i];
+          if (!row || row.length === 0) continue;
 
-    function renderDrinks() {
-      const t = i18n[currentLang];
-      const search = document.getElementById('searchInput').value.toLowerCase();
-      let filtered = allDrinks.filter(d => {
-        let drinkSeason = d.season || '';
-        let matchesSeason = drinkSeason === currentSeasonFilter;
-        const matchesCat = selectedCat === t.allCategories || d.category === selectedCat;
-        let ingSearchText = Array.isArray(d.ingredients_json) ? d.ingredients_json.map(i => i.name).join(' ') : (d.ingredients || '');
-        const matchesSearch = d.name.toLowerCase().includes(search) || ingSearchText.toLowerCase().includes(search);
-        
-        let matchesFilter = true;
-        if (activeSpecialFilter === 'featured') matchesFilter = d.is_featured;
-        if (activeSpecialFilter === 'vegan') matchesFilter = d.is_vegan || (d.allergens && d.allergens.toLowerCase().includes('vegan'));
-        if (activeSpecialFilter === 'glutenfree') matchesFilter = d.is_glutenfree || (d.allergens && d.allergens.toLowerCase().includes('glutenfrei'));
-        if (activeSpecialFilter === 'lactosefree') matchesFilter = d.is_lactosefree || (d.allergens && d.allergens.toLowerCase().includes('laktosefrei'));
-        if (activeSpecialFilter === 'nonalcoholic') matchesFilter = d.category === 'Mocktails';
-        if (activeSpecialFilter === 'favorites') matchesFilter = shiftFavorites.includes(d.id);
-        
-        let matchesGlass = selectedGlassFilter ? (d.glass_type && d.glass_type.trim() === selectedGlassFilter) : true;
+          const col0 = row[0] ? String(row[0]).trim() : "";
+          const col1 = row[1] ? String(row[1]).trim() : "";
 
-        return matchesSeason && matchesCat && matchesSearch && matchesFilter && matchesGlass;
-      });
+          if (["APERITTIF", "MOCKTAILS", "Cocktails", "After Dinner Drinks", "Salonplafond Classic"].includes(col1)) {
+            currentCat = col1;
+            continue;
+          }
 
-      const container = document.getElementById('drinksGrid');
-      if (filtered.length === 0) {
-        container.className = 'block';
-        container.innerHTML = '<p class="text-center text-slate-500 py-12">' + t.noDrinksFound + '</p>';
-        return;
-      }
+          if (col0.startsWith("Glass:")) {
+            if (currentDrink) {
+              currentDrink.glass_type = col0.replace("Glass:", "").trim();
+              if (col1.startsWith("Method:")) currentDrink.method = col1.replace("Method:", "").trim();
+            }
+            continue;
+          }
 
-      if (viewMode === 'grid') {
-        container.className = 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6';
-        container.innerHTML = filtered.map(d => {
-          let photoHtml = d.photo_url ? `<img src="${d.photo_url}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="">` : `<div class="flex items-center justify-center h-full text-slate-500 text-xs">${t.noPhoto}</div>`;
-          let badgeHtml = d.is_featured ? '<span class="absolute top-2 right-2 text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500 text-slate-950 shadow">⭐ TOP</span>' : '';
-          let isFav = shiftFavorites.includes(d.id);
-          let favBtnHtml = `<button onclick="toggleShiftFavorite('${d.id}', event)" class="absolute top-2 left-2 text-sm p-1 rounded-full bg-slate-900/80 hover:bg-slate-900 ${isFav ? 'text-red-500' : 'text-slate-400'}">${isFav ? '❤️' : '🤍'}</button>`;
-          let priceText = d.selling_price ? ` (${parseFloat(d.selling_price).toFixed(2)} €)` : '';
-          return `<div onclick="openDrinkModal('${d.id}')" class="card overflow-hidden cursor-pointer flex flex-col justify-between group"><div class="relative h-48 bg-slate-800">${photoHtml}${badgeHtml}${favBtnHtml}<span class="absolute bottom-2 left-2 text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-900/85 text-amber-400 border border-amber-500/30">${d.category || t.defaultDrinkCat}</span></div><div class="p-4 text-center"><h3 class="text-lg font-bold group-hover:text-amber-400 transition">${d.name}${priceText}</h3><span class="text-xs text-slate-400 mt-1 inline-block">${t.clickToView}</span></div></div>`;
-        }).join('');
-      } else {
-        container.className = 'flex flex-col gap-3';
-        container.innerHTML = filtered.map(d => {
-          let photoHtml = d.photo_url ? `<img src="${d.photo_url}" class="w-14 h-14 object-cover rounded-lg shrink-0" alt="">` : `<div class="w-14 h-14 bg-slate-800 rounded-lg shrink-0 flex items-center justify-center text-[10px] text-slate-500">No Pic</div>`;
-          let badgeHtml = d.is_featured ? '<span class="text-xs font-bold px-2 py-0.5 rounded bg-amber-500 text-slate-950">⭐ TOP</span>' : '';
-          let isFav = shiftFavorites.includes(d.id);
-          let priceText = d.selling_price ? ` (${parseFloat(d.selling_price).toFixed(2)} €)` : '';
-          return `<div onclick="openDrinkModal('${d.id}')" class="list-item p-3 cursor-pointer flex items-center justify-between gap-4 group"><div class="flex items-center gap-4 min-w-0">${photoHtml}<div class="min-w-0"><div class="flex items-center gap-2 flex-wrap"><h3 class="text-base font-bold group-hover:text-amber-400 transition truncate">${d.name}${priceText}</h3>${badgeHtml}</div><p class="text-xs text-slate-400 truncate mt-0.5">${d.method ? 'Method: ' + d.method : (d.category || '')}</p></div></div><div class="flex items-center gap-2 shrink-0"><button onclick="toggleShiftFavorite('${d.id}', event)" class="text-sm p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700">${isFav ? '❤️' : '🤍'}</button><span class="text-xs font-semibold px-2.5 py-1 rounded bg-slate-800 text-amber-400 border border-slate-700">${d.category || t.defaultDrinkCat}</span></div></div>`;
-        }).join('');
-      }
-    }
+          if (col0.startsWith("Ice:")) {
+            if (currentDrink) currentDrink.ice = col0.replace("Ice:", "").trim();
+            continue;
+          }
 
-    function openDrinkModal(id) {
-      const d = allDrinks.find(item => item.id === id);
-      if (!d) return;
-      const t = i18n[currentLang];
-      let html = '';
-      if (d.photo_url) html += `<img src="${d.photo_url}" class="w-full h-64 object-cover rounded-xl mb-4 shadow" alt="">`;
-      let priceText = d.selling_price ? ` (${parseFloat(d.selling_price).toFixed(2)} €)` : '';
-      html += `<div class="flex items-center gap-2 mb-2 flex-wrap"><span class="text-xs font-semibold px-2.5 py-1 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">${d.category || t.defaultDrinkCat}</span></div>`;
-      html += `<h2 class="text-3xl font-bold mb-4">${d.name}${priceText}</h2>`;
+          if (col0 === "Garnish:") continue;
 
-      // Kalkulačka marže a zisku IBA PRE MANAŽÉRA
-      if (isAdmin && d.selling_price && d.cost_price && parseFloat(d.selling_price) > 0) {
-        let sp = parseFloat(d.selling_price);
-        let cp = parseFloat(d.cost_price);
-        let profit = sp - cp;
-        let margin = ((profit / sp) * 100).toFixed(1);
-        html += `<div class="mb-4 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs flex justify-between items-center text-amber-300"><span>💶 Marge: <b>${margin}%</b> (Gewinn: <b>${profit.toFixed(2)} €</b>)</span><span class="text-[10px] text-slate-400">Wareneinsatz: ${cp.toFixed(2)} €</span></div>`;
-      }
+          if (col1.startsWith("Preis")) {
+            if (currentDrink) {
+              currentDrink.garnish = col0;
+              currentDrink.selling_price = col1.replace("Preis", "").replace(",", ".").trim();
+              parsedDrinks.push(currentDrink);
+              currentDrink = null;
+            }
+            continue;
+          }
 
-      html += `<div class="mb-6 border border-slate-700 rounded-xl overflow-hidden bg-slate-950 text-xs text-slate-200">`;
-      html += `<div class="grid grid-cols-2 border-b border-slate-800 p-2.5 bg-slate-900/50"><div><span class="text-slate-400 font-semibold block">Glass:</span> ${d.glass_type || '-'}</div><div><span class="text-slate-400 font-semibold block">Method:</span> ${d.method || '-'}</div></div>`;
-      html += `<div class="border-b border-slate-800 p-2.5 bg-slate-900/30"><span class="text-slate-400 font-semibold block">Ice:</span> ${d.ice || '-'}</div>`;
-      html += `<div class="p-2.5 border-b border-slate-800"><div class="grid grid-cols-2 font-bold text-amber-400 pb-1.5 border-b border-slate-800 mb-1.5"><span>Ingredients:</span><span>Amount:</span></div>`;
-      if (Array.isArray(d.ingredients_json) && d.ingredients_json.length > 0) {
-        d.ingredients_json.forEach(ing => {
-          html += `<div class="grid grid-cols-2 py-1 border-b border-slate-800/50 last:border-0"><span class="font-medium text-white">${ing.name}</span><span class="text-amber-300 font-semibold">${ing.amount || '-'}</span></div>`;
-        });
-      } else {
-        html += `<div class="py-1 text-slate-500 italic">Keine Zutaten angegeben</div>`;
-      }
-      html += `</div>`;
-      
-      if (d.allergens) {
-        html += `<div class="p-2.5 bg-slate-900/50 border-b border-slate-800"><span class="text-amber-400 font-semibold block mb-0.5">⚠️ Allergene:</span> <span class="text-slate-300">${d.allergens}</span></div>`;
-      }
+          if (col0 && !col0.startsWith("Ingredients:") && !currentDrink) {
+            currentDrink = {
+              name: col0,
+              category: currentCat,
+              season: importedSeason,
+              ingredients_json: [],
+              is_active: true
+            };
+            continue;
+          }
 
-      html += `<div class="p-2.5 bg-slate-900/30"><span class="text-slate-400 font-semibold block">Garnish:</span> ${d.garnish || '-'}</div>`;
-      html += `</div>`;
-
-      if (d.recipe) {
-        html += `<div class="mb-4 bg-slate-800/40 p-3 rounded-xl text-xs"><p class="font-bold text-amber-400 mb-1">${t.recipeLabel}</p><p class="text-slate-200 whitespace-pre-line">${d.recipe}</p></div>`;
-      }
-
-      if (d.updated_at) {
-        let updateDate = new Date(d.updated_at).toLocaleString();
-        html += `<div class="text-[10px] text-slate-400 mt-2">🕒 Letzte Änderung: ${updateDate}</div>`;
-      }
-
-      document.getElementById('modalContent').innerHTML = html;
-      
-      let isFav = shiftFavorites.includes(d.id);
-      document.getElementById('favBtnText').innerText = isFav ? 'Favorit ✓' : 'Schicht-Favorit';
-
-      document.getElementById('modalFavBtn').onclick = function() {
-        toggleShiftFavorite(d.id);
-      };
-
-      document.getElementById('modalEditBtn').onclick = function() {
-        closeModal();
-        requestEditDrink(d.id);
-      };
-
-      document.getElementById('modalDeleteBtn').onclick = function() {
-        deleteDrinkConfirm(d.id);
-      };
-
-      document.getElementById('drinkModal').classList.remove('hidden');
-      document.getElementById('drinkModal').classList.add('flex');
-    }
-
-    function closeModal() {
-      document.getElementById('drinkModal').classList.remove('flex');
-      document.getElementById('drinkModal').classList.add('hidden');
-    }
-
-    function toggleMode() {
-      const t = i18n[currentLang];
-      if (!isAdmin) {
-        let pass = prompt(t.passPrompt);
-        if (pass !== MANAGER_PASSWORD) { alert(t.passWrong); return; }
-        isAdmin = true;
-      } else {
-        isAdmin = false;
-      }
-      document.getElementById('modeStatusText').innerText = isAdmin ? t.managerMode : t.waiterMode;
-      document.getElementById('adminForm').classList.toggle('hidden', !isAdmin);
-      if (!isAdmin) resetForm();
-      renderDrinks();
-    }
-
-    function requestEditDrink(id) {
-      const t = i18n[currentLang];
-      if (!isAdmin) {
-        let pass = prompt(t.passPrompt);
-        if (pass === null) return;
-        if (pass !== MANAGER_PASSWORD) {
-          alert(t.passWrong);
-          return;
+          if (currentDrink && col0 && col0 !== "Ingredients:") {
+            currentDrink.ingredients_json.push({ name: col0, amount: col1 });
+          }
         }
-        isAdmin = true;
-        document.getElementById('modeStatusText').innerText = t.managerMode;
-        document.getElementById('adminForm').classList.remove('hidden');
-      }
-      editDrink(id);
-    }
 
-    function editDrink(id) {
-      const d = allDrinks.find(item => item.id === id);
-      if (!d) return;
-      closeModal();
-      document.getElementById('editingId').value = d.id;
-      document.getElementById('dName').value = d.name || '';
-      document.getElementsByName('dCatRadio').forEach(r => r.checked = (r.value === d.category));
-      renderSeasonFormSelect(d.season || getAllSeasons()[0]);
-      document.getElementById('dGlass').value = d.glass_type || '';
-      document.getElementById('dMethod').value = d.method || '';
-      document.getElementById('dIce').value = d.ice || '';
-      document.getElementById('dGarnish').value = d.garnish || '';
-      populateIngredientRows(d.ingredients_json);
-      document.getElementById('dCost').value = d.cost_price || '';
-      document.getElementById('dPrice').value = d.selling_price || '';
-      document.getElementById('dAllergens').value = d.allergens || '';
-      document.getElementById('dRecipe').value = d.recipe || '';
-      document.getElementById('dPhoto').value = d.photo_url || '';
-      document.getElementById('deleteFormBtn').classList.remove('hidden');
-      document.getElementById('adminForm').classList.remove('hidden');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    async function deleteDrinkConfirm(id) {
-      const t = i18n[currentLang];
-      if (!isAdmin) {
-        let pass = prompt(t.passPrompt);
-        if (pass !== MANAGER_PASSWORD) { alert(t.passWrong); return; }
-        isAdmin = true;
-      }
-
-      if (confirm(t.confirmDelete)) {
-        const { error } = await _supabase.from('drinks').delete().eq('id', id);
-        if (error) return alert("Error: " + error.message);
-        closeModal();
-        closeAdminForm();
-        loadDrinks();
-      }
-    }
-
-    function deleteDrinkFromForm() {
-      const id = document.getElementById('editingId').value;
-      if (id) deleteDrinkConfirm(id);
-    }
-
-    function resetForm() {
-      document.getElementById('editingId').value = '';
-      document.getElementById('dName').value = '';
-      document.getElementsByName('dCatRadio').forEach(r => r.checked = false);
-      populateIngredientRows([]);
-      document.getElementById('dGlass').value = '';
-      document.getElementById('dMethod').value = '';
-      document.getElementById('dIce').value = '';
-      document.getElementById('dGarnish').value = '';
-      document.getElementById('dCost').value = '';
-      document.getElementById('dPrice').value = '';
-      document.getElementById('dAllergens').value = '';
-      document.getElementById('dRecipe').value = '';
-      document.getElementById('dPhoto').value = '';
-      document.getElementById('deleteFormBtn').classList.add('hidden');
-    }
-
-    function closeAdminForm() {
-      resetForm();
-      document.getElementById('adminForm').classList.add('hidden');
-    }
-
-    async function saveDrink() {
-      const name = document.getElementById('dName').value;
-      let category = '';
-      document.getElementsByName('dCatRadio').forEach(r => { if (r.checked) category = r.value; });
-      if (!name || !category) return alert(i18n[currentLang].alertFill);
-
-      const drinkObj = {
-        name, category,
-        season: document.getElementById('dSeason').value,
-        glass_type: document.getElementById('dGlass').value,
-        method: document.getElementById('dMethod').value,
-        ice: document.getElementById('dIce').value,
-        garnish: document.getElementById('dGarnish').value,
-        ingredients_json: getIngredientsData(),
-        cost_price: parseFloat(document.getElementById('dCost').value) || null,
-        selling_price: parseFloat(document.getElementById('dPrice').value) || null,
-        allergens: document.getElementById('dAllergens').value,
-        recipe: document.getElementById('dRecipe').value,
-        photo_url: document.getElementById('dPhoto').value,
-        updated_at: new Date().toISOString()
+        if (parsedDrinks.length > 0) {
+          const { error } = await supabase.from("drinks").insert(parsedDrinks);
+          if (error) {
+            alert("Fehler beim Import: " + error.message);
+          } else {
+            alert(`Erfolg! ${parsedDrinks.length} Drinks für die Wintersaison importiert.`);
+            fetchDrinks();
+          }
+        } else {
+          alert("Keine Drinks in der Datei gefunden.");
+        }
       };
-
-      const id = document.getElementById('editingId').value;
-      if (id) await _supabase.from('drinks').update(drinkObj).eq('id', id);
-      else await _supabase.from('drinks').insert([drinkObj]);
-
-      resetForm();
-      loadDrinks();
+      reader.readAsArrayBuffer(file);
     }
-
-    loadDrinks();
   </script>
 </body>
 </html>
