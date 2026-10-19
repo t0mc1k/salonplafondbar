@@ -1,17 +1,32 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" id="htmlRoot">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v2.2.2</title>
+  <title>Salonplafond BAR v2.3.0</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body { background-color: #0f172a; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
-    .card { background: #1e293b; border: 1px solid #334155; border-radius: 1rem; transition: transform 0.2s; }
+    body { font-family: system-ui, -apple-system, sans-serif; transition: background-color 0.2s, color 0.2s; }
+    
+    /* Tmavý režim (štandard) */
+    body.dark-mode { background-color: #0f172a; color: #f8fafc; }
+    body.dark-mode .card { background: #1e293b; border: 1px solid #334155; }
+    body.dark-mode .list-item { background: #1e293b; border: 1px solid #334155; }
+    body.dark-mode .list-item:hover { background: #554133; border-color: #f59e0b; }
+    body.dark-mode .modal-bg { background: rgba(0,0,0,0.8); }
+
+    /* Svetlý režim */
+    body.light-mode { background-color: #f1f5f9; color: #0f172a; }
+    body.light-mode .card { background: #ffffff; border: 1px solid #cbd5e1; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+    body.light-mode .list-item { background: #ffffff; border: 1px solid #cbd5e1; }
+    body.light-mode .list-item:hover { background: #fef3c7; border-color: #f59e0b; }
+    body.light-mode input, body.light-mode select, body.light-mode textarea { background-color: #f8fafc !important; color: #0f172a !important; border-color: #cbd5e1 !important; }
+    body.light-mode .modal-bg { background: rgba(15,23,42,0.6); }
+
+    .card { border-radius: 1rem; transition: transform 0.2s; }
     .card:hover { transform: translateY(-4px); border-color: #f59e0b; }
-    .list-item { background: #1e293b; border: 1px solid #334155; border-radius: 0.75rem; transition: background 0.2s; }
-    .list-item:hover { background: #554133; border-color: #f59e0b; }
+    .list-item { border-radius: 0.75rem; transition: background 0.2s; }
     
     /* Splash Screen Animation */
     #splashScreen {
@@ -91,15 +106,14 @@
       animation: showCocktail 7s ease-in-out infinite;
     }
 
-    /* Print Styles */
     @media print {
       @page { size: portrait; margin: 10mm; }
       body { background: white !important; color: black !important; padding: 0 !important; }
-      body > *:not(#drinkModal):not(#supportModal):not(#seasonModal):not(#motivationModal) { display: none !important; }
+      body > *:not(#drinkModal):not(#supportModal):not(#seasonModal):not(#motivationModal):not(#shoppingModal) { display: none !important; }
     }
   </style>
 </head>
-<body class="p-4 md:p-8 max-w-6xl mx-auto pb-24" onclick="closeDropdowns(event)">
+<body class="dark-mode p-4 md:p-8 max-w-6xl mx-auto pb-24" onclick="closeDropdowns(event)">
 
   <!-- Úvodná animácia (Splash Screen) -->
   <div id="splashScreen" class="fixed inset-0 z-[100] bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
@@ -113,7 +127,7 @@
         <h1 class="text-2xl md:text-3xl font-black tracking-wider text-white uppercase">Willkommen bei</h1>
         <h2 class="text-3xl md:text-4xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
         <div class="mt-3">
-          <span class="text-sm md:text-base font-bold text-amber-300 block">v2.2.2</span>
+          <span class="text-sm md:text-base font-bold text-amber-300 block">v2.3.0</span>
           <span class="text-xs md:text-sm text-slate-400 font-medium mt-0.5 block">Erstellt von © T0mc1k (Tomas Kardos)</span>
         </div>
       </div>
@@ -128,13 +142,13 @@
   <!-- Header -->
   <header class="flex flex-col md:flex-row justify-between items-center gap-4 mb-8 pb-4 border-b border-slate-700">
     <div class="flex items-center gap-3">
-      <div class="header-logo-container" onclick="showRandomMotivation(event)" title="Klick mich für Motivation! 🍸">
+      <div class="header-logo-container" onclick="showRandomMotivation(event)" title="Klick mich für Osterei-Motivation! 🍸">
         <span class="logo-text">Ō</span>
         <span class="logo-icon">🍸</span>
       </div>
       <div>
         <h1 class="text-3xl font-bold tracking-tight text-amber-400">Salonplafond BAR</h1>
-        <span class="text-xs text-slate-400 font-medium">v2.2.2 • Erstellt von © T0mc1k (Tomas Kardos)</span>
+        <span class="text-xs text-slate-400 font-medium">v2.3.0 • Erstellt von © T0mc1k (Tomas Kardos)</span>
       </div>
     </div>
 
@@ -162,6 +176,10 @@
             <span>👤 Modus:</span> <span id="modeStatusText">Kellner</span>
           </button>
 
+          <button onclick="toggleThemeMode()" id="themeBtn" class="w-full text-left px-2.5 py-2 rounded bg-slate-900 hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center justify-between border border-slate-700">
+            <span>🎨 Design:</span> <span id="themeStatusText">Dunkel</span>
+          </button>
+
           <div class="flex bg-slate-900 rounded-lg p-1 border border-slate-700 my-0.5">
             <button onclick="setViewMode('grid')" id="viewGrid" class="flex-1 py-1 text-xs font-bold rounded bg-amber-500 text-slate-950 text-center">🖼️ Grid</button>
             <button onclick="setViewMode('list')" id="viewList" class="flex-1 py-1 text-xs font-bold rounded text-slate-400 hover:text-white text-center">☰ Liste</button>
@@ -179,6 +197,10 @@
 
           <button onclick="openSeasonModal()" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-2">
             📅 <span id="seasonMenuBtnText">Saison wählen...</span>
+          </button>
+
+          <button onclick="openShoppingModal()" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-2">
+            🛒 <span id="shoppingMenuBtnText">Einkaufsliste / Inventur</span>
           </button>
           
           <button onclick="exportToCSV()" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-2">
@@ -224,6 +246,7 @@
             <button onclick="toggleSpecialFilter('glutenfree')" id="filterGluten" class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 hover:border-amber-400 whitespace-nowrap">🌾 Glutenfrei</button>
             <button onclick="toggleSpecialFilter('lactosefree')" id="filterLactose" class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 hover:border-amber-400 whitespace-nowrap">🥛 Laktosefrei</button>
             <button onclick="toggleSpecialFilter('nonalcoholic')" id="filterNonAlc" class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 hover:border-amber-400 whitespace-nowrap">🚫 Alkoholfrei</button>
+            <button onclick="toggleSpecialFilter('favorites')" id="filterFavs" class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 hover:border-amber-400 whitespace-nowrap">❤️ Schicht-Favoriten</button>
           </div>
         </div>
 
@@ -305,7 +328,7 @@
         <div id="ingredientRowsContainer" class="flex flex-col gap-2"></div>
       </div>
 
-      <!-- POSTUP PRÍPRAVY (Zubereitung) -->
+      <!-- ZUBEREITUNG (Voliteľná možnosť) -->
       <div class="md:col-span-2 bg-slate-900 border border-slate-700/80 rounded-xl overflow-hidden">
         <button type="button" onclick="document.getElementById('recipeCollapse').classList.toggle('hidden')" class="w-full p-3 text-left font-bold text-amber-400 text-xs flex justify-between items-center bg-slate-800/80 hover:bg-slate-800 transition">
           <span>📖 Zubereitung / Schritt für Schritt (Optional)</span>
@@ -317,7 +340,7 @@
         </div>
       </div>
 
-      <!-- ALERGÉNY -->
+      <!-- ALERGÉNY (Voliteľná možnosť) -->
       <div class="md:col-span-2 bg-slate-900 border border-slate-700/80 rounded-xl overflow-hidden">
         <button type="button" onclick="document.getElementById('allergensCollapse').classList.toggle('hidden')" class="w-full p-3 text-left font-bold text-amber-400 text-xs flex justify-between items-center bg-slate-800/80 hover:bg-slate-800 transition">
           <span id="lblAllergensTitle">⚠️ Allergene (Optional)</span>
@@ -341,7 +364,7 @@
         </div>
       </div>
 
-      <!-- CENY (Rozbaľovacia možnosť) -->
+      <!-- CENY (Voliteľná možnosť) -->
       <div class="md:col-span-2 bg-slate-900 border border-slate-700/80 rounded-xl overflow-hidden">
         <button type="button" onclick="document.getElementById('pricesCollapse').classList.toggle('hidden')" class="w-full p-3 text-left font-bold text-amber-400 text-xs flex justify-between items-center bg-slate-800/80 hover:bg-slate-800 transition">
           <span>💶 Preis & Wareneinsatz (Optional)</span>
@@ -387,17 +410,20 @@
   </div>
 
   <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-    Salonplafond BAR App v2.2.2 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+    Salonplafond BAR App v2.3.0 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
   </footer>
 
   <!-- Modal Detail View -->
-  <div id="drinkModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-    <div class="card max-w-2xl w-full max-h-[90vh] overflow-y-auto bg-slate-900 border-slate-700 p-6 relative flex flex-col justify-between">
+  <div id="drinkModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="card max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 relative flex flex-col justify-between">
       <div>
         <button onclick="closeModal()" class="no-print absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
         <div id="modalContent"></div>
       </div>
       <div class="mt-6 pt-4 border-t border-slate-800 flex gap-2 no-print items-center flex-wrap">
+        <button id="modalFavBtn" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold rounded-xl transition text-sm flex items-center justify-center gap-2 border border-slate-700">
+          ❤️ <span id="favBtnText">Schicht-Favorit</span>
+        </button>
         <button id="modalEditBtn" class="px-4 py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl transition text-sm flex items-center justify-center gap-2">
           ✏️ <span id="editBtnText">Bearbeiten</span>
         </button>
@@ -412,12 +438,25 @@
     </div>
   </div>
 
-  <!-- Motivation Modal -->
-  <div id="motivationModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-    <div class="card max-w-md w-full bg-slate-900 border-amber-500/50 p-6 relative flex flex-col gap-4 text-center shadow-2xl">
+  <!-- Shopping List / Inventory Modal -->
+  <div id="shoppingModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="card max-w-lg w-full p-6 relative flex flex-col gap-4 max-h-[85vh] overflow-y-auto">
+      <button onclick="closeShoppingModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
+      <h3 class="text-xl font-bold text-amber-400">🛒 Zutaten-Einkaufsliste / Inventur</h3>
+      <p class="text-xs text-slate-300">Alle benötigten Zutaten für die aktuell aktive Saison (<span id="shoppingSeasonName" class="font-bold text-amber-400"></span>):</p>
+      <div id="shoppingListContainer" class="flex flex-col gap-1.5 mt-2 bg-slate-950/40 p-3 rounded-xl border border-slate-800 text-xs"></div>
+      <div class="flex justify-end mt-2">
+        <button onclick="closeShoppingModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 font-bold text-white rounded-lg text-xs transition">Schließen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Motivation Modal (Osterei) -->
+  <div id="motivationModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="card max-w-md w-full border-amber-500/50 p-6 relative flex flex-col gap-4 text-center shadow-2xl">
       <button onclick="closeMotivationModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
       <div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-2xl mx-auto flex items-center justify-center text-3xl border border-amber-500/30">🍸</div>
-      <h3 class="text-xl font-bold text-amber-400">Salonplafond Motivation</h3>
+      <h3 class="text-xl font-bold text-amber-400">Salonplafond Osterei 🐣</h3>
       <div id="motivationTextContainer" class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-sm text-slate-200 italic min-h-[90px] flex items-center justify-center"></div>
       <div class="flex gap-2 mt-2">
         <button onclick="showRandomMotivation()" class="flex-1 py-2.5 bg-amber-500 hover:bg-amber-600 font-bold text-slate-950 rounded-lg text-xs transition">🔄 Noch ein Spruch</button>
@@ -427,8 +466,8 @@
   </div>
 
   <!-- Season Selection Modal Dialog -->
-  <div id="seasonModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-    <div class="card max-w-md w-full bg-slate-900 border-slate-700 p-6 relative flex flex-col gap-4">
+  <div id="seasonModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="card max-w-md w-full p-6 relative flex flex-col gap-4">
       <button onclick="closeSeasonModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
       <h3 class="text-xl font-bold text-amber-400" id="seasonModalTitle">📅 Saison & Archiv wählen</h3>
       <p class="text-xs text-slate-300" id="seasonModalDesc">Wähle die aktive Saison oder das Archiv aus:</p>
@@ -440,8 +479,20 @@
   </div>
 
   <!-- Support Modal -->
-  <div id="seasonModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-    <!-- Unsurpassed support modal layout -->
+  <div id="supportModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="card max-w-lg w-full p-6 relative flex flex-col gap-4">
+      <button onclick="closeSupportModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
+      <h3 class="text-xl font-bold text-amber-400" id="supportModalTitle">✉️ Support & Feedback</h3>
+      <p class="text-xs text-slate-300" id="supportModalDesc">Sende direkt eine Nachricht an den Entwickler (Tomas Kardos).</p>
+      <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs text-slate-300 flex items-center justify-between">
+        <span>📧 <b>kdstom@outlook.com</b></span>
+      </div>
+      <textarea id="supportMessage" rows="4" placeholder="Schreibe deine Nachricht hier..." class="p-3 rounded bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400"></textarea>
+      <div class="flex gap-2">
+        <button onclick="sendSupportEmail()" id="sendSupportBtn" class="flex-1 py-2.5 bg-amber-500 hover:bg-amber-600 font-bold text-slate-950 rounded-lg text-xs transition">Nachricht senden</button>
+        <button onclick="closeSupportModal()" id="closeSupportBtn" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 font-bold text-white rounded-lg text-xs transition">Schließen</button>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -495,12 +546,14 @@
 
     let currentLang = 'de';
     let viewMode = 'grid';
+    let themeMode = 'dark';
     let allDrinks = [];
     let selectedCat = 'All';
     let activeSpecialFilter = null;
     let selectedGlassFilter = null;
     let currentSeasonFilter = null;
     let isAdmin = false;
+    let shiftFavorites = JSON.parse(localStorage.getItem('salon_shift_favorites') || '[]');
     const MANAGER_PASSWORD = "salon123";
 
     const i18n = {
@@ -513,6 +566,7 @@
         menuText: "Menü",
         refreshText: "Aktualisieren",
         seasonMenuBtnText: "Saison wählen...",
+        shoppingMenuBtnText: "Einkaufsliste / Inventur",
         seasonModalTitle: "📅 Saison & Archiv wählen",
         seasonModalDesc: "Wähle die aktive Saison oder das Archiv aus:",
         archiveBadgeText: "Aktive Saison:",
@@ -581,6 +635,7 @@
         menuText: "Menu",
         refreshText: "Refresh",
         seasonMenuBtnText: "Select Season...",
+        shoppingMenuBtnText: "Shopping List / Inventory",
         seasonModalTitle: "📅 Select Season & Archive",
         seasonModalDesc: "Choose the active season or archive to view the corresponding drinks:",
         archiveBadgeText: "Active Season:",
@@ -646,6 +701,24 @@
 
     function setQuickVal(fieldId, value) {
       document.getElementById(fieldId).value = value;
+    }
+
+    function toggleThemeMode() {
+      const root = document.getElementById('htmlRoot');
+      const body = document.body;
+      const statusText = document.getElementById('themeStatusText');
+      if (themeMode === 'dark') {
+        themeMode = 'light';
+        body.classList.remove('dark-mode');
+        body.classList.add('light-mode');
+        statusText.innerText = 'Hell';
+      } else {
+        themeMode = 'dark';
+        body.classList.remove('light-mode');
+        body.classList.add('dark-mode');
+        statusText.innerText = 'Dunkel';
+      }
+      document.getElementById('settingsDropdown').classList.add('hidden');
     }
 
     function toggleFilterDrawer() {
@@ -732,12 +805,50 @@
       document.getElementById('seasonModal').classList.add('hidden');
     }
 
+    function openShoppingModal() {
+      document.getElementById('settingsDropdown').classList.add('hidden');
+      document.getElementById('shoppingSeasonName').innerText = currentSeasonFilter;
+      
+      // Zozbieranie ingrediencií pre aktuálnu sezónu
+      let activeDrinks = allDrinks.filter(d => (d.season || '') === currentSeasonFilter);
+      let ingredientsMap = {};
+      activeDrinks.forEach(d => {
+        if (Array.isArray(d.ingredients_json)) {
+          d.ingredients_json.forEach(ing => {
+            let key = ing.name.toLowerCase().trim();
+            if (!ingredientsMap[key]) {
+              ingredientsMap[key] = { name: ing.name, amounts: [] };
+            }
+            if (ing.amount) ingredientsMap[key].amounts.push(`${ing.amount} (${d.name})`);
+          });
+        }
+      });
+
+      let container = document.getElementById('shoppingListContainer');
+      let keys = Object.keys(ingredientsMap);
+      if (keys.length === 0) {
+        container.innerHTML = '<p class="text-slate-500 italic">Keine Zutaten in dieser Saison gefunden.</p>';
+      } else {
+        container.innerHTML = keys.map(k => {
+          let item = ingredientsMap[k];
+          return `<div class="p-2 rounded bg-slate-900 border border-slate-800 flex justify-between items-center"><span class="font-bold text-amber-400">📦 ${item.name}</span><span class="text-[11px] text-slate-400 text-right">${item.amounts.join(', ')}</span></div>`;
+        }).join('');
+      }
+
+      document.getElementById('shoppingModal').classList.remove('hidden');
+      document.getElementById('shoppingModal').classList.add('flex');
+    }
+
+    function closeShoppingModal() {
+      document.getElementById('shoppingModal').classList.remove('flex');
+      document.getElementById('shoppingModal').classList.add('hidden');
+    }
+
     function getAllSeasons() {
       let seasons = [];
       allDrinks.forEach(d => {
         if (d.season && d.season !== 'current' && !seasons.includes(d.season)) seasons.push(d.season);
       });
-      // Ak žiadna sezóna neexistuje, pridáme predvolenú ukážkovú
       if (seasons.length === 0) seasons.push('01.09.2026 – 31.10.2026');
       return seasons;
     }
@@ -745,7 +856,7 @@
     function determineActiveSeasonAutomatically() {
       const now = new Date();
       let seasons = getAllSeasons();
-      let matchedSeason = seasons[0]; // Predvolene prvá nájdená
+      let matchedSeason = seasons[0];
 
       seasons.forEach(s => {
         if (s.includes('–')) {
@@ -899,6 +1010,7 @@
       document.getElementById('fsText').innerText = t.fullscreen;
       document.getElementById('menuText').innerText = t.menuText;
       document.getElementById('seasonMenuBtnText').innerText = t.seasonMenuBtnText;
+      document.getElementById('shoppingMenuBtnText').innerText = t.shoppingMenuBtnText;
       document.getElementById('seasonModalTitle').innerText = t.seasonModalTitle;
       document.getElementById('seasonModalDesc').innerText = t.seasonModalDesc;
       document.getElementById('archiveBadgeText').innerText = t.archiveBadgeText;
@@ -958,7 +1070,7 @@
       if (activeSpecialFilter === filterType) activeSpecialFilter = null;
       else activeSpecialFilter = filterType;
       
-      const filterButtons = { featured: 'filterFeatured', vegan: 'filterVegan', glutenfree: 'filterGluten', lactosefree: 'filterLactose', nonalcoholic: 'filterNonAlc' };
+      const filterButtons = { featured: 'filterFeatured', vegan: 'filterVegan', glutenfree: 'filterGluten', lactosefree: 'filterLactose', nonalcoholic: 'filterNonAlc', favorites: 'filterFavs' };
       Object.values(filterButtons).forEach(id => {
         const el = document.getElementById(id);
         if (el) el.className = 'px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 hover:border-amber-400 whitespace-nowrap';
@@ -993,11 +1105,26 @@
       }).join('');
     }
 
+    function toggleShiftFavorite(id, event) {
+      if (event) event.stopPropagation();
+      let index = shiftFavorites.indexOf(id);
+      if (index > -1) {
+        shiftFavorites.splice(index, 1);
+      } else {
+        shiftFavorites.push(id);
+      }
+      localStorage.setItem('salon_shift_favorites', JSON.stringify(shiftFavorites));
+      renderDrinks();
+      // Aktualizovať aj v modale ak je otvorený
+      const d = allDrinks.find(item => item.id === id);
+      if (d) openDrinkModal(id);
+    }
+
     function exportToCSV() {
       if (!allDrinks || allDrinks.length === 0) return alert("Keine Getränke.");
-      let csvContent = "data:text/csv;charset=utf-8,Name;Category;Season;SellingPrice\r\n";
+      let csvContent = "data:text/csv;charset=utf-8,Name;Category;Season;SellingPrice;CostPrice\r\n";
       allDrinks.forEach(d => {
-        csvContent += `"${(d.name || '').replace(/"/g, '""')}";"${(d.category || '').replace(/"/g, '""')}";"${(d.season || '')}";${d.selling_price || 0}\r\n`;
+        csvContent += `"${(d.name || '').replace(/"/g, '""')}";"${(d.category || '').replace(/"/g, '""')}";"${(d.season || '')}";${d.selling_price || 0};${d.cost_price || 0}\r\n`;
       });
       let link = document.createElement("a");
       link.setAttribute("href", encodeURI(csvContent));
@@ -1063,6 +1190,7 @@
         if (activeSpecialFilter === 'glutenfree') matchesFilter = d.is_glutenfree || (d.allergens && d.allergens.toLowerCase().includes('glutenfrei'));
         if (activeSpecialFilter === 'lactosefree') matchesFilter = d.is_lactosefree || (d.allergens && d.allergens.toLowerCase().includes('laktosefrei'));
         if (activeSpecialFilter === 'nonalcoholic') matchesFilter = d.category === 'Mocktails';
+        if (activeSpecialFilter === 'favorites') matchesFilter = shiftFavorites.includes(d.id);
         
         let matchesGlass = selectedGlassFilter ? (d.glass_type && d.glass_type.trim() === selectedGlassFilter) : true;
 
@@ -1081,16 +1209,19 @@
         container.innerHTML = filtered.map(d => {
           let photoHtml = d.photo_url ? `<img src="${d.photo_url}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="">` : `<div class="flex items-center justify-center h-full text-slate-500 text-xs">${t.noPhoto}</div>`;
           let badgeHtml = d.is_featured ? '<span class="absolute top-2 right-2 text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500 text-slate-950 shadow">⭐ TOP</span>' : '';
+          let isFav = shiftFavorites.includes(d.id);
+          let favBtnHtml = `<button onclick="toggleShiftFavorite('${d.id}', event)" class="absolute top-2 left-2 text-sm p-1 rounded-full bg-slate-900/80 hover:bg-slate-900 ${isFav ? 'text-red-500' : 'text-slate-400'}">${isFav ? '❤️' : '🤍'}</button>`;
           let priceText = d.selling_price ? ` (${parseFloat(d.selling_price).toFixed(2)} €)` : '';
-          return `<div onclick="openDrinkModal('${d.id}')" class="card overflow-hidden cursor-pointer flex flex-col justify-between group"><div class="relative h-48 bg-slate-800">${photoHtml}${badgeHtml}<span class="absolute top-2 left-2 text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-900/85 text-amber-400 border border-amber-500/30">${d.category || t.defaultDrinkCat}</span></div><div class="p-4 text-center"><h3 class="text-lg font-bold text-white group-hover:text-amber-400 transition">${d.name}${priceText}</h3><span class="text-xs text-slate-400 mt-1 inline-block">${t.clickToView}</span></div></div>`;
+          return `<div onclick="openDrinkModal('${d.id}')" class="card overflow-hidden cursor-pointer flex flex-col justify-between group"><div class="relative h-48 bg-slate-800">${photoHtml}${badgeHtml}${favBtnHtml}<span class="absolute bottom-2 left-2 text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-900/85 text-amber-400 border border-amber-500/30">${d.category || t.defaultDrinkCat}</span></div><div class="p-4 text-center"><h3 class="text-lg font-bold group-hover:text-amber-400 transition">${d.name}${priceText}</h3><span class="text-xs text-slate-400 mt-1 inline-block">${t.clickToView}</span></div></div>`;
         }).join('');
       } else {
         container.className = 'flex flex-col gap-3';
         container.innerHTML = filtered.map(d => {
           let photoHtml = d.photo_url ? `<img src="${d.photo_url}" class="w-14 h-14 object-cover rounded-lg shrink-0" alt="">` : `<div class="w-14 h-14 bg-slate-800 rounded-lg shrink-0 flex items-center justify-center text-[10px] text-slate-500">No Pic</div>`;
           let badgeHtml = d.is_featured ? '<span class="text-xs font-bold px-2 py-0.5 rounded bg-amber-500 text-slate-950">⭐ TOP</span>' : '';
+          let isFav = shiftFavorites.includes(d.id);
           let priceText = d.selling_price ? ` (${parseFloat(d.selling_price).toFixed(2)} €)` : '';
-          return `<div onclick="openDrinkModal('${d.id}')" class="list-item p-3 cursor-pointer flex items-center justify-between gap-4 group"><div class="flex items-center gap-4 min-w-0">${photoHtml}<div class="min-w-0"><div class="flex items-center gap-2 flex-wrap"><h3 class="text-base font-bold text-white group-hover:text-amber-400 transition truncate">${d.name}${priceText}</h3>${badgeHtml}</div><p class="text-xs text-slate-400 truncate mt-0.5">${d.method ? 'Method: ' + d.method : (d.category || '')}</p></div></div><span class="text-xs font-semibold px-2.5 py-1 rounded bg-slate-800 text-amber-400 border border-slate-700 shrink-0">${d.category || t.defaultDrinkCat}</span></div>`;
+          return `<div onclick="openDrinkModal('${d.id}')" class="list-item p-3 cursor-pointer flex items-center justify-between gap-4 group"><div class="flex items-center gap-4 min-w-0">${photoHtml}<div class="min-w-0"><div class="flex items-center gap-2 flex-wrap"><h3 class="text-base font-bold group-hover:text-amber-400 transition truncate">${d.name}${priceText}</h3>${badgeHtml}</div><p class="text-xs text-slate-400 truncate mt-0.5">${d.method ? 'Method: ' + d.method : (d.category || '')}</p></div></div><div class="flex items-center gap-2 shrink-0"><button onclick="toggleShiftFavorite('${d.id}', event)" class="text-sm p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700">${isFav ? '❤️' : '🤍'}</button><span class="text-xs font-semibold px-2.5 py-1 rounded bg-slate-800 text-amber-400 border border-slate-700">${d.category || t.defaultDrinkCat}</span></div></div>`;
         }).join('');
       }
     }
@@ -1103,7 +1234,16 @@
       if (d.photo_url) html += `<img src="${d.photo_url}" class="w-full h-64 object-cover rounded-xl mb-4 shadow" alt="">`;
       let priceText = d.selling_price ? ` (${parseFloat(d.selling_price).toFixed(2)} €)` : '';
       html += `<div class="flex items-center gap-2 mb-2 flex-wrap"><span class="text-xs font-semibold px-2.5 py-1 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">${d.category || t.defaultDrinkCat}</span></div>`;
-      html += `<h2 class="text-3xl font-bold text-white mb-4">${d.name}${priceText}</h2>`;
+      html += `<h2 class="text-3xl font-bold mb-4">${d.name}${priceText}</h2>`;
+
+      // Kalkulačka marže a zisku pre manažéra / info
+      if (d.selling_price && d.cost_price && parseFloat(d.selling_price) > 0) {
+        let sp = parseFloat(d.selling_price);
+        let cp = parseFloat(d.cost_price);
+        let profit = sp - cp;
+        let margin = ((profit / sp) * 100).toFixed(1);
+        html += `<div class="mb-4 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs flex justify-between items-center text-amber-300"><span>💶 Marge: <b>${margin}%</b> (Gewinn: <b>${profit.toFixed(2)} €</b>)</span><span class="text-[10px] text-slate-400">Wareneinsatz: ${cp.toFixed(2)} €</span></div>`;
+      }
 
       html += `<div class="mb-6 border border-slate-700 rounded-xl overflow-hidden bg-slate-950 text-xs text-slate-200">`;
       html += `<div class="grid grid-cols-2 border-b border-slate-800 p-2.5 bg-slate-900/50"><div><span class="text-slate-400 font-semibold block">Glass:</span> ${d.glass_type || '-'}</div><div><span class="text-slate-400 font-semibold block">Method:</span> ${d.method || '-'}</div></div>`;
@@ -1129,8 +1269,21 @@
         html += `<div class="mb-4 bg-slate-800/40 p-3 rounded-xl text-xs"><p class="font-bold text-amber-400 mb-1">${t.recipeLabel}</p><p class="text-slate-200 whitespace-pre-line">${d.recipe}</p></div>`;
       }
 
+      // História úprav (Log)
+      if (d.updated_at) {
+        let updateDate = new Date(d.updated_at).toLocaleString();
+        html += `<div class="text-[10px] text-slate-400 mt-2">🕒 Letzte Änderung: ${updateDate}</div>`;
+      }
+
       document.getElementById('modalContent').innerHTML = html;
       
+      let isFav = shiftFavorites.includes(d.id);
+      document.getElementById('favBtnText').innerText = isFav ? 'Favorit ✓' : 'Schicht-Favorit';
+
+      document.getElementById('modalFavBtn').onclick = function() {
+        toggleShiftFavorite(d.id);
+      };
+
       document.getElementById('modalEditBtn').onclick = function() {
         closeModal();
         requestEditDrink(d.id);
