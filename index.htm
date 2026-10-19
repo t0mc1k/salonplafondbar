@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v2.2.1</title>
+  <title>Salonplafond BAR v2.2.2</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -113,7 +113,7 @@
         <h1 class="text-2xl md:text-3xl font-black tracking-wider text-white uppercase">Willkommen bei</h1>
         <h2 class="text-3xl md:text-4xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
         <div class="mt-3">
-          <span class="text-sm md:text-base font-bold text-amber-300 block">v2.2.1</span>
+          <span class="text-sm md:text-base font-bold text-amber-300 block">v2.2.2</span>
           <span class="text-xs md:text-sm text-slate-400 font-medium mt-0.5 block">Erstellt von © T0mc1k (Tomas Kardos)</span>
         </div>
       </div>
@@ -134,7 +134,7 @@
       </div>
       <div>
         <h1 class="text-3xl font-bold tracking-tight text-amber-400">Salonplafond BAR</h1>
-        <span class="text-xs text-slate-400 font-medium">v2.2.1 • Erstellt von © T0mc1k (Tomas Kardos)</span>
+        <span class="text-xs text-slate-400 font-medium">v2.2.2 • Erstellt von © T0mc1k (Tomas Kardos)</span>
       </div>
     </div>
 
@@ -245,7 +245,6 @@
       <div class="md:col-span-2 bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col gap-2">
         <label class="text-xs text-slate-400 font-semibold" id="seasonLabel">📅 Saison / Zeitraum:</label>
         <select id="dSeason" onchange="handleSeasonSelectChange(this)" class="p-3 rounded bg-slate-950 border border-slate-800 text-white text-xs">
-          <option value="current">✨ Aktuelle Saison (Standard)</option>
           <option value="01.09.2026 – 31.10.2026">📦 Archiv: 01.09.2026 – 31.10.2026</option>
           <option value="01.11.2026 – 31.12.2026">📦 Zukünftig: 01.11.2026 – 31.12.2026</option>
           <option value="addNew">➕ Neue Saison erstellen...</option>
@@ -388,7 +387,7 @@
   </div>
 
   <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-    Salonplafond BAR App v2.2.1 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+    Salonplafond BAR App v2.2.2 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
   </footer>
 
   <!-- Modal Detail View -->
@@ -441,20 +440,8 @@
   </div>
 
   <!-- Support Modal -->
-  <div id="supportModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-    <div class="card max-w-lg w-full bg-slate-900 border-slate-700 p-6 relative flex flex-col gap-4">
-      <button onclick="closeSupportModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
-      <h3 class="text-xl font-bold text-amber-400" id="supportModalTitle">✉️ Support & Feedback</h3>
-      <p class="text-xs text-slate-300" id="supportModalDesc">Sende direkt eine Nachricht an den Entwickler (Tomas Kardos).</p>
-      <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs text-slate-300 flex items-center justify-between">
-        <span>📧 <b>kdstom@outlook.com</b></span>
-      </div>
-      <textarea id="supportMessage" rows="4" placeholder="Schreibe deine Nachricht hier..." class="p-3 rounded bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400"></textarea>
-      <div class="flex gap-2">
-        <button onclick="sendSupportEmail()" id="sendSupportBtn" class="flex-1 py-2.5 bg-amber-500 hover:bg-amber-600 font-bold text-slate-950 rounded-lg text-xs transition">Nachricht senden</button>
-        <button onclick="closeSupportModal()" id="closeSupportBtn" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 font-bold text-white rounded-lg text-xs transition">Schließen</button>
-      </div>
-    </div>
+  <div id="seasonModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <!-- Unsurpassed support modal layout -->
   </div>
 
   <script>
@@ -462,15 +449,12 @@
     const SUPABASE_KEY = "sb_publishable_2tw50zmlzxDClPx7zwnT3g_k2WiaUuL";
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // FUNKČNÝ ČASOVAČ DLAŽDICE ANIMÁCIE: Presne 2.5 sekundy
     function initSplash() {
       const splash = document.getElementById('splashScreen');
       if (splash) {
         setTimeout(() => {
           splash.style.opacity = '0';
-          setTimeout(() => { 
-            splash.style.display = 'none'; 
-          }, 500);
+          setTimeout(() => { splash.style.display = 'none'; }, 500);
         }, 2500);
       }
     }
@@ -515,7 +499,7 @@
     let selectedCat = 'All';
     let activeSpecialFilter = null;
     let selectedGlassFilter = null;
-    let currentSeasonFilter = 'current';
+    let currentSeasonFilter = null;
     let isAdmin = false;
     const MANAGER_PASSWORD = "salon123";
 
@@ -749,26 +733,30 @@
     }
 
     function getAllSeasons() {
-      let seasons = ['current', '01.09.2026 – 31.10.2026', '01.11.2026 – 31.12.2026'];
+      let seasons = [];
       allDrinks.forEach(d => {
-        if (d.season && !seasons.includes(d.season)) seasons.push(d.season);
+        if (d.season && d.season !== 'current' && !seasons.includes(d.season)) seasons.push(d.season);
       });
+      // Ak žiadna sezóna neexistuje, pridáme predvolenú ukážkovú
+      if (seasons.length === 0) seasons.push('01.09.2026 – 31.10.2026');
       return seasons;
     }
 
     function determineActiveSeasonAutomatically() {
       const now = new Date();
-      let matchedSeason = 'current';
-      allDrinks.forEach(d => {
-        if (d.season && d.season !== 'current' && d.season.includes('–')) {
-          let parts = d.season.split('–').map(s => s.trim());
+      let seasons = getAllSeasons();
+      let matchedSeason = seasons[0]; // Predvolene prvá nájdená
+
+      seasons.forEach(s => {
+        if (s.includes('–')) {
+          let parts = s.split('–').map(item => item.trim());
           if (parts.length === 2) {
             let [startDay, startMonth, startYear] = parts[0].split('.').map(Number);
             let [endDay, endMonth, endYear] = parts[1].split('.').map(Number);
             if (startYear && endYear && startMonth && endMonth && startDay && endDay) {
               let startDate = new Date(startYear, startMonth - 1, startDay);
               let endDate = new Date(endYear, endMonth - 1, endDay, 23, 59, 59);
-              if (now >= startDate && now <= endDate) matchedSeason = d.season;
+              if (now >= startDate && now <= endDate) matchedSeason = s;
             }
           }
         }
@@ -779,7 +767,7 @@
     function updateActiveSeasonBadgeUI() {
       const badge = document.getElementById('activeSeasonBadge');
       const seasonNameEl = document.getElementById('activeSeasonName');
-      if (currentSeasonFilter === 'current') {
+      if (!currentSeasonFilter) {
         badge.classList.remove('flex');
         badge.classList.add('hidden');
       } else {
@@ -791,10 +779,6 @@
 
     async function deleteEntireSeason(seasonKey, event) {
       if (event) event.stopPropagation();
-      if (seasonKey === 'current') {
-        alert("Die aktuelle Hauptsaison kann nicht gelöscht werden.");
-        return;
-      }
       
       if (!isAdmin) {
         let pass = prompt(i18n[currentLang].passPrompt);
@@ -817,7 +801,6 @@
       }
 
       alert(`Saison "${seasonKey}" wurde erfolgreich gelöscht!`);
-      currentSeasonFilter = 'current';
       loadDrinks();
       closeSeasonModal();
     }
@@ -826,25 +809,24 @@
       const seasons = getAllSeasons();
       const listContainer = document.getElementById('seasonModalList');
       listContainer.innerHTML = seasons.map(s => {
-        let label = s === 'current' ? '✨ Aktuelle Saison (Standard)' : `📦 Saison: ${s}`;
+        let label = `📦 Saison: ${s}`;
         let activeClass = currentSeasonFilter === s ? 'border-amber-400 bg-amber-500/10' : 'bg-slate-800 border-slate-700 hover:bg-slate-700';
-        
-        let deleteBtnHtml = (s !== 'current') ? `<button onclick="deleteEntireSeason('${s}', event)" class="p-1.5 px-2 bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white rounded-lg transition text-xs font-bold border border-red-500/30 ml-2" title="Saison komplett löschen">🗑️ Löschen</button>` : '';
+        let deleteBtnHtml = `<button onclick="deleteEntireSeason('${s}', event)" class="p-1.5 px-2 bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white rounded-lg transition text-xs font-bold border border-red-500/30 ml-2" title="Saison komplett löschen">🗑️ Löschen</button>`;
 
         return `<div class="p-3 rounded-xl ${activeClass} border transition flex items-center justify-between group cursor-pointer" onclick="selectSeason('${s}')"><div><div class="text-sm font-bold text-white group-hover:text-amber-400">${label}</div></div><div class="flex items-center"><span class="text-xs text-amber-400 font-semibold mr-1">${currentSeasonFilter === s ? 'Aktiv ✓' : 'Öffnen →'}</span>${deleteBtnHtml}</div></div>`;
       }).join('');
     }
 
-    function renderSeasonFormSelect(selectedVal = 'current') {
+    function renderSeasonFormSelect(selectedVal = '') {
       const seasons = getAllSeasons();
       const select = document.getElementById('dSeason');
-      let html = `<option value="current">✨ Aktuelle Saison (Standard)</option>`;
+      let html = '';
       seasons.forEach(s => {
-        if (s !== 'current') html += `<option value="${s}" ${selectedVal === s ? 'selected' : ''}>📦 ${s}</option>`;
+        html += `<option value="${s}" ${selectedVal === s ? 'selected' : ''}>📦 ${s}</option>`;
       });
       html += `<option value="addNew">➕ Neue Saison erstellen...</option>`;
       select.innerHTML = html;
-      select.value = selectedVal;
+      if (selectedVal) select.value = selectedVal;
     }
 
     function handleSeasonSelectChange(selectEl) {
@@ -859,7 +841,7 @@
           select.insertBefore(opt, select.lastElementChild);
           select.value = formattedName;
         } else {
-          selectEl.value = 'current';
+          selectEl.value = getAllSeasons()[0];
         }
       }
     }
@@ -1015,7 +997,7 @@
       if (!allDrinks || allDrinks.length === 0) return alert("Keine Getränke.");
       let csvContent = "data:text/csv;charset=utf-8,Name;Category;Season;SellingPrice\r\n";
       allDrinks.forEach(d => {
-        csvContent += `"${(d.name || '').replace(/"/g, '""')}";"${(d.category || '').replace(/"/g, '""')}";"${(d.season || 'current')}";${d.selling_price || 0}\r\n`;
+        csvContent += `"${(d.name || '').replace(/"/g, '""')}";"${(d.category || '').replace(/"/g, '""')}";"${(d.season || '')}";${d.selling_price || 0}\r\n`;
       });
       let link = document.createElement("a");
       link.setAttribute("href", encodeURI(csvContent));
@@ -1044,9 +1026,11 @@
       const { data, error } = await _supabase.from('drinks').select('*').order('created_at', { ascending: false });
       if (error) { console.error(error); return; }
       allDrinks = data || [];
-      currentSeasonFilter = determineActiveSeasonAutomatically();
+      if (!currentSeasonFilter) {
+        currentSeasonFilter = determineActiveSeasonAutomatically();
+      }
       updateActiveSeasonBadgeUI();
-      renderSeasonFormSelect(document.getElementById('dSeason').value);
+      renderSeasonFormSelect(currentSeasonFilter);
       renderCategories();
       renderGlassFilterButtons();
       renderDrinks();
@@ -1067,8 +1051,8 @@
       const t = i18n[currentLang];
       const search = document.getElementById('searchInput').value.toLowerCase();
       let filtered = allDrinks.filter(d => {
-        let drinkSeason = d.season || 'current';
-        let matchesSeason = (currentSeasonFilter === 'current') ? (drinkSeason === 'current') : (drinkSeason === currentSeasonFilter);
+        let drinkSeason = d.season || '';
+        let matchesSeason = drinkSeason === currentSeasonFilter;
         const matchesCat = selectedCat === t.allCategories || d.category === selectedCat;
         let ingSearchText = Array.isArray(d.ingredients_json) ? d.ingredients_json.map(i => i.name).join(' ') : (d.ingredients || '');
         const matchesSearch = d.name.toLowerCase().includes(search) || ingSearchText.toLowerCase().includes(search);
@@ -1203,7 +1187,7 @@
       document.getElementById('editingId').value = d.id;
       document.getElementById('dName').value = d.name || '';
       document.getElementsByName('dCatRadio').forEach(r => r.checked = (r.value === d.category));
-      renderSeasonFormSelect(d.season || 'current');
+      renderSeasonFormSelect(d.season || getAllSeasons()[0]);
       document.getElementById('dGlass').value = d.glass_type || '';
       document.getElementById('dMethod').value = d.method || '';
       document.getElementById('dIce').value = d.ice || '';
