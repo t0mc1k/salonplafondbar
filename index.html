@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.01</title>
+  <title>Salonplafond BAR v3.0.02</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import -->
@@ -32,13 +32,16 @@
     .card:hover { transform: translateY(-4px); border-color: #f59e0b; }
     .list-item { border-radius: 0.75rem; transition: background 0.2s; }
     
-    /* Animácia iba pre logo na prihlasovacej obrazovke */
-    .login-logo-pulse {
-      animation: pulseLogo 1.2s ease-in-out infinite alternate;
+    /* Bohatšia animácia loga na prihlásenie */
+    .login-logo-advanced {
+      animation: advancedLogoAnim 4s ease-in-out infinite;
     }
-    @keyframes pulseLogo {
-      0% { transform: scale(0.95); opacity: 0.85; }
-      100% { transform: scale(1.05); opacity: 1; }
+    @keyframes advancedLogoAnim {
+      0% { transform: scale(1) rotate(0deg); box-shadow: 0 0 15px rgba(245, 158, 11, 0.4); }
+      25% { transform: scale(1.08) rotate(6deg); box-shadow: 0 0 25px rgba(245, 158, 11, 0.7); }
+      50% { transform: scale(0.95) rotate(0deg); box-shadow: 0 0 10px rgba(245, 158, 11, 0.3); }
+      75% { transform: scale(1.08) rotate(-6deg); box-shadow: 0 0 25px rgba(245, 158, 11, 0.7); }
+      100% { transform: scale(1) rotate(0deg); box-shadow: 0 0 15px rgba(245, 158, 11, 0.4); }
     }
 
     /* Interaktívne animované logo v hlavičke */
@@ -110,18 +113,18 @@
     @media print {
       @page { size: portrait; margin: 10mm; }
       body { background: white !important; color: black !important; padding: 0 !important; }
-      body > *:not(#drinkModal):not(#supportModal):not(#seasonModal):not(#motivationModal):not(#shoppingModal) { display: none !important; }
+      body > *:not(#drinkModal):not(#supportModal):not(#seasonModal):not(#motivationModal):not(#shoppingModal):not(#importModal):not(#authModal) { display: none !important; }
     }
   </style>
 </head>
 <body class="dark-mode p-4 md:p-8 max-w-6xl mx-auto pb-24" onclick="closeDropdowns(event)">
 
-  <!-- 1. PRIHLASOVACIA OBRAZOVKA (Statická, pulzuje iba logo) -->
+  <!-- 1. PRIHLASOVACIA OBRAZOVKA -->
   <div id="authContainer" class="fixed inset-0 z-[200] bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
     <div class="flex flex-col items-center gap-4 w-full max-w-md">
       
-      <!-- Animované iba logo Ō -->
-      <div class="login-logo-pulse w-20 h-20 bg-amber-400 rounded-2xl flex flex-col items-center justify-center shadow-2xl p-2 text-slate-950 font-bold select-none border-2 border-amber-300 mx-auto">
+      <!-- Logo s pokročilou animáciou -->
+      <div class="login-logo-advanced w-20 h-20 bg-amber-400 rounded-2xl flex flex-col items-center justify-center shadow-2xl p-2 text-slate-950 font-bold select-none border-2 border-amber-300 mx-auto">
         <div class="text-[10px] font-black tracking-widest -mb-1">¯</div>
         <div class="text-4xl font-black leading-none">Ō</div>
         <div class="text-[10px] font-black leading-none mt-1">•</div>
@@ -130,10 +133,9 @@
       <div>
         <h1 class="text-xl md:text-2xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-2xl md:text-3xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-400 font-medium mt-1 block">v3.0.01 • Sichere Authentifizierung</span>
+        <span class="text-xs text-slate-400 font-medium mt-1 block">v3.0.02 • Sichere Authentifizierung</span>
       </div>
 
-      <!-- Login formulár bez predvyplneného e-mailu -->
       <form id="loginForm" onsubmit="handleLogin(event)" class="w-full bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl space-y-4 text-left mt-2">
         <div>
           <label class="block text-xs font-semibold uppercase mb-1 text-slate-300">E-Mail</label>
@@ -144,8 +146,8 @@
           <input type="password" id="loginPassword" required class="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400">
         </div>
         <div id="authError" class="text-xs text-red-400 hidden font-medium"></div>
-        <button type="submit" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold rounded-xl text-xs transition shadow-lg">
-          Einloggen
+        <button type="submit" id="loginSubmitBtn" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold rounded-xl text-xs transition shadow-lg flex items-center justify-center gap-2">
+          <span id="loginBtnText">Einloggen</span>
         </button>
       </form>
 
@@ -167,7 +169,7 @@
         </div>
         <div>
           <h1 class="text-3xl font-bold tracking-tight text-amber-400">Salonplafond BAR</h1>
-          <span class="text-xs text-slate-400 font-medium">v3.0.01 • Angemeldet: <span id="currentUserEmail" class="text-amber-300 font-bold"></span></span>
+          <span class="text-xs text-slate-400 font-medium">v3.0.02 • Angemeldet: <span id="currentUserEmail" class="text-amber-300 font-bold"></span></span>
         </div>
       </div>
 
@@ -230,11 +232,10 @@
               📊 <span id="exportText">Export CSV</span>
             </button>
 
-            <!-- Tlačidlo pre Excel import priamo v menu pre manažéra -->
-            <button onclick="triggerExcelImport()" id="btnMenuImportExcel" class="hidden w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-700 text-xs font-bold text-emerald-400 items-center gap-2">
-              📥 <span>Winterkarte Excel Import</span>
+            <!-- Univerzálny Excel import sprievodca v menu -->
+            <button onclick="openImportModal()" id="btnMenuImportExcel" class="hidden w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-700 text-xs font-semibold text-slate-200 items-center gap-2">
+              📥 <span id="importMenuBtnText">Excel Import (Sprievodca)</span>
             </button>
-            <input type="file" id="excelFileInput" accept=".xlsx, .xls" class="hidden" onchange="handleExcelImport(event)">
 
             <button onclick="openSupportModal()" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-700 text-xs font-semibold text-amber-400 flex items-center gap-2">
               ✉️ <span id="supportMenuText">Support / Feedback</span>
@@ -296,11 +297,7 @@
         
         <div class="md:col-span-2 bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col gap-2">
           <label class="text-xs text-slate-400 font-semibold" id="seasonLabel">📅 Saison / Zeitraum:</label>
-          <select id="dSeason" onchange="handleSeasonSelectChange(this)" class="p-3 rounded bg-slate-950 border border-slate-800 text-white text-xs">
-            <option value="16.11.2026 - 16.03.2027">📦 Winterkarte (16.11.2026 - 16.03.2027)</option>
-            <option value="Sommer 2026">📦 Sommerkarte 2026</option>
-            <option value="addNew">➕ Neue Saison erstellen...</option>
-          </select>
+          <select id="dSeason" onchange="handleSeasonSelectChange(this)" class="p-3 rounded bg-slate-950 border border-slate-800 text-white text-xs"></select>
         </div>
 
         <div class="md:col-span-2 bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col gap-2">
@@ -439,7 +436,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.01 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.02 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div> <!-- /Koniec appContainer -->
@@ -467,6 +464,59 @@
         <button onclick="closeModal()" id="closeModalBtn" class="flex-1 py-3.5 bg-slate-800 hover:bg-slate-700 active:scale-[0.99] text-amber-400 font-extrabold text-sm rounded-xl border-2 border-amber-500/50 transition shadow-lg tracking-wide">
           ✕ Schließen
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Excel Import Wizard Modal -->
+  <div id="importModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="card max-w-lg w-full p-6 relative flex flex-col gap-4">
+      <button onclick="closeImportModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
+      <h3 class="text-xl font-bold text-amber-400">📥 Excel Import Sprievodca</h3>
+      <p class="text-xs text-slate-300">Nahraj Excel súbor s receptami a vyber cieľovú sezónu:</p>
+      
+      <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col gap-3">
+        <label class="text-xs font-semibold text-slate-400">1. Vybrať Excel súbor (.xlsx, .xls):</label>
+        <input type="file" id="wizardExcelFile" accept=".xlsx, .xls" class="text-xs text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-600 cursor-pointer">
+      </div>
+
+      <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col gap-2">
+        <label class="text-xs font-semibold text-slate-400">2. Cieľová sezóna pre import:</label>
+        <select id="wizardSeasonSelect" onchange="handleWizardSeasonChange(this)" class="p-3 rounded bg-slate-900 border border-slate-700 text-white text-xs"></select>
+      </div>
+
+      <div id="wizardStatus" class="text-xs text-amber-400 font-medium text-center"></div>
+
+      <div class="flex gap-2 mt-2">
+        <button onclick="executeWizardImport()" class="flex-1 py-3 bg-amber-500 hover:bg-amber-600 font-bold text-slate-950 rounded-xl text-xs transition shadow-lg">Spustiť import</button>
+        <button onclick="closeImportModal()" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 font-bold text-white rounded-xl text-xs transition">Zrušiť</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Secure Manager Auth Modal Dialog -->
+  <div id="authModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="card max-w-md w-full p-6 relative flex flex-col gap-4 shadow-2xl border-amber-500/50">
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
+      <div class="w-12 h-12 bg-amber-500/20 text-amber-400 rounded-xl mx-auto flex items-center justify-center text-2xl border border-amber-500/30">🔒</div>
+      <h3 class="text-xl font-bold text-amber-400 text-center">Manager-Authentifizierung</h3>
+      <p class="text-xs text-slate-300 text-center">Diese Aktion erfordert Administratorrechte. Bitte geben Sie Ihre Manager E-Mail und Passwort ein:</p>
+      
+      <div class="space-y-3 mt-2">
+        <div>
+          <label class="block text-[11px] font-semibold uppercase mb-1 text-slate-300">Manager E-Mail</label>
+          <input type="email" id="modalAuthEmail" placeholder="amim@salonplafond.wien" class="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400">
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold uppercase mb-1 text-slate-300">Passwort</label>
+          <input type="password" id="modalAuthPassword" placeholder="••••••••" class="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400">
+        </div>
+        <div id="modalAuthError" class="text-xs text-red-400 hidden font-medium"></div>
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button onclick="verifyManagerAuthModal()" class="flex-1 py-3 bg-amber-500 hover:bg-amber-600 font-extrabold text-slate-950 rounded-xl text-xs transition shadow-lg">Autorisieren</button>
+        <button onclick="closeAuthModal()" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 font-bold text-white rounded-xl text-xs transition">Abbrechen</button>
       </div>
     </div>
   </div>
@@ -533,6 +583,8 @@
     const SUPABASE_KEY = "sb_publishable_2tw50zmlzxDClPx7zwnT3g_k2WiaUuL";
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    let pendingAuthCallback = null;
+
     // Auth & Session Check pri štarte
     window.addEventListener("DOMContentLoaded", async () => {
       const { data: { session } } = await _supabase.auth.getSession();
@@ -548,12 +600,15 @@
       const email = document.getElementById("loginEmail").value;
       const password = document.getElementById("loginPassword").value;
       const errDiv = document.getElementById("authError");
+      const btnText = document.getElementById("loginBtnText");
       errDiv.classList.add("hidden");
+      btnText.innerText = "Wird eingeloggt...";
 
       const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
       if (error) {
         errDiv.innerText = "Fehler: " + error.message;
         errDiv.classList.remove("hidden");
+        btnText.innerText = "Einloggen";
       } else {
         if (data && data.user) {
           showApp(data.user);
@@ -565,6 +620,7 @@
       await _supabase.auth.signOut();
       document.getElementById('appContainer').classList.add('hidden');
       document.getElementById('authContainer').classList.remove('hidden');
+      document.getElementById('loginBtnText').innerText = "Einloggen";
     }
 
     function showApp(user) {
@@ -581,7 +637,6 @@
       
       document.getElementById('modeStatusText').innerText = isAdmin ? i18n[currentLang].managerMode : i18n[currentLang].waiterMode;
       
-      // Zobraziť/skryť Excel import tlačidlo v menu pre manažéra
       const btnMenuImport = document.getElementById('btnMenuImportExcel');
       if (isAdmin) {
         btnMenuImport.classList.remove('hidden');
@@ -594,19 +649,56 @@
       loadDrinks();
     }
 
-    /* Funkcia na rýchle vyžiadanie manažérskeho prístupu (prompt) pre čašníkov */
-    function checkManagerAuth() {
-      if (isAdmin) return true;
-      let pass = prompt("Manager-Berechtigung erforderlich. Bitte Passwort oder E-Mail eingeben:");
-      if (pass === "salon123" || pass === "amim@salonplafond.wien") {
+    /* Bezpečné modálne overenie manažéra cez Supabase */
+    function checkManagerAuth(callback) {
+      if (isAdmin) {
+        if (callback) callback();
+        return;
+      }
+      pendingAuthCallback = callback;
+      document.getElementById('modalAuthEmail').value = '';
+      document.getElementById('modalAuthPassword').value = '';
+      document.getElementById('modalAuthError').classList.add('hidden');
+      document.getElementById('authModal').classList.remove('hidden');
+      document.getElementById('authModal').classList.add('flex');
+    }
+
+    function closeAuthModal() {
+      document.getElementById('authModal').classList.remove('flex');
+      document.getElementById('authModal').classList.add('hidden');
+      pendingAuthCallback = null;
+    }
+
+    async function verifyManagerAuthModal() {
+      const email = document.getElementById('modalAuthEmail').value;
+      const password = document.getElementById('modalAuthPassword').value;
+      const errDiv = document.getElementById('modalAuthError');
+      errDiv.classList.add('hidden');
+
+      if (!email || !password) {
+        errDiv.innerText = "Bitte E-Mail und Passwort eingeben.";
+        errDiv.classList.remove('hidden');
+        return;
+      }
+
+      const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+      if (error || !data.user || !data.user.email.includes("amim@salonplafond.wien")) {
+        errDiv.innerText = "Ungültige Administrator-Anmeldedaten!";
+        errDiv.classList.remove('hidden');
+      } else {
         isAdmin = true;
         document.getElementById('modeStatusText').innerText = i18n[currentLang].managerMode;
+        const btnMenuImport = document.getElementById('btnMenuImportExcel');
+        btnMenuImport.classList.remove('hidden');
+        btnMenuImport.classList.add('flex');
+        
+        closeAuthModal();
         alert("Erfolgreich als Manager autorisiert!");
-        return true;
-      } else if (pass !== null) {
-        alert("Falsches Passwort / E-Mail!");
+        if (pendingAuthCallback) {
+          pendingAuthCallback();
+          pendingAuthCallback = null;
+        }
       }
-      return false;
     }
 
     /* MOTIVAČNÉ HLÁŠKY */
@@ -672,6 +764,7 @@
         archiveBadgeText: "Aktive Saison:",
         langMenuLabel: "Sprache / Language",
         exportText: "Export CSV",
+        importMenuBtnText: "Excel Import (Sprievodca)",
         supportText: "Support / Feedback",
         supportModalTitle: "✉️ Support & Feedback",
         supportModalDesc: "Möchtest du ein Rezept ändern, ein neues Getränk hinzufügen oder hast du einen Verbesserungsvorschlag? Sende direkt eine Nachricht an den Entwickler (Tomas Kardos).",
@@ -739,6 +832,7 @@
         archiveBadgeText: "Active Season:",
         langMenuLabel: "Language",
         exportText: "CSV Export",
+        importMenuBtnText: "Excel Import Wizard",
         supportText: "Support / Feedback",
         supportModalTitle: "✉️ Support & Feedback",
         supportModalDesc: "Would you like to change a recipe, add a new drink, or do you have a suggestion? Send a message directly to the developer (Tomas Kardos).",
@@ -945,12 +1039,24 @@
         if (d.season && d.season !== 'current' && !seasons.includes(d.season)) seasons.push(d.season);
       });
       if (!seasons.includes('16.11.2026 - 16.03.2027')) seasons.push('16.11.2026 - 16.03.2027');
+      if (!seasons.includes('Sommer 2026')) seasons.push('Sommer 2026');
       return seasons;
     }
 
+    /* Inteligentná detekcia predvolenej sezóny podľa aktuálneho dátumu */
     function determineActiveSeasonAutomatically() {
       let seasons = getAllSeasons();
-      if (seasons.includes('16.11.2026 - 16.03.2027')) return '16.11.2026 - 16.03.2027';
+      const now = new Date();
+      
+      // Ak existuje staršia letná sezóna a aktuálny dátum je pred 16.11.2026, uprednostníme letnú/starú sezónu
+      const winterStart = new Date('2026-11-16');
+      if (now < winterStart && seasons.includes('Sommer 2026')) {
+        return 'Sommer 2026';
+      }
+      
+      if (seasons.includes('16.11.2026 - 16.03.2027') && now >= winterStart) {
+        return '16.11.2026 - 16.03.2027';
+      }
       return seasons[0];
     }
 
@@ -969,22 +1075,21 @@
 
     async function deleteEntireSeason(seasonKey, event) {
       if (event) event.stopPropagation();
-      
-      if (!checkManagerAuth()) return;
+      checkManagerAuth(async () => {
+        if (!confirm(`Möchten Sie wirklich die gesamte Saison "${seasonKey}" und alle darin enthaltenen Getränke löschen?`)) {
+          return;
+        }
 
-      if (!confirm(`Möchten Sie wirklich die gesamte Saison "${seasonKey}" und alle darin enthaltenen Getränke löschen?`)) {
-        return;
-      }
+        const { error } = await _supabase.from('drinks').delete().eq('season', seasonKey);
+        if (error) {
+          alert("Fehler beim Löschen: " + error.message);
+          return;
+        }
 
-      const { error } = await _supabase.from('drinks').delete().eq('season', seasonKey);
-      if (error) {
-        alert("Fehler beim Löschen: " + error.message);
-        return;
-      }
-
-      alert(`Saison "${seasonKey}" wurde erfolgreich gelöscht!`);
-      loadDrinks();
-      closeSeasonModal();
+        alert(`Saison "${seasonKey}" wurde erfolgreich gelöscht!`);
+        loadDrinks();
+        closeSeasonModal();
+      });
     }
 
     function renderSeasonModalList() {
@@ -1087,6 +1192,7 @@
       document.getElementById('archiveBadgeText').innerText = t.archiveBadgeText;
       document.getElementById('langMenuLabel').innerText = t.langMenuLabel;
       document.getElementById('exportText').innerText = t.exportText;
+      document.getElementById('importMenuBtnText').innerText = t.importMenuBtnText;
       document.getElementById('supportMenuText').innerText = t.supportText;
       document.getElementById('supportModalTitle').innerText = t.supportModalTitle;
       document.getElementById('supportModalDesc').innerText = t.supportModalDesc;
@@ -1306,7 +1412,6 @@
       html += `<div class="flex items-center gap-2 mb-2 flex-wrap"><span class="text-xs font-semibold px-2.5 py-1 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">${d.category || t.defaultDrinkCat}</span></div>`;
       html += `<h2 class="text-3xl font-bold mb-4">${d.name}${priceText}</h2>`;
 
-      // Kalkulačka marže a zisku IBA PRE MANAŽÉRA
       if (isAdmin && d.selling_price && d.cost_price && parseFloat(d.selling_price) > 0) {
         let sp = parseFloat(d.selling_price);
         let cp = parseFloat(d.cost_price);
@@ -1355,11 +1460,11 @@
 
       document.getElementById('modalEditBtn').onclick = function() {
         closeModal();
-        requestEditDrink(d.id);
+        checkManagerAuth(() => editDrink(d.id));
       };
 
       document.getElementById('modalDeleteBtn').onclick = function() {
-        deleteDrinkConfirm(d.id);
+        checkManagerAuth(() => deleteDrinkConfirm(d.id));
       };
 
       document.getElementById('drinkModal').classList.remove('hidden');
@@ -1374,29 +1479,22 @@
     function toggleMode() {
       const t = i18n[currentLang];
       if (!isAdmin) {
-        if (!checkManagerAuth()) return;
+        checkManagerAuth(() => {
+          document.getElementById('modeStatusText').innerText = t.managerMode;
+          document.getElementById('adminForm').classList.remove('hidden');
+          document.getElementById('btnMenuImportExcel').classList.remove('hidden');
+          document.getElementById('btnMenuImportExcel').classList.add('flex');
+          renderDrinks();
+        });
       } else {
         isAdmin = false;
+        document.getElementById('modeStatusText').innerText = t.waiterMode;
+        document.getElementById('adminForm').classList.add('hidden');
+        document.getElementById('btnMenuImportExcel').classList.add('hidden');
+        document.getElementById('btnMenuImportExcel').classList.remove('flex');
+        resetForm();
+        renderDrinks();
       }
-      document.getElementById('modeStatusText').innerText = isAdmin ? t.managerMode : t.waiterMode;
-      document.getElementById('adminForm').classList.toggle('hidden', !isAdmin);
-      
-      const btnMenuImport = document.getElementById('btnMenuImportExcel');
-      if (isAdmin) {
-        btnMenuImport.classList.remove('hidden');
-        btnMenuImport.classList.add('flex');
-      } else {
-        btnMenuImport.classList.add('hidden');
-        btnMenuImport.classList.remove('flex');
-      }
-
-      if (!isAdmin) resetForm();
-      renderDrinks();
-    }
-
-    function requestEditDrink(id) {
-      if (!checkManagerAuth()) return;
-      editDrink(id);
     }
 
     function editDrink(id) {
@@ -1424,8 +1522,6 @@
 
     async function deleteDrinkConfirm(id) {
       const t = i18n[currentLang];
-      if (!checkManagerAuth()) return;
-
       if (confirm(t.confirmDelete)) {
         const { error } = await _supabase.from('drinks').delete().eq('id', id);
         if (error) return alert("Error: " + error.message);
@@ -1437,7 +1533,7 @@
 
     function deleteDrinkFromForm() {
       const id = document.getElementById('editingId').value;
-      if (id) deleteDrinkConfirm(id);
+      if (id) checkManagerAuth(() => deleteDrinkConfirm(id));
     }
 
     function resetForm() {
@@ -1463,45 +1559,92 @@
     }
 
     async function saveDrink() {
-      if (!checkManagerAuth()) return;
-      const name = document.getElementById('dName').value;
-      let category = '';
-      document.getElementsByName('dCatRadio').forEach(r => { if (r.checked) category = r.value; });
-      if (!name || !category) return alert(i18n[currentLang].alertFill);
+      checkManagerAuth(async () => {
+        const name = document.getElementById('dName').value;
+        let category = '';
+        document.getElementsByName('dCatRadio').forEach(r => { if (r.checked) category = r.value; });
+        if (!name || !category) return alert(i18n[currentLang].alertFill);
 
-      const drinkObj = {
-        name, category,
-        season: document.getElementById('dSeason').value,
-        glass_type: document.getElementById('dGlass').value,
-        method: document.getElementById('dMethod').value,
-        ice: document.getElementById('dIce').value,
-        garnish: document.getElementById('dGarnish').value,
-        ingredients_json: getIngredientsData(),
-        cost_price: parseFloat(document.getElementById('dCost').value) || null,
-        selling_price: parseFloat(document.getElementById('dPrice').value) || null,
-        allergens: document.getElementById('dAllergens').value,
-        recipe: document.getElementById('dRecipe').value,
-        photo_url: document.getElementById('dPhoto').value,
-        updated_at: new Date().toISOString()
-      };
+        const drinkObj = {
+          name, category,
+          season: document.getElementById('dSeason').value,
+          glass_type: document.getElementById('dGlass').value,
+          method: document.getElementById('dMethod').value,
+          ice: document.getElementById('dIce').value,
+          garnish: document.getElementById('dGarnish').value,
+          ingredients_json: getIngredientsData(),
+          cost_price: parseFloat(document.getElementById('dCost').value) || null,
+          selling_price: parseFloat(document.getElementById('dPrice').value) || null,
+          allergens: document.getElementById('dAllergens').value,
+          recipe: document.getElementById('dRecipe').value,
+          photo_url: document.getElementById('dPhoto').value,
+          updated_at: new Date().toISOString()
+        };
 
-      const id = document.getElementById('editingId').value;
-      if (id) await _supabase.from('drinks').update(drinkObj).eq('id', id);
-      else await _supabase.from('drinks').insert([drinkObj]);
+        const id = document.getElementById('editingId').value;
+        if (id) await _supabase.from('drinks').update(drinkObj).eq('id', id);
+        else await _supabase.from('drinks').insert([drinkObj]);
 
-      resetForm();
-      loadDrinks();
+        resetForm();
+        loadDrinks();
+      });
     }
 
-    /* Funkcie pre Excel Import pre zimnú kartu */
-    function triggerExcelImport() {
-      if (!checkManagerAuth()) return;
-      document.getElementById('excelFileInput').click();
+    /* Univerzálny Excel Sprievodca Importom */
+    function openImportModal() {
+      document.getElementById('settingsDropdown').classList.add('hidden');
+      checkManagerAuth(() => {
+        renderWizardSeasonSelect();
+        document.getElementById('wizardExcelFile').value = '';
+        document.getElementById('wizardStatus').innerText = '';
+        document.getElementById('importModal').classList.remove('hidden');
+        document.getElementById('importModal').classList.add('flex');
+      });
     }
 
-    function handleExcelImport(event) {
-      const file = event.target.files[0];
-      if (!file) return;
+    function closeImportModal() {
+      document.getElementById('importModal').classList.remove('flex');
+      document.getElementById('importModal').classList.add('hidden');
+    }
+
+    function renderWizardSeasonSelect() {
+      const seasons = getAllSeasons();
+      const select = document.getElementById('wizardSeasonSelect');
+      let html = '';
+      seasons.forEach(s => {
+        html += `<option value="${s}">📦 ${s}</option>`;
+      });
+      html += `<option value="addNew">➕ Neue Saison erstellen...</option>`;
+      select.innerHTML = html;
+    }
+
+    function handleWizardSeasonChange(selectEl) {
+      if (selectEl.value === 'addNew') {
+        let newName = prompt("Zeitraum eingeben (z. B. 01.04.2027 – 30.09.2027):");
+        if (newName && newName.trim() !== '') {
+          let formatted = newName.trim();
+          let opt = document.createElement('option');
+          opt.value = formatted;
+          opt.text = `📦 ${formatted}`;
+          selectEl.insertBefore(opt, selectEl.lastElementChild);
+          selectEl.value = formatted;
+        } else {
+          selectEl.value = getAllSeasons()[0];
+        }
+      }
+    }
+
+    function executeWizardImport() {
+      const fileInput = document.getElementById('wizardExcelFile');
+      const file = fileInput.files[0];
+      if (!file) {
+        alert("Bitte wählen Sie zuerst eine Excel-Datei aus.");
+        return;
+      }
+
+      const targetSeason = document.getElementById('wizardSeasonSelect').value;
+      const statusEl = document.getElementById('wizardStatus');
+      statusEl.innerText = "Wird importiert...";
 
       const reader = new FileReader();
       reader.onload = async function(e) {
@@ -1510,7 +1653,6 @@
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
         const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-        const importedSeason = "16.11.2026 - 16.03.2027";
         let parsedDrinks = [];
         let currentDrink = null;
         let currentCat = "Cocktails";
@@ -1556,7 +1698,7 @@
             currentDrink = {
               name: col0,
               category: currentCat,
-              season: importedSeason,
+              season: targetSeason,
               ingredients_json: [],
               is_active: true
             };
@@ -1571,13 +1713,14 @@
         if (parsedDrinks.length > 0) {
           const { error } = await _supabase.from("drinks").insert(parsedDrinks);
           if (error) {
-            alert("Fehler beim Import: " + error.message);
+            statusEl.innerText = "Fehler: " + error.message;
           } else {
-            alert(`Erfolg! ${parsedDrinks.length} Drinks für die Wintersaison (${importedSeason}) importiert.`);
+            alert(`Erfolg! ${parsedDrinks.length} Drinks für die Saison (${targetSeason}) importiert.`);
+            closeImportModal();
             loadDrinks();
           }
         } else {
-          alert("Keine Drinks in der Datei gefunden.");
+          statusEl.innerText = "Keine Drinks in der Datei gefunden.";
         }
       };
       reader.readAsArrayBuffer(file);
