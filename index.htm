@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v2.3.0</title>
+  <title>Salonplafond BAR v2.3.1</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -127,7 +127,7 @@
         <h1 class="text-2xl md:text-3xl font-black tracking-wider text-white uppercase">Willkommen bei</h1>
         <h2 class="text-3xl md:text-4xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
         <div class="mt-3">
-          <span class="text-sm md:text-base font-bold text-amber-300 block">v2.3.0</span>
+          <span class="text-sm md:text-base font-bold text-amber-300 block">v2.3.1</span>
           <span class="text-xs md:text-sm text-slate-400 font-medium mt-0.5 block">Erstellt von © T0mc1k (Tomas Kardos)</span>
         </div>
       </div>
@@ -148,7 +148,7 @@
       </div>
       <div>
         <h1 class="text-3xl font-bold tracking-tight text-amber-400">Salonplafond BAR</h1>
-        <span class="text-xs text-slate-400 font-medium">v2.3.0 • Erstellt von © T0mc1k (Tomas Kardos)</span>
+        <span class="text-xs text-slate-400 font-medium">v2.3.1 • Erstellt von © T0mc1k (Tomas Kardos)</span>
       </div>
     </div>
 
@@ -328,7 +328,7 @@
         <div id="ingredientRowsContainer" class="flex flex-col gap-2"></div>
       </div>
 
-      <!-- ZUBEREITUNG (Voliteľná možnosť) -->
+      <!-- ZUBEREITUNG -->
       <div class="md:col-span-2 bg-slate-900 border border-slate-700/80 rounded-xl overflow-hidden">
         <button type="button" onclick="document.getElementById('recipeCollapse').classList.toggle('hidden')" class="w-full p-3 text-left font-bold text-amber-400 text-xs flex justify-between items-center bg-slate-800/80 hover:bg-slate-800 transition">
           <span>📖 Zubereitung / Schritt für Schritt (Optional)</span>
@@ -340,7 +340,7 @@
         </div>
       </div>
 
-      <!-- ALERGÉNY (Voliteľná možnosť) -->
+      <!-- ALERGÉNY -->
       <div class="md:col-span-2 bg-slate-900 border border-slate-700/80 rounded-xl overflow-hidden">
         <button type="button" onclick="document.getElementById('allergensCollapse').classList.toggle('hidden')" class="w-full p-3 text-left font-bold text-amber-400 text-xs flex justify-between items-center bg-slate-800/80 hover:bg-slate-800 transition">
           <span id="lblAllergensTitle">⚠️ Allergene (Optional)</span>
@@ -364,7 +364,7 @@
         </div>
       </div>
 
-      <!-- CENY (Voliteľná možnosť) -->
+      <!-- CENY -->
       <div class="md:col-span-2 bg-slate-900 border border-slate-700/80 rounded-xl overflow-hidden">
         <button type="button" onclick="document.getElementById('pricesCollapse').classList.toggle('hidden')" class="w-full p-3 text-left font-bold text-amber-400 text-xs flex justify-between items-center bg-slate-800/80 hover:bg-slate-800 transition">
           <span>💶 Preis & Wareneinsatz (Optional)</span>
@@ -410,7 +410,7 @@
   </div>
 
   <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-    Salonplafond BAR App v2.3.0 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+    Salonplafond BAR App v2.3.1 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
   </footer>
 
   <!-- Modal Detail View -->
@@ -516,7 +516,15 @@
       initSplash();
     }
 
+    /* AKTUALIZOVANÝ ZOZNAM MOTIVAČNÝCH HLÁŠOK */
     const motivationalQuotes = [
+      "„Frau gut? Ruhe bitte!“ 🤫",
+      "„Keine Zeit!“ ⏱️",
+      "„Shaken, einschenken, lächeln! Ihr macht das großartig!“ 🍸✨",
+      "„Kein Stress hinter der Bar – die Drinks schmecken besser mit Gelassenheit!“ 🧊",
+      "„Ein perfekter Drink ist wie Kunst. Und ihr seid die Künstler heute Abend!“ 🎨🍾",
+      "„Fokus, Teamwork und ein guter Cocktail – das Erfolgsrezept für jeden Abend!“ 🔥",
+      "„Egal wie lang die Schlange ist: Einen Drink nach dem anderen. Du schaffst das!“ 💪",
       "„Weißt du, wer der beste Spüler im Salonplafond ist? Natürlich Tomas, der auch diese App für euch erstellt hat, um euch die Arbeit zu erleichtern! Er grüßt euch und freut sich, dass ihr diese App nutzt, da ihn die Programmierung viel Arbeit gekostet hat!“ 🧽✨",
       "„Wer nie vom Weg abkommt, bleibt auf der Strecke. Weitermachen, Team!“ 🚀",
       "„Gute Getränke heben die Laune, aber ein starkes Team rockt den ganzen Abend!“ 🍸",
@@ -809,7 +817,6 @@
       document.getElementById('settingsDropdown').classList.add('hidden');
       document.getElementById('shoppingSeasonName').innerText = currentSeasonFilter;
       
-      // Zozbieranie ingrediencií pre aktuálnu sezónu
       let activeDrinks = allDrinks.filter(d => (d.season || '') === currentSeasonFilter);
       let ingredientsMap = {};
       activeDrinks.forEach(d => {
@@ -1115,7 +1122,6 @@
       }
       localStorage.setItem('salon_shift_favorites', JSON.stringify(shiftFavorites));
       renderDrinks();
-      // Aktualizovať aj v modale ak je otvorený
       const d = allDrinks.find(item => item.id === id);
       if (d) openDrinkModal(id);
     }
@@ -1236,8 +1242,8 @@
       html += `<div class="flex items-center gap-2 mb-2 flex-wrap"><span class="text-xs font-semibold px-2.5 py-1 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">${d.category || t.defaultDrinkCat}</span></div>`;
       html += `<h2 class="text-3xl font-bold mb-4">${d.name}${priceText}</h2>`;
 
-      // Kalkulačka marže a zisku pre manažéra / info
-      if (d.selling_price && d.cost_price && parseFloat(d.selling_price) > 0) {
+      // Kalkulačka marže a zisku IBA PRE MANAŽÉRA
+      if (isAdmin && d.selling_price && d.cost_price && parseFloat(d.selling_price) > 0) {
         let sp = parseFloat(d.selling_price);
         let cp = parseFloat(d.cost_price);
         let profit = sp - cp;
@@ -1269,7 +1275,6 @@
         html += `<div class="mb-4 bg-slate-800/40 p-3 rounded-xl text-xs"><p class="font-bold text-amber-400 mb-1">${t.recipeLabel}</p><p class="text-slate-200 whitespace-pre-line">${d.recipe}</p></div>`;
       }
 
-      // História úprav (Log)
       if (d.updated_at) {
         let updateDate = new Date(d.updated_at).toLocaleString();
         html += `<div class="text-[10px] text-slate-400 mt-2">🕒 Letzte Änderung: ${updateDate}</div>`;
