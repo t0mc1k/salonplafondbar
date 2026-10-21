@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.26</title>
+  <title>Salonplafond BAR v3.0.25</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import & Export -->
@@ -121,7 +121,7 @@
       <div>
         <h1 class="text-xl md:text-2xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-2xl md:text-3xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-400 font-medium mt-1 block">v3.0.26 • Sichere Authentifizierung</span>
+        <span class="text-xs text-slate-400 font-medium mt-1 block">v3.0.25 • Sichere Authentifizierung</span>
       </div>
 
       <form id="loginForm" onsubmit="handleLogin(event)" autocomplete="off" class="w-full bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl space-y-4 text-left mt-2">
@@ -185,7 +185,7 @@
         </div>
         <div>
           <h1 class="text-3xl font-bold tracking-tight text-amber-500 dark:text-amber-400">Salonplafond BAR</h1>
-          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium">v3.0.26 • Angemeldet: <span id="currentUserEmail" class="text-amber-600 dark:text-amber-300 font-bold"></span> <button onclick="openWaiterNameModalDirect()" class="ml-1 text-[10px] underline text-slate-400 hover:text-amber-400" title="Meno zmeniť">(Ändern)</button></span>
+          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium">v3.0.25 • Angemeldet: <span id="currentUserEmail" class="text-amber-600 dark:text-amber-300 font-bold"></span> <button onclick="openWaiterNameModalDirect()" class="ml-1 text-[10px] underline text-slate-400 hover:text-amber-400" title="Meno zmeniť">(Ändern)</button></span>
         </div>
       </div>
 
@@ -319,7 +319,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-300 dark:border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.26 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.25 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div>
@@ -809,24 +809,17 @@
 
         <div id="adminChangelogFormContainer" class="hidden custom-box p-4 rounded-xl border flex flex-col gap-2.5">
           <label class="text-xs font-bold text-amber-600 dark:text-amber-300">➕ Neue Neuigkeit hinzufügen (Tomas - Developer):</label>
-          <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.26..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
+          <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.25..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
           <button onclick="submitNewChangelog()" class="py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs transition shadow">Als Neuigkeit veröffentlichen</button>
         </div>
 
         <div class="flex flex-col gap-2.5 max-h-[45vh] overflow-y-auto pr-1" id="changelogListContainer">
           <div class="custom-box p-3.5 rounded-xl border text-xs">
             <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-              <span>Version v3.0.26 (Tomas Kardos - Developer)</span>
+              <span>Version v3.0.25 (Tomas Kardos - Developer)</span>
               <span class="text-slate-500">Oktober 2026</span>
             </div>
-            <p>Diagnostická verzia: Pridaná núdzová záchranná sieť (timeout a try-catch blok) pre prihlásenie cez Supabase, vyppísanie presnej chyby do konzoly a zamedzenie zablokovania appky na prihlasovacej obrazovke.</p>
-          </div>
-          <div class="custom-box p-3.5 rounded-xl border text-xs">
-            <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-              <span>Version v3.0.25</span>
-              <span class="text-slate-500">Oktober 2026</span>
-            </div>
-            <p>Návrat k pôvodným čistým farbám, pridanie živého Personal-Chatu (pinnwand) s blikajúcimi notifikáciami, ukladanie mien čašníkov do Supabase.</p>
+            <p>Návrat k pôvodným čistým farbám, pridanie živého Personal-Chatu (pinnwand) s blikajúcimi notifikáciami, ukladanie mien čašníkov do Supabase (`staff_presence`) s možnosťou mazania manažérom v centrálnych nastaveniach a presunutie tlačidla aktualizácie do menu.</p>
           </div>
           <div class="custom-box p-3.5 rounded-xl border text-xs">
             <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
@@ -879,6 +872,13 @@
           </div>
           <div class="custom-box p-3.5 rounded-xl border text-xs">
             <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
+              <span>Version v3.0.17</span>
+              <span class="text-slate-500">Oktober 2026</span>
+            </div>
+            <p>Erweiterung der Import- und Export-Assistenten für Excel-Dateien.</p>
+          </div>
+          <div class="custom-box p-3.5 rounded-xl border text-xs">
+            <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
               <span>Version v3.0.14</span>
               <span class="text-slate-500">Oktober 2026</span>
             </div>
@@ -905,16 +905,10 @@
 
     window.addEventListener("DOMContentLoaded", async () => {
       window.addEventListener('scroll', handleScrollPosition);
-      try {
-        const { data: { session }, error } = await _supabase.auth.getSession();
-        if (error) console.error("Session error:", error);
-        if (session && session.user) {
-          await handleSessionAfterLogin(session.user);
-        } else {
-          document.getElementById('authContainer').classList.remove('hidden');
-        }
-      } catch (err) {
-        console.error("Init crash:", err);
+      const { data: { session } } = await _supabase.auth.getSession();
+      if (session && session.user) {
+        await handleSessionAfterLogin(session.user);
+      } else {
         document.getElementById('authContainer').classList.remove('hidden');
       }
     });
@@ -937,44 +931,19 @@
       const email = document.getElementById("loginEmail").value;
       const password = document.getElementById("loginPassword").value;
       const errDiv = document.getElementById("authError");
-      const btnSubmit = document.getElementById("loginSubmitBtn");
-      const btnText = btnSubmit.querySelector('span');
-      
+      const btnText = document.getElementById("loginSubmitBtn").querySelector('span');
       errDiv.classList.add("hidden");
       btnText.innerText = "Wird eingeloggt...";
 
-      try {
-        // Záchranná sieť proti zablokovaniu (Timeout po 8 sekundách)
-        const loginPromise = _supabase.auth.signInWithPassword({ email, password });
-        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout: Server antwortet nicht.")), 8000));
-        
-        const res = await Promise.race([loginPromise, timeoutPromise]);
-        const data = res.data;
-        const error = res.error;
-
-        if (error) {
-          errDiv.innerText = "Fehler: " + error.message;
-          errDiv.classList.remove("hidden");
-          btnText.innerText = "Einloggen";
-        } else {
-          const user = (data && data.user) ? data.user : null;
-          if (user) {
-            await handleSessionAfterLogin(user);
-          } else {
-            // Náhradný pokus ak objekt user chýba
-            const { data: sessionData } = await _supabase.auth.getSession();
-            if (sessionData && sessionData.session) {
-              await handleSessionAfterLogin(sessionData.session.user);
-            } else {
-              throw new Error("Benutzerkontext konnte nach Login nicht geladen werden.");
-            }
-          }
-        }
-      } catch (err) {
-        console.error("Login catch error:", err);
-        errDiv.innerText = "Anmelde-Fehler: " + (err.message || "Unbekannter Fehler");
+      const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        errDiv.innerText = "Fehler: " + error.message;
         errDiv.classList.remove("hidden");
         btnText.innerText = "Einloggen";
+      } else {
+        if (data && data.user) {
+          await handleSessionAfterLogin(data.user);
+        }
       }
     }
 
@@ -982,6 +951,7 @@
       currentLoggedInUserEmail = user.email;
       document.getElementById('authContainer').classList.add('hidden');
       
+      // Načítame predchádzajúce mená z DB pre rýchlu voľbu
       await loadWaiterPresetsFromDB();
 
       if (!currentWaiterName) {
@@ -1040,6 +1010,7 @@
     }
 
     async function registerWaiterPresence(name) {
+      // Upsert do tabuľky staff_presence
       await _supabase.from('staff_presence').upsert([
         { name: name, last_used_at: new Date().toISOString() }
       ], { onConflict: 'name' });
@@ -1172,6 +1143,7 @@
       document.getElementById('settingsDropdown').classList.add('hidden');
       document.getElementById('chatAuthorDisplay').innerText = currentWaiterName;
       
+      // Označíme ako videné
       localStorage.setItem('salon_chat_last_seen', Date.now().toString());
       document.getElementById('headerChatDot').classList.add('hidden');
       document.getElementById('menuChatDot').classList.add('hidden');
@@ -1465,10 +1437,10 @@
       container.innerHTML = dynamicHtml + `
         <div class="custom-box p-3.5 rounded-xl border text-xs">
           <div class="flex justify-between items-center mb-1 text-[11px] text-amber-400 font-bold">
-            <span>Version v3.0.26</span>
+            <span>Version v3.0.25</span>
             <span class="text-slate-500">Oktober 2026</span>
           </div>
-          <p>Diagnostická verzia: Pridaná núdzová záchranná sieť (timeout a try-catch blok) pre prihlásenie cez Supabase.</p>
+          <p>Návrat k pôvodným čistým farbám, pridanie živého Personal-Chatu (pinnwand) s blikajúcimi notifikáciami, ukladanie mien čašníkov do Supabase s možnosťou mazania manažérom v nastaveniach.</p>
         </div>
       `;
     }
@@ -1478,9 +1450,9 @@
       "„Keine Zeit!“ ⏱️",
       "„Shaken, einschenken, lächeln! Ihr macht das großartig!“ 🍸✨",
       "„Kein Stress hinter der Bar – die Drinks schmecken besser mit Gelassenheit!“ 🧊",
-      "„Ein perfekter Drink ist wie Kunst. Und ihr seid die Künstler heute Abend! 🎨🍾",
-      "„Fokus, Teamwork und ein guter Cocktail – das Erfolgsrezept für jeden Abend! 🔥",
-      "„Egal wie lang die Schlange ist: Einen Drink nach dem anderen. Du schaffst das! 💪",
+      "„Ein perfekter Drink ist wie Kunst. Und ihr seid die Künstler heute Abend!“ 🎨🍾",
+      "„Fokus, Teamwork und ein guter Cocktail – das Erfolgsrezept für jeden Abend!“ 🔥",
+      "„Egal wie lang die Schlange ist: Einen Drink nach dem anderen. Du schaffst das!“ 💪",
       "„Weißt du, wer der beste Spüler im Salonplafond ist? Natürlich Tomas Kardos, der auch diese App für euch programmiert hat! Er grüßt euch und freut sich, dass ihr diese App nutzt!“ 🧽✨",
       "„Wer nie vom Weg abkommt, bleibt auf der Strecke. Weitermachen, Team!“ 🚀"
     ];
