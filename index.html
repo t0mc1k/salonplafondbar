@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.21</title>
+  <title>Salonplafond BAR v3.0.22</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import & Export -->
@@ -80,7 +80,7 @@
       100% { transform: translateY(0) rotate(0deg) scale(1); }
     }
 
-    /* Blikajúca ikona pre nové požiadavky / update (iba samotná ikonka) */
+    /* Blikajúca ikona pre nové požiadavky / update */
     .pulse-badge-dot {
       animation: pulseBlinkEffect 1.5s infinite;
     }
@@ -135,7 +135,7 @@
       <div>
         <h1 class="text-xl md:text-2xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-2xl md:text-3xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-400 font-medium mt-1 block">v3.0.21 • Sichere Authentifizierung</span>
+        <span class="text-xs text-slate-400 font-medium mt-1 block">v3.0.22 • Sichere Authentifizierung</span>
       </div>
 
       <form id="loginForm" onsubmit="handleLogin(event)" autocomplete="off" class="w-full bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl space-y-4 text-left mt-2">
@@ -172,7 +172,7 @@
         </div>
         <div>
           <h1 class="text-3xl font-bold tracking-tight text-amber-400">Salonplafond BAR</h1>
-          <span class="text-xs text-slate-400 font-medium">v3.0.21 • Angemeldet: <span id="currentUserEmail" class="text-amber-300 font-bold"></span></span>
+          <span class="text-xs text-slate-400 font-medium">v3.0.22 • Angemeldet: <span id="currentUserEmail" class="text-amber-300 font-bold"></span></span>
         </div>
       </div>
 
@@ -291,7 +291,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.21 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.22 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div> <!-- /Koniec appContainer -->
@@ -708,7 +708,7 @@
     </div>
   </div>
 
-  <!-- Support & Tickets Modal (S novými záložkami Požiadavky a Changelog) -->
+  <!-- Support & Tickets Modal -->
   <div id="supportModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
     <div class="card max-w-2xl w-full p-6 relative flex flex-col gap-4 max-h-[85vh] overflow-y-auto border-amber-500/50 shadow-2xl">
       <button onclick="closeSupportModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
@@ -722,7 +722,7 @@
       <!-- OBSAH 1: TICKETS / POŽIADAVKY -->
       <div id="supportTabTickets" class="flex flex-col gap-4">
         <div>
-          <h3 class="text-xl font-bold text-amber-400">💬 Bar-Tickets & Požiadavky</h3>
+          <h3 class="text-xl font-bold text-amber-400">💬 Bar-Tickets & Anfragen</h3>
           <p class="text-xs text-slate-400 mt-0.5">Schreibe eine Anfrage oder einen Änderungswunsch. Tomas (Developer) und das Team sehen es hier.</p>
         </div>
 
@@ -737,7 +737,7 @@
         <div class="flex flex-col gap-2 mt-2">
           <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Aktive & gelöste Anfragen:</h4>
           <div id="ticketsListContainer" class="flex flex-col gap-2 max-h-[35vh] overflow-y-auto pr-1">
-            <p class="text-slate-500 italic text-xs text-center py-4">Lade Tickets...</p>
+            <p class="text-slate-500 italic text-xs text-center py-4">Lade Anfragen...</p>
           </div>
         </div>
       </div>
@@ -749,10 +749,10 @@
           <p class="text-xs text-slate-400 mt-0.5">Hier siehst du, was in den letzten Versionen der App verbessert wurde.</p>
         </div>
 
-        <!-- Pridanie novej novinky (iba pre teba ako správcu) -->
+        <!-- Pridanie novej novinky -->
         <div id="adminChangelogFormContainer" class="hidden bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col gap-2.5">
           <label class="text-xs font-bold text-amber-300">➕ Neue Neuigkeit hinzufügen (Tomas - Developer):</label>
-          <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.21: Ticket-System und Developer-Modus integriert..." class="p-3 rounded-lg bg-slate-900 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400"></textarea>
+          <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.22: Deutsche UI & Ticket-Löschfunktion integriert..." class="p-3 rounded-lg bg-slate-900 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400"></textarea>
           <button onclick="submitNewChangelog()" class="py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs transition shadow">Als Neuigkeit veröffentlichen</button>
         </div>
 
@@ -760,17 +760,17 @@
         <div class="flex flex-col gap-2.5 max-h-[45vh] overflow-y-auto pr-1" id="changelogListContainer">
           <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 text-xs">
             <div class="flex justify-between items-center mb-1 text-[11px] text-amber-400 font-bold">
-              <span>Version v3.0.21 (Tomas Kardos - Developer)</span>
+              <span>Version v3.0.22 (Tomas Kardos - Developer)</span>
               <span class="text-slate-500">Oktober 2026</span>
             </div>
-            <p class="text-slate-300">Integriertes Ticket-System, nahtlose Zuordnung von Entwickler-Kommentaren und diskrete Blink-Indikatoren.</p>
+            <p class="text-slate-300">Übersetzung der Ticket-Überschriften ins Deutsche und Hinzufügen einer Ticket-Löschfunktion für den Developer.</p>
           </div>
           <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 text-xs">
             <div class="flex justify-between items-center mb-1 text-[11px] text-amber-400 font-bold">
-              <span>Version v3.0.17 - v3.0.20</span>
+              <span>Version v3.0.21</span>
               <span class="text-slate-500">Oktober 2026</span>
             </div>
-            <p class="text-slate-300">Behebung von Druckfehlern beim Einkaufszettel, Logo-Korrektur (durchgezogener Macron), automatisches Laden der Getränke beim Start.</p>
+            <p class="text-slate-300">Integriertes Ticket-System, nahtlose Zuordnung von Entwickler-Kommentaren und diskrete Blink-Indikatoren.</p>
           </div>
         </div>
       </div>
@@ -846,7 +846,6 @@
       document.getElementById('authContainer').classList.add('hidden');
       document.getElementById('appContainer').classList.remove('hidden');
       
-      // Ak si to ty (kdstom@outlook.com) alebo manažér, nastavíme administrátorské práva a pekné meno
       if (user.email === "kdstom@outlook.com") {
         isAdmin = true;
         document.getElementById('currentUserEmail').innerHTML = `<span class="text-amber-400 font-black">Tomas Kardos (Developer)</span>`;
@@ -1037,12 +1036,17 @@
           adminActionHtml = `
             <div class="mt-3 pt-2 border-t border-slate-800 flex flex-col gap-2">
               <input type="text" id="comment_${t.id}" placeholder="Kommentar als Tomas (Developer) hinzufügen..." value="${t.admin_comment || ''}" class="p-2 rounded bg-slate-900 border border-slate-800 text-white text-[11px]">
-              <div class="flex gap-2">
-                <button onclick="updateTicketStatus('${t.id}', '${isResolved ? 'pending' : 'resolved'}')" class="px-3 py-1.5 rounded text-[11px] font-bold ${isResolved ? 'bg-slate-800 text-slate-300' : 'bg-emerald-600 hover:bg-emerald-500 text-white'}">
-                  ${isResolved ? '↩ Als offen markieren' : '✓ Als erledigt markieren'}
-                </button>
-                <button onclick="saveTicketComment('${t.id}')" class="px-3 py-1.5 rounded text-[11px] font-bold bg-amber-500 hover:bg-amber-600 text-slate-950">
-                  Als Tomas speichern
+              <div class="flex flex-wrap gap-2 items-center justify-between">
+                <div class="flex gap-2">
+                  <button onclick="updateTicketStatus('${t.id}', '${isResolved ? 'pending' : 'resolved'}')" class="px-3 py-1.5 rounded text-[11px] font-bold ${isResolved ? 'bg-slate-800 text-slate-300' : 'bg-emerald-600 hover:bg-emerald-500 text-white'}">
+                    ${isResolved ? '↩ Als offen markieren' : '✓ Als erledigt markieren'}
+                  </button>
+                  <button onclick="saveTicketComment('${t.id}')" class="px-3 py-1.5 rounded text-[11px] font-bold bg-amber-500 hover:bg-amber-600 text-slate-950">
+                    Als Tomas speichern
+                  </button>
+                </div>
+                <button onclick="deleteTicket('${t.id}')" class="px-3 py-1.5 rounded text-[11px] font-bold bg-red-600/20 hover:bg-red-600/40 text-red-400 border border-red-500/30">
+                  🗑️ Löschen
                 </button>
               </div>
             </div>
@@ -1085,6 +1089,20 @@
           alert("Fehler: " + error.message);
         } else {
           alert("Kommentar gespeichert und als von Tomas Kardos (Developer) erledigt markiert!");
+          loadTicketsData();
+          checkPendingTicketsBadge();
+        }
+      });
+    }
+
+    async function deleteTicket(id) {
+      checkManagerAuth(async () => {
+        if (!confirm("Möchten Sie dieses Ticket wirklich permanent löschen?")) return;
+        const { error } = await _supabase.from('support_tickets').delete().eq('id', id);
+        if (error) {
+          alert("Fehler beim Löschen: " + error.message);
+        } else {
+          alert("Ticket erfolgreich gelöscht!");
           loadTicketsData();
           checkPendingTicketsBadge();
         }
@@ -1138,17 +1156,17 @@
       container.innerHTML = dynamicHtml + `
         <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 text-xs">
           <div class="flex justify-between items-center mb-1 text-[11px] text-amber-400 font-bold">
+            <span>Version v3.0.22</span>
+            <span class="text-slate-500">Oktober 2026</span>
+          </div>
+          <p class="text-slate-300">Übersetzung der Ticket-Überschriften ins Deutsche und Hinzufügen einer Ticket-Löschfunktion für den Developer.</p>
+        </div>
+        <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 text-xs">
+          <div class="flex justify-between items-center mb-1 text-[11px] text-amber-400 font-bold">
             <span>Version v3.0.21</span>
             <span class="text-slate-500">Oktober 2026</span>
           </div>
           <p class="text-slate-300">Integriertes Ticket-System, nahtlose Zuordnung von Entwickler-Kommentaren und diskrete Blink-Indikatoren.</p>
-        </div>
-        <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 text-xs">
-          <div class="flex justify-between items-center mb-1 text-[11px] text-amber-400 font-bold">
-            <span>Version v3.0.17 - v3.0.20</span>
-            <span class="text-slate-500">Oktober 2026</span>
-          </div>
-          <p class="text-slate-300">Behebung von Druckfehlern beim Einkaufszettel, Logo-Korrektur (durchgezogener Macron), automatisches Laden der Getränke beim Start.</p>
         </div>
       `;
     }
