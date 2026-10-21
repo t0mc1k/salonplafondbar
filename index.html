@@ -13,13 +13,14 @@
   <style>
     body { font-family: system-ui, -apple-system, sans-serif; transition: background-color 0.2s, color 0.2s; }
     
-    /* Tmavý režim (štandard) */
+    /* Tmavý režim (štandard) - oprava bielych pozadí vo formulároch */
     body.dark-mode { background-color: #0f172a; color: #f8fafc; }
     body.dark-mode .card { background: #1e293b; border: 1px solid #334155; color: #f8fafc; }
     body.dark-mode .list-item { background: #1e293b; border: 1px solid #334155; color: #f8fafc; }
     body.dark-mode .list-item:hover { background: #283548; border-color: #f59e0b; }
     body.dark-mode .modal-bg { background: rgba(0,0,0,0.8); }
     body.dark-mode .custom-box { background: #090d16; border-color: #1e293b; color: #cbd5e1; }
+    body.dark-mode input, body.dark-mode select, body.dark-mode textarea { background-color: #090d16 !important; color: #f8fafc !important; border-color: #334155 !important; }
 
     /* Svetlý režim (čistý a augenschonend) */
     body.light-mode { background-color: #f8fafc; color: #0f172a; }
@@ -623,7 +624,7 @@
   <!-- Jednotný Import & Export Dialog Modal -->
   <div id="importExportModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
     <div class="card max-w-xl w-full p-6 relative flex flex-col gap-6 max-h-[90vh] overflow-y-auto border-amber-500/50 shadow-2xl">
-      <button onclick="closeImportExportModal()" class="absolute top-4 right-4 text-slate-500 dark:text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
+      <button onclick="closeImportExportModal()" class="absolute top-4 right-4 text-slate-400 dark:text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
       
       <div>
         <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400 flex items-center gap-2">📊 Import & Export (Zentrale)</h3>
@@ -788,7 +789,7 @@
               <span>Version v3.0.24 (Tomas Kardos - Developer)</span>
               <span class="text-slate-500">Oktober 2026</span>
             </div>
-            <p>Implementierung des schnellen Čašník-Menovitého výberu (Cesta A) pre tickety a hlavičku, pridanie tlačidla „Neues Getränk hinzufügen“ priamo do menu a úplne prepracovaný, prehľadnejší dialóg pre výber sezóny.</p>
+            <p>Oprava bielych pozadí formulárových polí (input, select, textarea) v tmavom režime, implementácia rýchleho čašníckeho výberu mena a optimalizácia dialógov.</p>
           </div>
           <div class="custom-box p-3.5 rounded-xl border text-xs">
             <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
@@ -920,7 +921,6 @@
       currentLoggedInUserEmail = user.email;
       document.getElementById('authContainer').classList.add('hidden');
       
-      // Ak ešte nemá zvolené meno čašníka, otvoríme modal pre výber mena
       if (!currentWaiterName) {
         document.getElementById('waiterNameModal').classList.remove('hidden');
         document.getElementById('waiterNameModal').classList.add('flex');
@@ -1284,7 +1284,7 @@
             <span>Version v3.0.24</span>
             <span class="text-slate-500">Oktober 2026</span>
           </div>
-          <p>Implementierung des schnellen Čašník-Menovitého výberu (Cesta A) pre tickety a hlavičku, pridanie tlačidla „Neues Getränk hinzufügen“ priamo do menu a úplne prepracovaný, prehľadnejší dialóg pre výber sezóny.</p>
+          <p>Oprava bielych pozadí formulárových polí v tmavom režime, implementácia rýchleho čašníckeho výberu mena a optimalizácia dialógov.</p>
         </div>
         <div class="custom-box p-3.5 rounded-xl border text-xs">
           <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
