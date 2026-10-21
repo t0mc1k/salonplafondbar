@@ -931,18 +931,33 @@
       const email = document.getElementById("loginEmail").value;
       const password = document.getElementById("loginPassword").value;
       const errDiv = document.getElementById("authError");
-      const btnText = document.getElementById("loginSubmitBtn").querySelector('span');
+      const btnSubmit = document.getElementById("loginSubmitBtn");
+      const btnText = btnSubmit.querySelector('span');
+      
       errDiv.classList.add("hidden");
       btnText.innerText = "Wird eingeloggt...";
 
       const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+      
       if (error) {
         errDiv.innerText = "Fehler: " + error.message;
         errDiv.classList.remove("hidden");
         btnText.innerText = "Einloggen";
       } else {
-        if (data && data.user) {
-          await handleSessionAfterLogin(data.user);
+        const { data: sessionData } = await _supabase.auth.getSession();
+        const user = (data && data.user) ? data.user : (sessionData && sessionData.session ? sessionData.session.user : null);
+
+        if (user) {
+          await handleSessionAfterLogin(user);
+        } else {
+          document.getElementById('authContainer').classList.add('hidden');
+          await loadWaiterPresetsFromDB();
+          if (!currentWaiterName) {
+            openWaiterNameModalDirect();
+          } else {
+            await registerWaiterPresence(currentWaiterName);
+            await finalizeAppStart({ email: email });
+          }
         }
       }
     }
@@ -951,7 +966,6 @@
       currentLoggedInUserEmail = user.email;
       document.getElementById('authContainer').classList.add('hidden');
       
-      // Načítame predchádzajúce mená z DB pre rýchlu voľbu
       await loadWaiterPresetsFromDB();
 
       if (!currentWaiterName) {
@@ -1010,7 +1024,6 @@
     }
 
     async function registerWaiterPresence(name) {
-      // Upsert do tabuľky staff_presence
       await _supabase.from('staff_presence').upsert([
         { name: name, last_used_at: new Date().toISOString() }
       ], { onConflict: 'name' });
@@ -1143,7 +1156,6 @@
       document.getElementById('settingsDropdown').classList.add('hidden');
       document.getElementById('chatAuthorDisplay').innerText = currentWaiterName;
       
-      // Označíme ako videné
       localStorage.setItem('salon_chat_last_seen', Date.now().toString());
       document.getElementById('headerChatDot').classList.add('hidden');
       document.getElementById('menuChatDot').classList.add('hidden');
