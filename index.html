@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.18</title>
+  <title>Salonplafond BAR v3.0.20</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import & Export -->
@@ -80,6 +80,16 @@
       100% { transform: translateY(0) rotate(0deg) scale(1); }
     }
 
+    /* Blikajúca ikona pre nové požiadavky / update */
+    .pulse-update-icon {
+      animation: pulseBlinkEffect 1.5s infinite;
+    }
+    @keyframes pulseBlinkEffect {
+      0% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+      50% { transform: scale(1.08); opacity: 0.85; box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+      100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+    }
+
     /* Čistá tlač bez bordelu */
     @media print {
       @page { size: portrait; margin: 15mm; }
@@ -125,7 +135,7 @@
       <div>
         <h1 class="text-xl md:text-2xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-2xl md:text-3xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-400 font-medium mt-1 block">v3.0.18 • Sichere Authentifizierung</span>
+        <span class="text-xs text-slate-400 font-medium mt-1 block">v3.0.20 • Sichere Authentifizierung</span>
       </div>
 
       <form id="loginForm" onsubmit="handleLogin(event)" autocomplete="off" class="w-full bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl space-y-4 text-left mt-2">
@@ -162,11 +172,16 @@
         </div>
         <div>
           <h1 class="text-3xl font-bold tracking-tight text-amber-400">Salonplafond BAR</h1>
-          <span class="text-xs text-slate-400 font-medium">v3.0.18 • Angemeldet: <span id="currentUserEmail" class="text-amber-300 font-bold"></span></span>
+          <span class="text-xs text-slate-400 font-medium">v3.0.20 • Angemeldet: <span id="currentUserEmail" class="text-amber-300 font-bold"></span></span>
         </div>
       </div>
 
       <div class="flex flex-wrap items-center gap-2">
+        <!-- Blikajúce tlačidlo pre Support / Tickets -->
+        <button id="supportBtnBadge" onclick="openSupportModal()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-bold border border-slate-700 text-amber-400 flex items-center gap-1.5 transition">
+          <span id="supportBadgeIcon">💬</span> Support & Tickets
+        </button>
+
         <button onclick="handleLogout()" class="px-3 py-1.5 bg-red-600/80 hover:bg-red-600 text-white rounded-lg text-xs font-bold transition flex items-center gap-1">
           🚪 Abmelden
         </button>
@@ -209,7 +224,7 @@
             </button>
 
             <button onclick="openSupportModal()" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-700 text-xs font-semibold text-amber-400 flex items-center gap-2">
-              ✉️ Support / Feedback
+              💬 Support & Tickets
             </button>
 
             <div class="border-t border-slate-700 my-0.5"></div>
@@ -277,7 +292,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.18 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.20 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div> <!-- /Koniec appContainer -->
@@ -694,19 +709,76 @@
     </div>
   </div>
 
-  <!-- Support Modal -->
+  <!-- Support & Tickets Modal (S novými záložkami Požiadavky a Changelog) -->
   <div id="supportModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-    <div class="card max-w-lg w-full p-6 relative flex flex-col gap-4">
+    <div class="card max-w-2xl w-full p-6 relative flex flex-col gap-4 max-h-[85vh] overflow-y-auto border-amber-500/50 shadow-2xl">
       <button onclick="closeSupportModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
-      <h3 class="text-xl font-bold text-amber-400">✉️ Support & Feedback</h3>
-      <p class="text-xs text-slate-300">Sende direkt eine Nachricht an den Entwickler (Tomas Kardos).</p>
-      <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs text-slate-300 flex items-center justify-between">
-        <span>📧 <b>kdstom@outlook.com</b></span>
+      
+      <!-- Prepínacie záložky -->
+      <div class="flex border-b border-slate-800 pb-3 gap-2">
+        <button onclick="switchSupportTab('tickets')" id="tabBtnTickets" class="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition">💬 Support & Tickets</button>
+        <button onclick="switchSupportTab('changelog')" id="tabBtnChangelog" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">🚀 Was ist neu? (Changelog)</button>
       </div>
-      <textarea id="supportMessage" rows="4" placeholder="Schreibe deine Nachricht hier..." class="p-3 rounded bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400"></textarea>
-      <div class="flex gap-2">
-        <button onclick="sendSupportEmail()" class="flex-1 py-2.5 bg-amber-500 hover:bg-amber-600 font-bold text-slate-950 rounded-lg text-xs transition">Nachricht senden</button>
-        <button onclick="closeSupportModal()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 font-bold text-white rounded-lg text-xs transition">Schließen</button>
+
+      <!-- OBSAH 1: TICKETS / POŽIADAVKY -->
+      <div id="supportTabTickets" class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-xl font-bold text-amber-400">💬 Bar-Tickets & Požiadavky</h3>
+          <p class="text-xs text-slate-400 mt-0.5">Schreibe eine Anfrage oder einen Änderungswunsch. Das Team und Tomas sehen es hier.</p>
+        </div>
+
+        <!-- Formulár na novú požiadavku -->
+        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col gap-2.5">
+          <label class="text-xs font-semibold text-slate-300">Neue Anfrage / Anliegen:</label>
+          <textarea id="newTicketMessage" rows="3" placeholder="z. B. Rezept für Strawberry Kiss anpassen..." class="p-3 rounded-lg bg-slate-900 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400"></textarea>
+          <button onclick="submitNewTicket()" class="py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs transition shadow">Absenden</button>
+        </div>
+
+        <!-- Zoznam tiketov -->
+        <div class="flex flex-col gap-2 mt-2">
+          <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Aktive & gelöste Anfragen:</h4>
+          <div id="ticketsListContainer" class="flex flex-col gap-2 max-h-[35vh] overflow-y-auto pr-1">
+            <p class="text-slate-500 italic text-xs text-center py-4">Lade Tickets...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- OBSAH 2: CHANGELOG / NOVINKY -->
+      <div id="supportTabChangelog" class="hidden flex flex-col gap-4">
+        <div>
+          <h3 class="text-xl font-bold text-amber-400">🚀 Neuigkeiten & Updates</h3>
+          <p class="text-xs text-slate-400 mt-0.5">Hier siehst du, was in den letzten Versionen der App verbessert wurde.</p>
+        </div>
+
+        <!-- Pridanie novej novinky (iba pre manažéra) -->
+        <div id="adminChangelogFormContainer" class="hidden bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col gap-2.5">
+          <label class="text-xs font-bold text-amber-300">➕ Neue Neuigkeit hinzufügen (Admin):</label>
+          <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.20: Ticket-System und Changelog integriert..." class="p-3 rounded-lg bg-slate-900 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400"></textarea>
+          <button onclick="submitNewChangelog()" class="py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs transition shadow">Als Neuigkeit veröffentlichen</button>
+        </div>
+
+        <!-- Zoznam changelogu -->
+        <div class="flex flex-col gap-2.5 max-h-[45vh] overflow-y-auto pr-1" id="changelogListContainer">
+          <!-- Statické ukážkové novinky + budú ťahané aj z databázy -->
+          <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 text-xs">
+            <div class="flex justify-between items-center mb-1 text-[11px] text-amber-400 font-bold">
+              <span>Version v3.0.20</span>
+              <span class="text-slate-500">Oktober 2026</span>
+            </div>
+            <p class="text-slate-300">Integriertes Ticket-System für Bar-Anfragen und interaktiver Changelog direkt in der App.</p>
+          </div>
+          <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 text-xs">
+            <div class="flex justify-between items-center mb-1 text-[11px] text-amber-400 font-bold">
+              <span>Version v3.0.17 - v3.0.19</span>
+              <span class="text-slate-500">Oktober 2026</span>
+            </div>
+            <p class="text-slate-300">Behebung von Druckfehlern beim Einkaufszettel, Logo-Korrektur (durchgezogener Macron), automatisches Laden der Getränke beim Start.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-3 border-t border-slate-800">
+        <button onclick="closeSupportModal()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 font-bold text-white rounded-xl text-xs transition">Schließen</button>
       </div>
     </div>
   </div>
@@ -718,6 +790,7 @@
 
     let pendingAuthCallback = null;
     let currentPhotoPreviewUrl = null;
+    let currentLoggedInUserEmail = "";
 
     window.addEventListener("DOMContentLoaded", async () => {
       window.addEventListener('scroll', handleScrollPosition);
@@ -771,6 +844,7 @@
     }
 
     async function showApp(user) {
+      currentLoggedInUserEmail = user.email;
       document.getElementById('authContainer').classList.add('hidden');
       document.getElementById('appContainer').classList.remove('hidden');
       document.getElementById('currentUserEmail').innerText = user.email;
@@ -783,17 +857,22 @@
       
       const btnMenuImportExport = document.getElementById('btnMenuImportExport');
       const addBtnCont = document.getElementById('addDrinkBtnContainer');
+      const adminChangelogCont = document.getElementById('adminChangelogFormContainer');
+
       if (isAdmin) {
         btnMenuImportExport.classList.remove('hidden');
         btnMenuImportExport.classList.add('flex');
         addBtnCont.classList.remove('hidden');
+        if (adminChangelogCont) adminChangelogCont.classList.remove('hidden');
       } else {
         btnMenuImportExport.classList.add('hidden');
         btnMenuImportExport.classList.remove('flex');
         addBtnCont.classList.add('hidden');
+        if (adminChangelogCont) adminChangelogCont.classList.add('hidden');
       }
 
       await loadDrinks();
+      await checkPendingTicketsBadge();
     }
 
     function checkManagerAuth(callback) {
@@ -836,6 +915,8 @@
         document.getElementById('btnMenuImportExport').classList.remove('hidden');
         document.getElementById('btnMenuImportExport').classList.add('flex');
         document.getElementById('addDrinkBtnContainer').classList.remove('hidden');
+        const adminChangelogCont = document.getElementById('adminChangelogFormContainer');
+        if (adminChangelogCont) adminChangelogCont.classList.remove('hidden');
         
         closeAuthModal();
         alert("Erfolgreich als Manager autorisiert!");
@@ -844,6 +925,232 @@
           pendingAuthCallback = null;
         }
       }
+    }
+
+    /* ---- SUPPORT & TICKETS LOGIKA ---- */
+    async function checkPendingTicketsBadge() {
+      const { data, error } = await _supabase.from('support_tickets').select('*').eq('is_changelog', false);
+      if (error) return;
+      
+      const badgeBtn = document.getElementById('supportBtnBadge');
+      const badgeIcon = document.getElementById('supportBadgeIcon');
+      
+      // Zistíme, či existuje nejaký nevybavený tiket ('pending')
+      const hasPending = (data || []).some(t => t.status === 'pending');
+      
+      if (hasPending) {
+        badgeBtn.classList.add('pulse-update-icon', 'border-amber-400');
+        badgeIcon.innerText = '🔴';
+      } else {
+        badgeBtn.classList.remove('pulse-update-icon', 'border-amber-400');
+        badgeIcon.innerText = '💬';
+      }
+    }
+
+    function openSupportModal() {
+      document.getElementById('settingsDropdown').classList.add('hidden');
+      switchSupportTab('tickets');
+      loadTicketsData();
+      const modal = document.getElementById('supportModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeSupportModal() {
+      const modal = document.getElementById('supportModal');
+      modal.classList.remove('flex');
+      modal.classList.add('hidden');
+      checkPendingTicketsBadge();
+    }
+
+    function switchSupportTab(tabName) {
+      const btnTickets = document.getElementById('tabBtnTickets');
+      const btnChangelog = document.getElementById('tabBtnChangelog');
+      const contentTickets = document.getElementById('supportTabTickets');
+      const contentChangelog = document.getElementById('supportTabChangelog');
+
+      if (tabName === 'tickets') {
+        btnTickets.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition';
+        btnChangelog.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition';
+        contentTickets.classList.remove('hidden');
+        contentChangelog.classList.add('hidden');
+        loadTicketsData();
+      } else {
+        btnChangelog.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition';
+        btnTickets.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition';
+        contentChangelog.classList.remove('hidden');
+        contentTickets.classList.add('hidden');
+        loadChangelogData();
+      }
+    }
+
+    async function submitNewTicket() {
+      const msgInput = document.getElementById('newTicketMessage');
+      const text = msgInput.value.trim();
+      if (!text) return alert("Bitte geben Sie eine Nachricht ein.");
+
+      const { error } = await _supabase.from('support_tickets').insert([{
+        author_email: currentLoggedInUserEmail || 'Unbekannt',
+        message: text,
+        status: 'pending',
+        is_changelog: false
+      }]);
+
+      if (error) {
+        alert("Fehler beim Absenden: " + error.message);
+      } else {
+        msgInput.value = '';
+        alert("Anfrage erfolgreich an das Team gesendet!");
+        loadTicketsData();
+        checkPendingTicketsBadge();
+      }
+    }
+
+    async function loadTicketsData() {
+      const container = document.getElementById('ticketsListContainer');
+      container.innerHTML = `<p class="text-slate-500 italic text-xs text-center py-4">Lade Anfragen...</p>`;
+
+      const { data, error } = await _supabase.from('support_tickets').select('*').eq('is_changelog', false).order('created_at', { ascending: false });
+      if (error) {
+        container.innerHTML = `<p class="text-red-400 text-xs text-center py-4">Fehler beim Laden: ${error.message}</p>`;
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        container.innerHTML = `<p class="text-slate-500 italic text-xs text-center py-4">Keine Anfragen vorhanden.</p>`;
+        return;
+      }
+
+      container.innerHTML = data.map(t => {
+        let isResolved = t.status === 'resolved';
+        let statusBadge = isResolved 
+          ? `<span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30 text-[10px]">✓ Erledigt</span>` 
+          : `<span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 font-bold border border-amber-500/30 text-[10px]">⏳ Offen</span>`;
+        
+        let dateStr = new Date(t.created_at).toLocaleString();
+        let commentHtml = t.admin_comment ? `<div class="mt-2 text-[11px] bg-slate-900 p-2 rounded border border-slate-800 text-amber-300"><b>Kommentar (Admin):</b> ${t.admin_comment}</div>` : '';
+
+        // Ak je admin, môže to zaškrtnúť ako hotové a pridať komentár
+        let adminActionHtml = '';
+        if (isAdmin) {
+          adminActionHtml = `
+            <div class="mt-3 pt-2 border-t border-slate-800 flex flex-col gap-2">
+              <input type="text" id="comment_${t.id}" placeholder="Admin-Kommentar hinzufügen..." value="${t.admin_comment || ''}" class="p-2 rounded bg-slate-900 border border-slate-800 text-white text-[11px]">
+              <div class="flex gap-2">
+                <button onclick="updateTicketStatus('${t.id}', '${isResolved ? 'pending' : 'resolved'}')" class="px-3 py-1.5 rounded text-[11px] font-bold ${isResolved ? 'bg-slate-800 text-slate-300' : 'bg-emerald-600 hover:bg-emerald-500 text-white'}">
+                  ${isResolved ? '↩ Als offen markieren' : '✓ Als erledigt markieren'}
+                </button>
+                <button onclick="saveTicketComment('${t.id}')" class="px-3 py-1.5 rounded text-[11px] font-bold bg-amber-500 hover:bg-amber-600 text-slate-950">
+                  Kommentar speichern
+                </button>
+              </div>
+            </div>
+          `;
+        }
+
+        return `
+          <div class="bg-slate-900 p-3.5 rounded-xl border border-slate-800 flex flex-col gap-2">
+            <div class="flex justify-between items-center">
+              <span class="text-[11px] font-semibold text-slate-400">👤 ${t.author_email} • <span class="text-slate-500">${dateStr}</span></span>
+              ${statusBadge}
+            </div>
+            <p class="text-white text-xs font-medium">${t.message}</p>
+            ${commentHtml}
+            ${adminActionHtml}
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function updateTicketStatus(id, newStatus) {
+      checkManagerAuth(async () => {
+        const { error } = await _supabase.from('support_tickets').update({ status: newStatus }).eq('id', id);
+        if (error) {
+          alert("Fehler: " + error.message);
+        } else {
+          loadTicketsData();
+          checkPendingTicketsBadge();
+        }
+      });
+    }
+
+    async function saveTicketComment(id) {
+      checkManagerAuth(async () => {
+        const commentInput = document.getElementById(`comment_${id}`);
+        const commentVal = commentInput ? commentInput.value.trim() : '';
+
+        const { error } = await _supabase.from('support_tickets').update({ admin_comment: commentVal, status: 'resolved' }).eq('id', id);
+        if (error) {
+          alert("Fehler: " + error.message);
+        } else {
+          alert("Kommentar gespeichert und Ticket als erledigt markiert!");
+          loadTicketsData();
+          checkPendingTicketsBadge();
+        }
+      });
+    }
+
+    async function submitNewChangelog() {
+      checkManagerAuth(async () => {
+        const textInput = document.getElementById('newChangelogText');
+        const text = textInput.value.trim();
+        if (!text) return alert("Bitte Neuigkeit eingeben.");
+
+        const { error } = await _supabase.from('support_tickets').insert([{
+          author_email: currentLoggedInUserEmail || 'Admin',
+          message: text,
+          status: 'resolved',
+          is_changelog: true,
+          admin_comment: 'Neuigkeit veröffentlicht'
+        }]);
+
+        if (error) {
+          alert("Fehler: " + error.message);
+        } else {
+          textInput.value = '';
+          alert("Neuigkeit erfolgreich veröffentlicht!");
+          loadChangelogData();
+        }
+      });
+    }
+
+    async function loadChangelogData() {
+      const container = document.getElementById('changelogListContainer');
+      const { data, error } = await _supabase.from('support_tickets').select('*').eq('is_changelog', true).order('created_at', { ascending: false });
+      
+      let dynamicHtml = '';
+      if (data && data.length > 0) {
+        dynamicHtml = data.map(item => {
+          let dateStr = new Date(item.created_at).toLocaleDateString();
+          return `
+            <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 text-xs">
+              <div class="flex justify-between items-center mb-1 text-[11px] text-amber-400 font-bold">
+                <span>Update / Notiz</span>
+                <span class="text-slate-500">${dateStr}</span>
+              </div>
+              <p class="text-slate-300">${item.message}</p>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Pridáme aj statické hlavné verzie
+      container.innerHTML = dynamicHtml + `
+        <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 text-xs">
+          <div class="flex justify-between items-center mb-1 text-[11px] text-amber-400 font-bold">
+            <span>Version v3.0.20</span>
+            <span class="text-slate-500">Oktober 2026</span>
+          </div>
+          <p class="text-slate-300">Integriertes Ticket-System für Bar-Anfragen und interaktiver Changelog direkt in der App.</p>
+        </div>
+        <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 text-xs">
+          <div class="flex justify-between items-center mb-1 text-[11px] text-amber-400 font-bold">
+            <span>Version v3.0.17 - v3.0.19</span>
+            <span class="text-slate-500">Oktober 2026</span>
+          </div>
+          <p class="text-slate-300">Behebung von Druckfehlern beim Einkaufszettel, Logo-Korrektur (durchgezogener Macron), automatisches Laden der Getränke beim Start.</p>
+        </div>
+      `;
     }
 
     const motivationalQuotes = [
@@ -892,7 +1199,7 @@
     let shiftFavorites = JSON.parse(localStorage.getItem('salon_shift_favorites') || '[]');
     let barTraySelection = JSON.parse(localStorage.getItem('salon_bar_tray') || '[]');
 
-    function refreshData() { loadDrinks(); }
+    function refreshData() { loadDrinks(); checkPendingTicketsBadge(); }
 
     function setQuickVal(fieldId, value) {
       document.getElementById(fieldId).value = value;
@@ -1255,27 +1562,9 @@
       renderDrinks();
     }
 
-    function openSupportModal() {
-      document.getElementById('settingsDropdown').classList.add('hidden');
-      document.getElementById('supportModal').classList.remove('hidden');
-      document.getElementById('supportModal').classList.add('flex');
-    }
-
-    function closeSupportModal() {
-      document.getElementById('supportModal').classList.remove('flex');
-      document.getElementById('supportModal').classList.add('hidden');
-    }
-
-    function sendSupportEmail() {
-      const msg = document.getElementById('supportMessage').value;
-      window.location.href = `mailto:kdstom@outlook.com?subject=Support&body=${encodeURIComponent(msg)}`;
-      closeSupportModal();
-    }
-
     function setViewMode(mode) {
       viewMode = mode;
-      document.getElementById('unifiedViewGrid').className = mode === 'grid' ? 'px-2.5 py-1 text-xs font-bold rounded bg-amber-500 text-slate-950' : 'px-2.5 py-1 text-xs font-bold rounded bg-slate-800 text-slate-300';
-      document.getElementById('unifiedViewList').className = mode === 'list' ? 'px-2.5 py-1 text-xs font-bold rounded bg-amber-500 text-slate-950' : 'px-2.5 py-1 text-xs font-bold rounded bg-slate-800 text-slate-300';
+      updateUnifiedSettingsUI();
       renderDrinks();
     }
 
@@ -1737,6 +2026,8 @@
           document.getElementById('btnMenuImportExport').classList.remove('hidden');
           document.getElementById('btnMenuImportExport').classList.add('flex');
           document.getElementById('addDrinkBtnContainer').classList.remove('hidden');
+          const adminChangelogCont = document.getElementById('adminChangelogFormContainer');
+          if (adminChangelogCont) adminChangelogCont.classList.remove('hidden');
           renderDrinks();
         });
       } else {
@@ -1744,6 +2035,8 @@
         document.getElementById('btnMenuImportExport').classList.add('hidden');
         document.getElementById('btnMenuImportExport').classList.remove('flex');
         document.getElementById('addDrinkBtnContainer').classList.add('hidden');
+        const adminChangelogCont = document.getElementById('adminChangelogFormContainer');
+        if (adminChangelogCont) adminChangelogCont.classList.add('hidden');
         resetForm();
         renderDrinks();
       }
