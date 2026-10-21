@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.23</title>
+  <title>Salonplafond BAR v3.0.24</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import & Export -->
@@ -21,7 +21,7 @@
     body.dark-mode .modal-bg { background: rgba(0,0,0,0.8); }
     body.dark-mode .custom-box { background: #090d16; border-color: #1e293b; color: #cbd5e1; }
 
-    /* Svetlý režim (kompletne prepracovaný pre čistotu a čitateľnosť) */
+    /* Svetlý režim (čistý a augenschonend) */
     body.light-mode { background-color: #f8fafc; color: #0f172a; }
     body.light-mode .card { background: #ffffff; border: 1px solid #e2e8f0; color: #0f172a; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -4px rgba(0,0,0,0.05); }
     body.light-mode .list-item { background: #ffffff; border: 1px solid #e2e8f0; color: #0f172a; }
@@ -92,7 +92,6 @@
       100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
     }
 
-    /* Čistá tlač bez bordelu */
     @media print {
       @page { size: portrait; margin: 15mm; }
       body { background: white !important; color: black !important; padding: 0 !important; }
@@ -137,7 +136,7 @@
       <div>
         <h1 class="text-xl md:text-2xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-2xl md:text-3xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-400 font-medium mt-1 block">v3.0.23 • Sichere Authentifizierung</span>
+        <span class="text-xs text-slate-400 font-medium mt-1 block">v3.0.24 • Sichere Authentifizierung</span>
       </div>
 
       <form id="loginForm" onsubmit="handleLogin(event)" autocomplete="off" class="w-full bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl space-y-4 text-left mt-2">
@@ -161,7 +160,34 @@
     </div>
   </div>
 
-  <!-- Celá aplikácia obalená pre Auth kontrolu -->
+  <!-- MODAL PRE VÝBER MENA ČAŠNÍKA (Cesta A) -->
+  <div id="waiterNameModal" class="fixed inset-0 z-[250] bg-slate-950/90 backdrop-blur-md hidden flex items-center justify-center p-6 text-center">
+    <div class="card max-w-md w-full p-6 relative flex flex-col gap-4 border-amber-500/50 shadow-2xl text-left">
+      <div class="w-12 h-12 bg-amber-500/20 text-amber-500 rounded-xl mx-auto flex items-center justify-center text-2xl border border-amber-500/30">👤</div>
+      <h3 class="text-xl font-bold text-amber-500 text-center">Wer bedient gerade?</h3>
+      <p class="text-xs text-slate-400 text-center">Bitte wähle deinen Vornamen aus oder gib ihn ein. Damit wissen wir, wer Tickets schreibt und wer eingeloggt ist.</p>
+      
+      <div class="grid grid-cols-2 gap-2 mt-2" id="waiterPresetButtons">
+        <button type="button" onclick="selectWaiterNameQuick('Amim')" class="p-2.5 rounded-xl custom-box border hover:border-amber-500 text-xs font-bold transition">Amim</button>
+        <button type="button" onclick="selectWaiterNameQuick('Anas')" class="p-2.5 rounded-xl custom-box border hover:border-amber-500 text-xs font-bold transition">Anas</button>
+        <button type="button" onclick="selectWaiterNameQuick('Matthias')" class="p-2.5 rounded-xl custom-box border hover:border-amber-500 text-xs font-bold transition">Matthias</button>
+        <button type="button" onclick="selectWaiterNameQuick('Tibor')" class="p-2.5 rounded-xl custom-box border hover:border-amber-500 text-xs font-bold transition">Tibor</button>
+        <button type="button" onclick="selectWaiterNameQuick('Emmanuel')" class="p-2.5 rounded-xl custom-box border hover:border-amber-500 text-xs font-bold transition">Emmanuel</button>
+        <button type="button" onclick="selectWaiterNameQuick('Tomas')" class="p-2.5 rounded-xl custom-box border hover:border-amber-500 text-xs font-bold transition">Tomas</button>
+      </div>
+
+      <div class="mt-2">
+        <label class="block text-[11px] font-semibold uppercase mb-1 text-slate-400">Oder eigenen Vornamen eingeben:</label>
+        <input type="text" id="customWaiterNameInput" placeholder="z. B. Robin..." class="w-full p-3 rounded-xl border text-xs focus:outline-none focus:border-amber-500">
+      </div>
+
+      <button onclick="confirmWaiterName()" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold rounded-xl text-xs transition shadow-lg mt-2">
+        Weiter zur Bar 🍸
+      </button>
+    </div>
+  </div>
+
+  <!-- Celá aplikácia -->
   <div id="appContainer" class="hidden">
 
     <!-- Header -->
@@ -174,7 +200,7 @@
         </div>
         <div>
           <h1 class="text-3xl font-bold tracking-tight text-amber-500 dark:text-amber-400">Salonplafond BAR</h1>
-          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium">v3.0.23 • Angemeldet: <span id="currentUserEmail" class="text-amber-600 dark:text-amber-300 font-bold"></span></span>
+          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium">v3.0.24 • Angemeldet: <span id="currentUserEmail" class="text-amber-600 dark:text-amber-300 font-bold"></span></span>
         </div>
       </div>
 
@@ -204,6 +230,11 @@
           
           <div id="settingsDropdown" class="hidden absolute right-0 mt-2 w-64 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl shadow-2xl p-2 z-50 flex flex-col gap-1.5 text-slate-900 dark:text-slate-100">
             
+            <!-- Manažérske tlačidlo hneď hore v menu -->
+            <button onclick="openAddDrinkModalFromMenu()" id="menuAddDrinkBtn" class="hidden w-full text-left px-2.5 py-2 rounded bg-amber-500 text-slate-950 hover:bg-amber-600 text-xs font-black items-center gap-2 shadow-sm">
+              ➕ Neues Getränk hinzufügen
+            </button>
+
             <button onclick="openUnifiedSettingsModal()" class="w-full text-left px-2.5 py-2 rounded bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center justify-between border border-slate-200 dark:border-slate-700">
               <span>⚙️ Einstellungen (Zentrale)</span> <span>→</span>
             </button>
@@ -245,7 +276,7 @@
       </div>
     </div>
 
-    <!-- Tlačidlo pre pridanie nového drinku -->
+    <!-- Tlačidlo pre pridanie nového drinku (hlavná obrazovka pre manažérov) -->
     <div id="addDrinkBtnContainer" class="hidden mb-4">
       <button onclick="openAddDrinkModal()" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl text-xs transition shadow-md flex items-center gap-2">
         ➕ Neues Getränk hinzufügen
@@ -292,17 +323,17 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-300 dark:border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.23 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.24 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
-  </div> <!-- /Koniec appContainer -->
+  </div>
 
-  <!-- Scroll-to-Top plávajúce tlačidlo -->
+  <!-- Scroll-to-Top -->
   <button id="scrollToTopBtn" onclick="scrollToTop()" class="hidden fixed bottom-20 right-5 z-40 bg-amber-500 hover:bg-amber-600 text-slate-950 p-3.5 rounded-full shadow-xl transition font-black text-base border-2 border-white dark:border-slate-900" title="Nach oben">
     ⬆️
   </button>
 
-  <!-- Pripnutá spodná lišta pre barmanský výber (Bar Tray) -->
+  <!-- Bar Tray -->
   <div id="barTrayBar" class="hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 border-t border-amber-500/40 backdrop-blur-md p-3 px-4 shadow-2xl flex items-center justify-between gap-3 max-w-5xl mx-auto rounded-t-2xl">
     <div class="flex items-center gap-2 overflow-x-auto py-1 flex-1" id="barTrayItems"></div>
     <div class="flex items-center gap-2 shrink-0 border-l border-slate-300 dark:border-slate-700 pl-3">
@@ -459,7 +490,6 @@
           <div id="ingredientRowsContainer" class="flex flex-col gap-2"></div>
         </div>
 
-        <!-- ZUBEREITUNG -->
         <div class="md:col-span-2 custom-box border rounded-xl overflow-hidden">
           <button type="button" onclick="document.getElementById('recipeCollapse').classList.toggle('hidden')" class="w-full p-3 text-left font-bold text-amber-700 dark:text-amber-400 text-xs flex justify-between items-center bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 transition">
             <span>📖 Zubereitung / Schritt für Schritt (Optional)</span>
@@ -471,7 +501,6 @@
           </div>
         </div>
 
-        <!-- ALERGÉNY -->
         <div class="md:col-span-2 custom-box border rounded-xl overflow-hidden">
           <button type="button" onclick="document.getElementById('allergensCollapse').classList.toggle('hidden')" class="w-full p-3 text-left font-bold text-amber-700 dark:text-amber-400 text-xs flex justify-between items-center bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 transition">
             <span>⚠️ Allergene (Optional)</span>
@@ -495,7 +524,6 @@
           </div>
         </div>
 
-        <!-- CENY -->
         <div class="md:col-span-2 custom-box border rounded-xl overflow-hidden">
           <button type="button" onclick="document.getElementById('pricesCollapse').classList.toggle('hidden')" class="w-full p-3 text-left font-bold text-amber-700 dark:text-amber-400 text-xs flex justify-between items-center bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 transition">
             <span>💶 Preis & Wareneinsatz (Optional)</span>
@@ -696,13 +724,13 @@
     </div>
   </div>
 
-  <!-- Season Selection Modal Dialog -->
+  <!-- Season Selection Modal Dialog (Prepracovaný krajší dizajn) -->
   <div id="seasonModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-    <div class="card max-w-md w-full p-6 relative flex flex-col gap-4 shadow-2xl">
+    <div class="card max-w-md w-full p-6 relative flex flex-col gap-4 shadow-2xl border-amber-500/50">
       <button onclick="closeSeasonModal()" class="absolute top-4 right-4 text-slate-500 dark:text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
       <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400">📅 Saison & Archiv wählen</h3>
-      <p class="text-xs text-slate-600 dark:text-slate-300">Wähle die aktive Saison oder das Archiv aus:</p>
-      <div id="seasonModalList" class="flex flex-col gap-2 mt-2"></div>
+      <p class="text-xs text-slate-600 dark:text-slate-300">Wähle die aktive Saison oder verwalte die Einträge:</p>
+      <div id="seasonModalList" class="flex flex-col gap-2.5 mt-2 max-h-[50vh] overflow-y-auto pr-1"></div>
       <div class="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800 flex justify-end">
         <button onclick="closeSeasonModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 font-bold text-slate-800 dark:text-white rounded-lg text-xs transition">Schließen</button>
       </div>
@@ -724,7 +752,7 @@
       <div id="supportTabTickets" class="flex flex-col gap-4">
         <div>
           <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400">💬 Bar-Tickets & Anfragen</h3>
-          <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Schreibe eine Anfrage oder einen Änderungswunsch. Tomas (Developer) und das Team sehen es hier.</p>
+          <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Schreibe eine Anfrage oder einen Änderungswunsch als <b id="ticketAuthorDisplay" class="text-amber-600 dark:text-amber-300"></b>.</p>
         </div>
 
         <div class="custom-box p-4 rounded-xl border flex flex-col gap-2.5">
@@ -741,7 +769,7 @@
         </div>
       </div>
 
-      <!-- OBSAH 2: CHANGELOG / NOVINKY (Zvýšené na 10 verzií) -->
+      <!-- OBSAH 2: CHANGELOG / NOVINKY (10 verzií) -->
       <div id="supportTabChangelog" class="hidden flex flex-col gap-4">
         <div>
           <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400">🚀 Neuigkeiten & Updates (Letzte 10 Versionen)</h3>
@@ -750,14 +778,21 @@
 
         <div id="adminChangelogFormContainer" class="hidden custom-box p-4 rounded-xl border flex flex-col gap-2.5">
           <label class="text-xs font-bold text-amber-600 dark:text-amber-300">➕ Neue Neuigkeit hinzufügen (Tomas - Developer):</label>
-          <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.23: Verbesserter Tag-Modus & Changelog-Erweiterung..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
+          <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.24: Schnell-Mena pre čašníkov & vylepšený dialóg sezón..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
           <button onclick="submitNewChangelog()" class="py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs transition shadow">Als Neuigkeit veröffentlichen</button>
         </div>
 
         <div class="flex flex-col gap-2.5 max-h-[45vh] overflow-y-auto pr-1" id="changelogListContainer">
           <div class="custom-box p-3.5 rounded-xl border text-xs">
             <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-              <span>Version v3.0.23 (Tomas Kardos - Developer)</span>
+              <span>Version v3.0.24 (Tomas Kardos - Developer)</span>
+              <span class="text-slate-500">Oktober 2026</span>
+            </div>
+            <p>Implementierung des schnellen Čašník-Menovitého výberu (Cesta A) pre tickety a hlavičku, pridanie tlačidla „Neues Getränk hinzufügen“ priamo do menu a úplne prepracovaný, prehľadnejší dialóg pre výber sezóny.</p>
+          </div>
+          <div class="custom-box p-3.5 rounded-xl border text-xs">
+            <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
+              <span>Version v3.0.23</span>
               <span class="text-slate-500">Oktober 2026</span>
             </div>
             <p>Vollständige Überarbeitung des Light-Modus (helles, augenschonendes Design) und Erweiterung des Changelogs auf die letzten 10 Versionen.</p>
@@ -813,13 +848,6 @@
           </div>
           <div class="custom-box p-3.5 rounded-xl border text-xs">
             <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-              <span>Version v3.0.15</span>
-              <span class="text-slate-500">Oktober 2026</span>
-            </div>
-            <p>Druckoptimierungen für den Bar-Einkaufszettel und Inventur.</p>
-          </div>
-          <div class="custom-box p-3.5 rounded-xl border text-xs">
-            <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
               <span>Version v3.0.14</span>
               <span class="text-slate-500">Oktober 2026</span>
             </div>
@@ -842,12 +870,13 @@
     let pendingAuthCallback = null;
     let currentPhotoPreviewUrl = null;
     let currentLoggedInUserEmail = "";
+    let currentWaiterName = localStorage.getItem('salon_waiter_name') || "";
 
     window.addEventListener("DOMContentLoaded", async () => {
       window.addEventListener('scroll', handleScrollPosition);
       const { data: { session } } = await _supabase.auth.getSession();
       if (session && session.user) {
-        await showApp(session.user);
+        await handleSessionAfterLogin(session.user);
       } else {
         document.getElementById('authContainer').classList.remove('hidden');
       }
@@ -882,9 +911,83 @@
         btnText.innerText = "Einloggen";
       } else {
         if (data && data.user) {
-          await showApp(data.user);
+          await handleSessionAfterLogin(data.user);
         }
       }
+    }
+
+    async function handleSessionAfterLogin(user) {
+      currentLoggedInUserEmail = user.email;
+      document.getElementById('authContainer').classList.add('hidden');
+      
+      // Ak ešte nemá zvolené meno čašníka, otvoríme modal pre výber mena
+      if (!currentWaiterName) {
+        document.getElementById('waiterNameModal').classList.remove('hidden');
+        document.getElementById('waiterNameModal').classList.add('flex');
+      } else {
+        await finalizeAppStart(user);
+      }
+    }
+
+    function selectWaiterNameQuick(name) {
+      currentWaiterName = name;
+      localStorage.setItem('salon_waiter_name', currentWaiterName);
+      document.getElementById('customWaiterNameInput').value = name;
+    }
+
+    async function confirmWaiterName() {
+      const customInput = document.getElementById('customWaiterNameInput').value.trim();
+      if (customInput) {
+        currentWaiterName = customInput;
+      }
+      if (!currentWaiterName) {
+        alert("Bitte wähle oder gib einen Namen ein.");
+        return;
+      }
+      localStorage.setItem('salon_waiter_name', currentWaiterName);
+      document.getElementById('waiterNameModal').classList.remove('flex');
+      document.getElementById('waiterNameModal').classList.add('hidden');
+
+      const { data: { session } } = await _supabase.auth.getSession();
+      if (session && session.user) {
+        await finalizeAppStart(session.user);
+      }
+    }
+
+    async function finalizeAppStart(user) {
+      document.getElementById('appContainer').classList.remove('hidden');
+      
+      if (user.email === "kdstom@outlook.com" || user.email.includes("amim@salonplafond.wien")) {
+        isAdmin = true;
+        document.getElementById('currentUserEmail').innerHTML = `<span class="text-amber-600 dark:text-amber-400 font-black">${currentWaiterName} (Developer / Manager)</span>`;
+      } else {
+        isAdmin = false;
+        document.getElementById('currentUserEmail').innerHTML = `<span class="text-amber-600 dark:text-amber-400 font-black">${currentWaiterName}</span>`;
+      }
+      
+      const btnMenuImportExport = document.getElementById('btnMenuImportExport');
+      const menuAddDrinkBtn = document.getElementById('menuAddDrinkBtn');
+      const addBtnCont = document.getElementById('addDrinkBtnContainer');
+      const adminChangelogCont = document.getElementById('adminChangelogFormContainer');
+
+      if (isAdmin) {
+        btnMenuImportExport.classList.remove('hidden');
+        btnMenuImportExport.classList.add('flex');
+        menuAddDrinkBtn.classList.remove('hidden');
+        menuAddDrinkBtn.classList.add('flex');
+        addBtnCont.classList.remove('hidden');
+        if (adminChangelogCont) adminChangelogCont.classList.remove('hidden');
+      } else {
+        btnMenuImportExport.classList.add('hidden');
+        btnMenuImportExport.classList.remove('flex');
+        menuAddDrinkBtn.classList.add('hidden');
+        menuAddDrinkBtn.classList.remove('flex');
+        addBtnCont.classList.add('hidden');
+        if (adminChangelogCont) adminChangelogCont.classList.add('hidden');
+      }
+
+      await loadDrinks();
+      await checkPendingTicketsBadge();
     }
 
     async function handleLogout() {
@@ -892,42 +995,6 @@
       document.getElementById('appContainer').classList.add('hidden');
       document.getElementById('authContainer').classList.remove('hidden');
       document.getElementById('loginSubmitBtn').querySelector('span').innerText = "Einloggen";
-    }
-
-    async function showApp(user) {
-      currentLoggedInUserEmail = user.email;
-      document.getElementById('authContainer').classList.add('hidden');
-      document.getElementById('appContainer').classList.remove('hidden');
-      
-      if (user.email === "kdstom@outlook.com") {
-        isAdmin = true;
-        document.getElementById('currentUserEmail').innerHTML = `<span class="text-amber-600 dark:text-amber-400 font-black">Tomas Kardos (Developer)</span>`;
-      } else if (user.email.includes("amim@salonplafond.wien")) {
-        isAdmin = true;
-        document.getElementById('currentUserEmail').innerText = user.email;
-      } else {
-        isAdmin = false;
-        document.getElementById('currentUserEmail').innerText = user.email;
-      }
-      
-      const btnMenuImportExport = document.getElementById('btnMenuImportExport');
-      const addBtnCont = document.getElementById('addDrinkBtnContainer');
-      const adminChangelogCont = document.getElementById('adminChangelogFormContainer');
-
-      if (isAdmin) {
-        btnMenuImportExport.classList.remove('hidden');
-        btnMenuImportExport.classList.add('flex');
-        addBtnCont.classList.remove('hidden');
-        if (adminChangelogCont) adminChangelogCont.classList.remove('hidden');
-      } else {
-        btnMenuImportExport.classList.add('hidden');
-        btnMenuImportExport.classList.remove('flex');
-        addBtnCont.classList.add('hidden');
-        if (adminChangelogCont) adminChangelogCont.classList.add('hidden');
-      }
-
-      await loadDrinks();
-      await checkPendingTicketsBadge();
     }
 
     function checkManagerAuth(callback) {
@@ -969,6 +1036,8 @@
         isAdmin = true;
         document.getElementById('btnMenuImportExport').classList.remove('hidden');
         document.getElementById('btnMenuImportExport').classList.add('flex');
+        document.getElementById('menuAddDrinkBtn').classList.remove('hidden');
+        document.getElementById('menuAddDrinkBtn').classList.add('flex');
         document.getElementById('addDrinkBtnContainer').classList.remove('hidden');
         const adminChangelogCont = document.getElementById('adminChangelogFormContainer');
         if (adminChangelogCont) adminChangelogCont.classList.remove('hidden');
@@ -1003,6 +1072,7 @@
 
     function openSupportModal() {
       document.getElementById('settingsDropdown').classList.add('hidden');
+      document.getElementById('ticketAuthorDisplay').innerText = currentWaiterName;
       switchSupportTab('tickets');
       loadTicketsData();
       const modal = document.getElementById('supportModal');
@@ -1043,8 +1113,10 @@
       const text = msgInput.value.trim();
       if (!text) return alert("Bitte geben Sie eine Nachricht ein.");
 
+      const authorString = `${currentWaiterName} (${currentLoggedInUserEmail || 'Staff'})`;
+
       const { error } = await _supabase.from('support_tickets').insert([{
-        author_email: currentLoggedInUserEmail || 'Unbekannt',
+        author_email: authorString,
         message: text,
         status: 'pending',
         is_changelog: false
@@ -1169,7 +1241,7 @@
         if (!text) return alert("Bitte Neuigkeit eingeben.");
 
         const { error } = await _supabase.from('support_tickets').insert([{
-          author_email: currentLoggedInUserEmail || 'Tomas Kardos',
+          author_email: `${currentWaiterName} (Tomas Kardos)`,
           message: text,
           status: 'resolved',
           is_changelog: true,
@@ -1207,6 +1279,13 @@
       }
 
       container.innerHTML = dynamicHtml + `
+        <div class="custom-box p-3.5 rounded-xl border text-xs">
+          <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
+            <span>Version v3.0.24</span>
+            <span class="text-slate-500">Oktober 2026</span>
+          </div>
+          <p>Implementierung des schnellen Čašník-Menovitého výberu (Cesta A) pre tickety a hlavičku, pridanie tlačidla „Neues Getränk hinzufügen“ priamo do menu a úplne prepracovaný, prehľadnejší dialóg pre výber sezóny.</p>
+        </div>
         <div class="custom-box p-3.5 rounded-xl border text-xs">
           <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
             <span>Version v3.0.23</span>
@@ -1625,13 +1704,23 @@
       const seasons = getAllSeasons();
       const listContainer = document.getElementById('seasonModalList');
       listContainer.innerHTML = seasons.map(s => {
-        let label = `📅 Saison: ${s}`;
         let activeClass = currentSeasonFilter === s ? 'border-amber-500 bg-amber-500/10' : 'custom-box border';
         
-        let renameBtnHtml = `<button onclick="renameSeason('${s}', event)" class="p-1.5 px-2 bg-amber-500/20 hover:bg-amber-500 text-amber-700 dark:text-amber-400 hover:text-slate-950 rounded-lg transition text-xs font-bold border border-amber-500/30 ml-2" title="Saison umbenennen">✏️ Umbenennen</button>`;
-        let deleteBtnHtml = `<button onclick="deleteEntireSeason('${s}', event)" class="p-1.5 px-2 bg-red-500/20 hover:bg-red-500 text-red-600 dark:text-red-400 hover:text-white rounded-lg transition text-xs font-bold border border-red-500/30 ml-1.5" title="Saison löschen">🗑️ Löschen</button>`;
+        let renameBtnHtml = `<button onclick="renameSeason('${s}', event)" class="p-1.5 px-2.5 bg-amber-500/20 hover:bg-amber-500 text-amber-700 dark:text-amber-400 hover:text-slate-950 rounded-lg transition text-xs font-bold border border-amber-500/30" title="Saison umbenennen">✏️</button>`;
+        let deleteBtnHtml = `<button onclick="deleteEntireSeason('${s}', event)" class="p-1.5 px-2.5 bg-red-500/20 hover:bg-red-500 text-red-600 dark:text-red-400 hover:text-white rounded-lg transition text-xs font-bold border border-red-500/30 ml-1" title="Saison löschen">🗑️</button>`;
 
-        return `<div class="p-3 rounded-xl ${activeClass} transition flex items-center justify-between group cursor-pointer" onclick="selectSeason('${s}')"><div><div class="text-sm font-bold group-hover:text-amber-500">${label}</div></div><div class="flex items-center"><span class="text-xs text-amber-600 dark:text-amber-400 font-semibold mr-2">${currentSeasonFilter === s ? 'Aktiv ✓' : 'Öffnen →'}</span>${renameBtnHtml}${deleteBtnHtml}</div></div>`;
+        return `
+          <div class="p-3.5 rounded-xl ${activeClass} transition flex items-center justify-between gap-3 cursor-pointer hover:border-amber-400" onclick="selectSeason('${s}')">
+            <div class="flex flex-col text-left min-w-0">
+              <span class="text-sm font-bold truncate">📅 ${s}</span>
+              <span class="text-[10px] text-slate-400">${currentSeasonFilter === s ? 'Aktive Saison ✓' : 'Klicken zum Aktivieren'}</span>
+            </div>
+            <div class="flex items-center shrink-0" onclick="event.stopPropagation()">
+              ${renameBtnHtml}
+              ${deleteBtnHtml}
+            </div>
+          </div>
+        `;
       }).join('');
     }
 
@@ -2135,6 +2224,8 @@
           isAdmin = true;
           document.getElementById('btnMenuImportExport').classList.remove('hidden');
           document.getElementById('btnMenuImportExport').classList.add('flex');
+          document.getElementById('menuAddDrinkBtn').classList.remove('hidden');
+          document.getElementById('menuAddDrinkBtn').classList.add('flex');
           document.getElementById('addDrinkBtnContainer').classList.remove('hidden');
           const adminChangelogCont = document.getElementById('adminChangelogFormContainer');
           if (adminChangelogCont) adminChangelogCont.classList.remove('hidden');
@@ -2144,6 +2235,8 @@
         isAdmin = false;
         document.getElementById('btnMenuImportExport').classList.add('hidden');
         document.getElementById('btnMenuImportExport').classList.remove('flex');
+        document.getElementById('menuAddDrinkBtn').classList.add('hidden');
+        document.getElementById('menuAddDrinkBtn').classList.remove('flex');
         document.getElementById('addDrinkBtnContainer').classList.add('hidden');
         const adminChangelogCont = document.getElementById('adminChangelogFormContainer');
         if (adminChangelogCont) adminChangelogCont.classList.add('hidden');
@@ -2161,6 +2254,11 @@
         document.getElementById('adminModal').classList.remove('hidden');
         document.getElementById('adminModal').classList.add('flex');
       });
+    }
+
+    function openAddDrinkModalFromMenu() {
+      document.getElementById('settingsDropdown').classList.add('hidden');
+      openAddDrinkModal();
     }
 
     function closeAdminModal() {
