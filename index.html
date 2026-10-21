@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.15</title>
+  <title>Salonplafond BAR v3.0.16</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import & Export -->
@@ -32,7 +32,7 @@
     .card:hover { transform: translateY(-4px); border-color: #f59e0b; }
     .list-item { border-radius: 0.75rem; transition: background 0.2s; }
     
-    /* Presné Logo styling: Ō s dĺžňom hore a bodkou dole */
+    /* Logo animácia */
     .login-logo-advanced {
       animation: advancedSpinRotateAnim 5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
     }
@@ -65,9 +65,9 @@
       transform: scale(1.1) rotate(5deg);
     }
     
-    .logo-main-char { font-size: 1.35rem; font-weight: 900; color: #0f172a; line-height: 1; }
-    .logo-macron { font-size: 8px; font-weight: 900; color: #0f172a; line-height: 1; margin-top: -2px; letter-spacing: 2px; }
-    .logo-dot { font-size: 8px; font-weight: 900; color: #0f172a; line-height: 1; margin-top: -2px; }
+    .logo-main-char { font-size: 1.25rem; font-weight: 900; color: #0f172a; line-height: 1; }
+    .logo-macron { font-size: 11px; font-weight: 900; color: #0f172a; line-height: 1; margin-bottom: -1px; letter-spacing: 3px; }
+    .logo-dot { font-size: 8px; font-weight: 900; color: #0f172a; line-height: 1; margin-top: -1px; }
 
     @keyframes salonLogoPlayful {
       0% { transform: translateY(0) rotate(0deg) scale(1); }
@@ -114,15 +114,15 @@
     <div class="flex flex-col items-center gap-4 w-full max-w-md">
       
       <div class="login-logo-advanced w-20 h-20 bg-amber-400 rounded-2xl flex flex-col items-center justify-center shadow-2xl p-1 text-slate-950 font-bold select-none border-2 border-amber-300 mx-auto">
-        <div class="text-[10px] font-black tracking-widest leading-none">¯</div>
-        <div class="text-3xl font-black leading-none my-0.5">O</div>
-        <div class="text-[10px] font-black leading-none">•</div>
+        <div class="text-[12px] font-black tracking-[4px] leading-none mb-0.5">——</div>
+        <div class="text-3xl font-black leading-none my-0">O</div>
+        <div class="text-[10px] font-black leading-none mt-0.5">•</div>
       </div>
 
       <div>
         <h1 class="text-xl md:text-2xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-2xl md:text-3xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-400 font-medium mt-1 block">v3.0.15 • Sichere Authentifizierung</span>
+        <span class="text-xs text-slate-400 font-medium mt-1 block">v3.0.16 • Sichere Authentifizierung</span>
       </div>
 
       <form id="loginForm" onsubmit="handleLogin(event)" autocomplete="off" class="w-full bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl space-y-4 text-left mt-2">
@@ -153,13 +153,13 @@
     <header class="flex flex-col md:flex-row justify-between items-center gap-4 mb-8 pb-4 border-b border-slate-700">
       <div class="flex items-center gap-3">
         <div class="header-logo-container" onclick="showRandomMotivation(event)" title="Klick mich für Osterei-Motivation! 🍸">
-          <span class="logo-macron">¯</span>
+          <span class="logo-macron">——</span>
           <span class="logo-main-char">O</span>
           <span class="logo-dot">•</span>
         </div>
         <div>
           <h1 class="text-3xl font-bold tracking-tight text-amber-400">Salonplafond BAR</h1>
-          <span class="text-xs text-slate-400 font-medium">v3.0.15 • Angemeldet: <span id="currentUserEmail" class="text-amber-300 font-bold"></span></span>
+          <span class="text-xs text-slate-400 font-medium">v3.0.16 • Angemeldet: <span id="currentUserEmail" class="text-amber-300 font-bold"></span></span>
         </div>
       </div>
 
@@ -274,7 +274,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.15 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.16 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div> <!-- /Koniec appContainer -->
@@ -295,7 +295,7 @@
     </div>
   </div>
 
-  <!-- Shopping List / Inventory Modal (Prepracovaný dialóg) -->
+  <!-- Shopping List / Inventory Modal -->
   <div id="shoppingModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
     <div class="card max-w-3xl w-full p-6 relative flex flex-col gap-4 max-h-[85vh] overflow-y-auto border-amber-500/50 shadow-2xl">
       <button onclick="closeShoppingModal()" class="no-print absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
@@ -305,7 +305,6 @@
         <p class="text-xs text-slate-400 mt-1">Übersicht aller benötigten Zutaten für die aktive Saison: <span id="shoppingSeasonName" class="font-bold text-amber-300"></span></p>
       </div>
 
-      <!-- Akčné tlačidlá pre tlač a export nákupnej zoznamu -->
       <div class="no-print flex flex-wrap gap-2 pt-1 pb-2 border-b border-slate-800">
         <button onclick="printShoppingList()" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl text-xs transition shadow flex items-center gap-1.5">
           🖨️ Einkaufsliste drucken
@@ -315,7 +314,6 @@
         </button>
       </div>
 
-      <!-- Prehľadná tabuľka / zoznam -->
       <div id="shoppingListContainer" class="flex flex-col gap-2 mt-1 bg-slate-950/60 p-4 rounded-xl border border-slate-800 text-xs max-h-[50vh] overflow-y-auto"></div>
 
       <div class="no-print flex justify-end pt-3 border-t border-slate-800">
@@ -369,7 +367,7 @@
       <h3 class="text-xl font-bold text-amber-400">⚡ Multi-View: Rezepte im direkten Vergleich</h3>
       <div id="multiViewContentContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-2"></div>
       <div class="flex justify-end pt-3 border-t border-slate-800">
-        <button onclick="closeMultiViewModal()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold rounded-xl text-xs transition border border-slate-700">Schließen</button>
+        <button onclick="closeMultiViewModal()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 font-bold text-white rounded-xl text-xs transition border border-slate-700">Schließen</button>
       </div>
     </div>
   </div>
@@ -769,7 +767,7 @@
       document.getElementById('loginSubmitBtn').querySelector('span').innerText = "Einloggen";
     }
 
-    function showApp(user) {
+    async function showApp(user) {
       document.getElementById('authContainer').classList.add('hidden');
       document.getElementById('appContainer').classList.remove('hidden');
       document.getElementById('currentUserEmail').innerText = user.email;
@@ -794,7 +792,7 @@
         addBtnCont.classList.add('hidden');
       }
 
-      loadDrinks();
+      await loadDrinks();
     }
 
     function checkManagerAuth(callback) {
@@ -1043,7 +1041,6 @@
       document.getElementById('seasonModal').classList.add('hidden');
     }
 
-    /* Vylepšený dialóg Einkaufsliste / Inventur */
     function openShoppingModal() {
       document.getElementById('settingsDropdown').classList.add('hidden');
       document.getElementById('shoppingSeasonName').innerText = currentSeasonFilter;
