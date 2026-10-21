@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.24</title>
+  <title>Salonplafond BAR v3.0.25</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import & Export -->
@@ -13,7 +13,7 @@
   <style>
     body { font-family: system-ui, -apple-system, sans-serif; transition: background-color 0.2s, color 0.2s; }
     
-    /* Tmavý režim (štandard) - oprava bielych pozadí vo formulároch */
+    /* Tmavý režim (štandard) */
     body.dark-mode { background-color: #0f172a; color: #f8fafc; }
     body.dark-mode .card { background: #1e293b; border: 1px solid #334155; color: #f8fafc; }
     body.dark-mode .list-item { background: #1e293b; border: 1px solid #334155; color: #f8fafc; }
@@ -22,7 +22,7 @@
     body.dark-mode .custom-box { background: #090d16; border-color: #1e293b; color: #cbd5e1; }
     body.dark-mode input, body.dark-mode select, body.dark-mode textarea { background-color: #090d16 !important; color: #f8fafc !important; border-color: #334155 !important; }
 
-    /* Svetlý režim (čistý a augenschonend) */
+    /* Svetlý režim */
     body.light-mode { background-color: #f8fafc; color: #0f172a; }
     body.light-mode .card { background: #ffffff; border: 1px solid #e2e8f0; color: #0f172a; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -4px rgba(0,0,0,0.05); }
     body.light-mode .list-item { background: #ffffff; border: 1px solid #e2e8f0; color: #0f172a; }
@@ -83,7 +83,6 @@
       100% { transform: translateY(0) rotate(0deg) scale(1); }
     }
 
-    /* Blikajúca ikona pre nové požiadavky / update */
     .pulse-badge-dot {
       animation: pulseBlinkEffect 1.5s infinite;
     }
@@ -137,7 +136,7 @@
       <div>
         <h1 class="text-xl md:text-2xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-2xl md:text-3xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-400 font-medium mt-1 block">v3.0.24 • Sichere Authentifizierung</span>
+        <span class="text-xs text-slate-400 font-medium mt-1 block">v3.0.25 • Sichere Authentifizierung</span>
       </div>
 
       <form id="loginForm" onsubmit="handleLogin(event)" autocomplete="off" class="w-full bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl space-y-4 text-left mt-2">
@@ -161,20 +160,15 @@
     </div>
   </div>
 
-  <!-- MODAL PRE VÝBER MENA ČAŠNÍKA (Cesta A) -->
+  <!-- MODAL PRE VÝBER MENA ČAŠNÍKA Z TABUĽKY staff_presence -->
   <div id="waiterNameModal" class="fixed inset-0 z-[250] bg-slate-950/90 backdrop-blur-md hidden flex items-center justify-center p-6 text-center">
     <div class="card max-w-md w-full p-6 relative flex flex-col gap-4 border-amber-500/50 shadow-2xl text-left">
       <div class="w-12 h-12 bg-amber-500/20 text-amber-500 rounded-xl mx-auto flex items-center justify-center text-2xl border border-amber-500/30">👤</div>
       <h3 class="text-xl font-bold text-amber-500 text-center">Wer bedient gerade?</h3>
-      <p class="text-xs text-slate-400 text-center">Bitte wähle deinen Vornamen aus oder gib ihn ein. Damit wissen wir, wer Tickets schreibt und wer eingeloggt ist.</p>
+      <p class="text-xs text-slate-400 text-center">Wähle deinen Vornamen aus der Liste aus:</p>
       
-      <div class="grid grid-cols-2 gap-2 mt-2" id="waiterPresetButtons">
-        <button type="button" onclick="selectWaiterNameQuick('Amim')" class="p-2.5 rounded-xl custom-box border hover:border-amber-500 text-xs font-bold transition">Amim</button>
-        <button type="button" onclick="selectWaiterNameQuick('Anas')" class="p-2.5 rounded-xl custom-box border hover:border-amber-500 text-xs font-bold transition">Anas</button>
-        <button type="button" onclick="selectWaiterNameQuick('Matthias')" class="p-2.5 rounded-xl custom-box border hover:border-amber-500 text-xs font-bold transition">Matthias</button>
-        <button type="button" onclick="selectWaiterNameQuick('Tibor')" class="p-2.5 rounded-xl custom-box border hover:border-amber-500 text-xs font-bold transition">Tibor</button>
-        <button type="button" onclick="selectWaiterNameQuick('Emmanuel')" class="p-2.5 rounded-xl custom-box border hover:border-amber-500 text-xs font-bold transition">Emmanuel</button>
-        <button type="button" onclick="selectWaiterNameQuick('Tomas')" class="p-2.5 rounded-xl custom-box border hover:border-amber-500 text-xs font-bold transition">Tomas</button>
+      <div class="grid grid-cols-2 gap-2 mt-2" id="waiterDatabasePresetButtons">
+        <span class="text-xs text-slate-500 italic text-center col-span-2 py-2">Lade Personal aus der Datenbank...</span>
       </div>
 
       <div class="mt-2">
@@ -201,7 +195,7 @@
         </div>
         <div>
           <h1 class="text-3xl font-bold tracking-tight text-amber-500 dark:text-amber-400">Salonplafond BAR</h1>
-          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium">v3.0.24 • Angemeldet: <span id="currentUserEmail" class="text-amber-600 dark:text-amber-300 font-bold"></span></span>
+          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium">v3.0.25 • Angemeldet als: <span id="currentUserEmail" class="text-amber-600 dark:text-amber-300 font-bold"></span> <button onclick="openWaiterModalFromHeader()" class="ml-2 text-[10px] bg-amber-500/20 hover:bg-amber-500/30 text-amber-600 dark:text-amber-300 font-bold px-2 py-0.5 rounded border border-amber-500/30 transition">✏️ Ändern</button></span>
         </div>
       </div>
 
@@ -231,7 +225,6 @@
           
           <div id="settingsDropdown" class="hidden absolute right-0 mt-2 w-64 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl shadow-2xl p-2 z-50 flex flex-col gap-1.5 text-slate-900 dark:text-slate-100">
             
-            <!-- Manažérske tlačidlo hneď hore v menu -->
             <button onclick="openAddDrinkModalFromMenu()" id="menuAddDrinkBtn" class="hidden w-full text-left px-2.5 py-2 rounded bg-amber-500 text-slate-950 hover:bg-amber-600 text-xs font-black items-center gap-2 shadow-sm">
               ➕ Neues Getränk hinzufügen
             </button>
@@ -277,7 +270,7 @@
       </div>
     </div>
 
-    <!-- Tlačidlo pre pridanie nového drinku (hlavná obrazovka pre manažérov) -->
+    <!-- Tlačidlo pre pridanie nového drinku -->
     <div id="addDrinkBtnContainer" class="hidden mb-4">
       <button onclick="openAddDrinkModal()" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl text-xs transition shadow-md flex items-center gap-2">
         ➕ Neues Getränk hinzufügen
@@ -324,7 +317,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-300 dark:border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.24 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.25 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div>
@@ -725,7 +718,7 @@
     </div>
   </div>
 
-  <!-- Season Selection Modal Dialog (Prepracovaný krajší dizajn) -->
+  <!-- Season Selection Modal Dialog -->
   <div id="seasonModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
     <div class="card max-w-md w-full p-6 relative flex flex-col gap-4 shadow-2xl border-amber-500/50">
       <button onclick="closeSeasonModal()" class="absolute top-4 right-4 text-slate-500 dark:text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
@@ -779,14 +772,21 @@
 
         <div id="adminChangelogFormContainer" class="hidden custom-box p-4 rounded-xl border flex flex-col gap-2.5">
           <label class="text-xs font-bold text-amber-600 dark:text-amber-300">➕ Neue Neuigkeit hinzufügen (Tomas - Developer):</label>
-          <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.24: Schnell-Mena pre čašníkov & vylepšený dialóg sezón..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
+          <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.25: Personal-Auswahl direkt aus staff_presence..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
           <button onclick="submitNewChangelog()" class="py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs transition shadow">Als Neuigkeit veröffentlichen</button>
         </div>
 
         <div class="flex flex-col gap-2.5 max-h-[45vh] overflow-y-auto pr-1" id="changelogListContainer">
           <div class="custom-box p-3.5 rounded-xl border text-xs">
             <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-              <span>Version v3.0.24 (Tomas Kardos - Developer)</span>
+              <span>Version v3.0.25 (Tomas Kardos - Developer)</span>
+              <span class="text-slate-500">Oktober 2026</span>
+            </div>
+            <p>Verknüpfung der Personal-Schnellauswahl mit der Supabase-Tabelle staff_presence, Schnellumschalter im Header und automatische Aktualisierung von last_used_at.</p>
+          </div>
+          <div class="custom-box p-3.5 rounded-xl border text-xs">
+            <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
+              <span>Version v3.0.24</span>
               <span class="text-slate-500">Oktober 2026</span>
             </div>
             <p>Oprava bielych pozadí formulárových polí (input, select, textarea) v tmavom režime, implementácia rýchleho čašníckeho výberu mena a optimalizácia dialógov.</p>
@@ -846,13 +846,6 @@
               <span class="text-slate-500">Oktober 2026</span>
             </div>
             <p>Integration von Multi-View und direktem Rezeptvergleich.</p>
-          </div>
-          <div class="custom-box p-3.5 rounded-xl border text-xs">
-            <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-              <span>Version v3.0.14</span>
-              <span class="text-slate-500">Oktober 2026</span>
-            </div>
-            <p>Initiale Veröffentlichung der Salonplafond BAR Web-App.</p>
           </div>
         </div>
       </div>
@@ -921,18 +914,46 @@
       currentLoggedInUserEmail = user.email;
       document.getElementById('authContainer').classList.add('hidden');
       
+      await loadStaffPresenceNames();
       if (!currentWaiterName) {
-        document.getElementById('waiterNameModal').classList.remove('hidden');
-        document.getElementById('waiterNameModal').classList.add('flex');
+        openWaiterModal();
       } else {
         await finalizeAppStart(user);
       }
+    }
+
+    async function loadStaffPresenceNames() {
+      const { data, error } = await _supabase.from('staff_presence').select('name').order('name', { ascending: true });
+      const container = document.getElementById('waiterDatabasePresetButtons');
+      if (error || !data || data.length === 0) {
+        container.innerHTML = `<span class="text-xs text-slate-500 italic col-span-2 text-center py-2">Keine Namen in staff_presence gefunden.</span>`;
+        return;
+      }
+      container.innerHTML = data.map(staff => `
+        <button type="button" onclick="selectWaiterNameQuick('${staff.name}')" class="p-3 rounded-xl custom-box border hover:border-amber-500 text-xs font-bold transition flex items-center justify-center gap-2">
+          <span>👤 ${staff.name}</span>
+        </button>
+      `).join('');
+    }
+
+    function openWaiterModal() {
+      document.getElementById('waiterNameModal').classList.remove('hidden');
+      document.getElementById('waiterNameModal').classList.add('flex');
+    }
+
+    function openWaiterModalFromHeader() {
+      loadStaffPresenceNames();
+      openWaiterModal();
     }
 
     function selectWaiterNameQuick(name) {
       currentWaiterName = name;
       localStorage.setItem('salon_waiter_name', currentWaiterName);
       document.getElementById('customWaiterNameInput').value = name;
+      
+      _supabase.from('staff_presence').update({ last_used_at: new Date().toISOString() }).eq('name', name).then();
+
+      confirmWaiterName();
     }
 
     async function confirmWaiterName() {
@@ -957,7 +978,7 @@
     async function finalizeAppStart(user) {
       document.getElementById('appContainer').classList.remove('hidden');
       
-      if (user.email === "kdstom@outlook.com" || user.email.includes("amim@salonplafond.wien")) {
+      if (user.email === "kdstom@outlook.com" || currentWaiterName.toLowerCase() === "amim" || user.email.includes("amim@salonplafond.wien")) {
         isAdmin = true;
         document.getElementById('currentUserEmail').innerHTML = `<span class="text-amber-600 dark:text-amber-400 font-black">${currentWaiterName} (Developer / Manager)</span>`;
       } else {
@@ -1279,6 +1300,13 @@
       }
 
       container.innerHTML = dynamicHtml + `
+        <div class="custom-box p-3.5 rounded-xl border text-xs">
+          <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
+            <span>Version v3.0.25 (Tomas Kardos - Developer)</span>
+            <span class="text-slate-500">Oktober 2026</span>
+          </div>
+          <p>Verknüpfung der Personal-Schnellauswahl mit der Supabase-Tabelle staff_presence, Schnellumschalter im Header und automatische Aktualisierung von last_used_at.</p>
+        </div>
         <div class="custom-box p-3.5 rounded-xl border text-xs">
           <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
             <span>Version v3.0.24</span>
