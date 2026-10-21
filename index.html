@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.20</title>
+  <title>Salonplafond BAR v3.0.21</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import & Export -->
@@ -80,13 +80,13 @@
       100% { transform: translateY(0) rotate(0deg) scale(1); }
     }
 
-    /* Blikajúca ikona pre nové požiadavky / update */
-    .pulse-update-icon {
+    /* Blikajúca ikona pre nové požiadavky / update (iba samotná ikonka) */
+    .pulse-badge-dot {
       animation: pulseBlinkEffect 1.5s infinite;
     }
     @keyframes pulseBlinkEffect {
-      0% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
-      50% { transform: scale(1.08); opacity: 0.85; box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+      0% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.8); }
+      50% { transform: scale(1.2); opacity: 0.8; box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
       100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
     }
 
@@ -135,7 +135,7 @@
       <div>
         <h1 class="text-xl md:text-2xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-2xl md:text-3xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-400 font-medium mt-1 block">v3.0.20 • Sichere Authentifizierung</span>
+        <span class="text-xs text-slate-400 font-medium mt-1 block">v3.0.21 • Sichere Authentifizierung</span>
       </div>
 
       <form id="loginForm" onsubmit="handleLogin(event)" autocomplete="off" class="w-full bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl space-y-4 text-left mt-2">
@@ -172,16 +172,11 @@
         </div>
         <div>
           <h1 class="text-3xl font-bold tracking-tight text-amber-400">Salonplafond BAR</h1>
-          <span class="text-xs text-slate-400 font-medium">v3.0.20 • Angemeldet: <span id="currentUserEmail" class="text-amber-300 font-bold"></span></span>
+          <span class="text-xs text-slate-400 font-medium">v3.0.21 • Angemeldet: <span id="currentUserEmail" class="text-amber-300 font-bold"></span></span>
         </div>
       </div>
 
       <div class="flex flex-wrap items-center gap-2">
-        <!-- Blikajúce tlačidlo pre Support / Tickets -->
-        <button id="supportBtnBadge" onclick="openSupportModal()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-bold border border-slate-700 text-amber-400 flex items-center gap-1.5 transition">
-          <span id="supportBadgeIcon">💬</span> Support & Tickets
-        </button>
-
         <button onclick="handleLogout()" class="px-3 py-1.5 bg-red-600/80 hover:bg-red-600 text-white rounded-lg text-xs font-bold transition flex items-center gap-1">
           🚪 Abmelden
         </button>
@@ -200,9 +195,12 @@
         </div>
 
         <div class="relative">
-          <button onclick="toggleSettingsMenu(event)" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs flex items-center gap-1 shadow-lg transition">
+          <button onclick="toggleSettingsMenu(event)" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs flex items-center gap-1 shadow-lg transition relative">
             ⚙️ Menü
+            <!-- Nenápadná blikajúca bodka priamo v menu tlačidle, ak sú nové tickety -->
+            <span id="menuNotificationDot" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-amber-400 rounded-full border-2 border-slate-950 pulse-badge-dot"></span>
           </button>
+          
           <div id="settingsDropdown" class="hidden absolute right-0 mt-2 w-64 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl p-2 z-50 flex flex-col gap-1.5">
             
             <button onclick="openUnifiedSettingsModal()" class="w-full text-left px-2.5 py-2 rounded bg-slate-900 hover:bg-slate-700 text-xs font-bold text-amber-400 flex items-center justify-between border border-slate-700">
@@ -223,8 +221,9 @@
               📊 Import & Export
             </button>
 
-            <button onclick="openSupportModal()" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-700 text-xs font-semibold text-amber-400 flex items-center gap-2">
-              💬 Support & Tickets
+            <button onclick="openSupportModal()" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-700 text-xs font-semibold text-amber-400 flex items-center justify-between">
+              <span class="flex items-center gap-2">💬 Support & Tickets</span>
+              <span id="menuDropdownTicketDot" class="hidden w-2 h-2 bg-amber-400 rounded-full pulse-badge-dot"></span>
             </button>
 
             <div class="border-t border-slate-700 my-0.5"></div>
@@ -245,7 +244,7 @@
       </div>
     </div>
 
-    <!-- Tlačidlo pre pridanie nového drinku (zobrazené nad kategóriami iba pre manažéra) -->
+    <!-- Tlačidlo pre pridanie nového drinku (zobrazené nad kategóriami iba pre manažéra / teba) -->
     <div id="addDrinkBtnContainer" class="hidden mb-4">
       <button onclick="openAddDrinkModal()" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl text-xs transition shadow-lg flex items-center gap-2">
         ➕ Neues Getränk hinzufügen
@@ -292,7 +291,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.20 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.21 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div> <!-- /Koniec appContainer -->
@@ -666,7 +665,7 @@
       <div class="space-y-3 mt-2">
         <div>
           <label class="block text-[11px] font-semibold uppercase mb-1 text-slate-300">Manager E-Mail</label>
-          <input type="email" id="modalAuthEmail" autocomplete="off" placeholder="amim@salonplafond.wien" class="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400">
+          <input type="email" id="modalAuthEmail" autocomplete="off" placeholder="kdstom@outlook.com" class="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400">
         </div>
         <div>
           <label class="block text-[11px] font-semibold uppercase mb-1 text-slate-300">Passwort</label>
@@ -724,7 +723,7 @@
       <div id="supportTabTickets" class="flex flex-col gap-4">
         <div>
           <h3 class="text-xl font-bold text-amber-400">💬 Bar-Tickets & Požiadavky</h3>
-          <p class="text-xs text-slate-400 mt-0.5">Schreibe eine Anfrage oder einen Änderungswunsch. Das Team und Tomas sehen es hier.</p>
+          <p class="text-xs text-slate-400 mt-0.5">Schreibe eine Anfrage oder einen Änderungswunsch. Tomas (Developer) und das Team sehen es hier.</p>
         </div>
 
         <!-- Formulár na novú požiadavku -->
@@ -750,26 +749,25 @@
           <p class="text-xs text-slate-400 mt-0.5">Hier siehst du, was in den letzten Versionen der App verbessert wurde.</p>
         </div>
 
-        <!-- Pridanie novej novinky (iba pre manažéra) -->
+        <!-- Pridanie novej novinky (iba pre teba ako správcu) -->
         <div id="adminChangelogFormContainer" class="hidden bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col gap-2.5">
-          <label class="text-xs font-bold text-amber-300">➕ Neue Neuigkeit hinzufügen (Admin):</label>
-          <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.20: Ticket-System und Changelog integriert..." class="p-3 rounded-lg bg-slate-900 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400"></textarea>
+          <label class="text-xs font-bold text-amber-300">➕ Neue Neuigkeit hinzufügen (Tomas - Developer):</label>
+          <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.21: Ticket-System und Developer-Modus integriert..." class="p-3 rounded-lg bg-slate-900 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400"></textarea>
           <button onclick="submitNewChangelog()" class="py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs transition shadow">Als Neuigkeit veröffentlichen</button>
         </div>
 
         <!-- Zoznam changelogu -->
         <div class="flex flex-col gap-2.5 max-h-[45vh] overflow-y-auto pr-1" id="changelogListContainer">
-          <!-- Statické ukážkové novinky + budú ťahané aj z databázy -->
           <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 text-xs">
             <div class="flex justify-between items-center mb-1 text-[11px] text-amber-400 font-bold">
-              <span>Version v3.0.20</span>
+              <span>Version v3.0.21 (Tomas Kardos - Developer)</span>
               <span class="text-slate-500">Oktober 2026</span>
             </div>
-            <p class="text-slate-300">Integriertes Ticket-System für Bar-Anfragen und interaktiver Changelog direkt in der App.</p>
+            <p class="text-slate-300">Integriertes Ticket-System, nahtlose Zuordnung von Entwickler-Kommentaren und diskrete Blink-Indikatoren.</p>
           </div>
           <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 text-xs">
             <div class="flex justify-between items-center mb-1 text-[11px] text-amber-400 font-bold">
-              <span>Version v3.0.17 - v3.0.19</span>
+              <span>Version v3.0.17 - v3.0.20</span>
               <span class="text-slate-500">Oktober 2026</span>
             </div>
             <p class="text-slate-300">Behebung von Druckfehlern beim Einkaufszettel, Logo-Korrektur (durchgezogener Macron), automatisches Laden der Getränke beim Start.</p>
@@ -847,12 +845,17 @@
       currentLoggedInUserEmail = user.email;
       document.getElementById('authContainer').classList.add('hidden');
       document.getElementById('appContainer').classList.remove('hidden');
-      document.getElementById('currentUserEmail').innerText = user.email;
-
-      if (user.email.includes("amim@salonplafond.wien")) {
+      
+      // Ak si to ty (kdstom@outlook.com) alebo manažér, nastavíme administrátorské práva a pekné meno
+      if (user.email === "kdstom@outlook.com") {
         isAdmin = true;
+        document.getElementById('currentUserEmail').innerHTML = `<span class="text-amber-400 font-black">Tomas Kardos (Developer)</span>`;
+      } else if (user.email.includes("amim@salonplafond.wien")) {
+        isAdmin = true;
+        document.getElementById('currentUserEmail').innerText = user.email;
       } else {
         isAdmin = false;
+        document.getElementById('currentUserEmail').innerText = user.email;
       }
       
       const btnMenuImportExport = document.getElementById('btnMenuImportExport');
@@ -907,7 +910,7 @@
       }
 
       const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
-      if (error || !data.user || !data.user.email.includes("amim@salonplafond.wien")) {
+      if (error || !data.user || (data.user.email !== "kdstom@outlook.com" && !data.user.email.includes("amim@salonplafond.wien"))) {
         errDiv.innerText = "Ungültige Administrator-Anmeldedaten!";
         errDiv.classList.remove('hidden');
       } else {
@@ -919,7 +922,7 @@
         if (adminChangelogCont) adminChangelogCont.classList.remove('hidden');
         
         closeAuthModal();
-        alert("Erfolgreich als Manager autorisiert!");
+        alert("Erfolgreich als Administrator autorisiert!");
         if (pendingAuthCallback) {
           pendingAuthCallback();
           pendingAuthCallback = null;
@@ -932,18 +935,17 @@
       const { data, error } = await _supabase.from('support_tickets').select('*').eq('is_changelog', false);
       if (error) return;
       
-      const badgeBtn = document.getElementById('supportBtnBadge');
-      const badgeIcon = document.getElementById('supportBadgeIcon');
+      const menuDot = document.getElementById('menuNotificationDot');
+      const dropdownDot = document.getElementById('menuDropdownTicketDot');
       
-      // Zistíme, či existuje nejaký nevybavený tiket ('pending')
       const hasPending = (data || []).some(t => t.status === 'pending');
       
       if (hasPending) {
-        badgeBtn.classList.add('pulse-update-icon', 'border-amber-400');
-        badgeIcon.innerText = '🔴';
+        if (menuDot) menuDot.classList.remove('hidden');
+        if (dropdownDot) dropdownDot.classList.remove('hidden');
       } else {
-        badgeBtn.classList.remove('pulse-update-icon', 'border-amber-400');
-        badgeIcon.innerText = '💬';
+        if (menuDot) menuDot.classList.add('hidden');
+        if (dropdownDot) dropdownDot.classList.add('hidden');
       }
     }
 
@@ -1000,7 +1002,7 @@
         alert("Fehler beim Absenden: " + error.message);
       } else {
         msgInput.value = '';
-        alert("Anfrage erfolgreich an das Team gesendet!");
+        alert("Anfrage erfolgreich an das Team & Tomas gesendet!");
         loadTicketsData();
         checkPendingTicketsBadge();
       }
@@ -1028,20 +1030,19 @@
           : `<span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 font-bold border border-amber-500/30 text-[10px]">⏳ Offen</span>`;
         
         let dateStr = new Date(t.created_at).toLocaleString();
-        let commentHtml = t.admin_comment ? `<div class="mt-2 text-[11px] bg-slate-900 p-2 rounded border border-slate-800 text-amber-300"><b>Kommentar (Admin):</b> ${t.admin_comment}</div>` : '';
+        let commentHtml = t.admin_comment ? `<div class="mt-2 text-[11px] bg-slate-900 p-2 rounded border border-slate-800 text-amber-300"><b>Kommentar (Tomas Kardos - Developer):</b> ${t.admin_comment}</div>` : '';
 
-        // Ak je admin, môže to zaškrtnúť ako hotové a pridať komentár
         let adminActionHtml = '';
         if (isAdmin) {
           adminActionHtml = `
             <div class="mt-3 pt-2 border-t border-slate-800 flex flex-col gap-2">
-              <input type="text" id="comment_${t.id}" placeholder="Admin-Kommentar hinzufügen..." value="${t.admin_comment || ''}" class="p-2 rounded bg-slate-900 border border-slate-800 text-white text-[11px]">
+              <input type="text" id="comment_${t.id}" placeholder="Kommentar als Tomas (Developer) hinzufügen..." value="${t.admin_comment || ''}" class="p-2 rounded bg-slate-900 border border-slate-800 text-white text-[11px]">
               <div class="flex gap-2">
                 <button onclick="updateTicketStatus('${t.id}', '${isResolved ? 'pending' : 'resolved'}')" class="px-3 py-1.5 rounded text-[11px] font-bold ${isResolved ? 'bg-slate-800 text-slate-300' : 'bg-emerald-600 hover:bg-emerald-500 text-white'}">
                   ${isResolved ? '↩ Als offen markieren' : '✓ Als erledigt markieren'}
                 </button>
                 <button onclick="saveTicketComment('${t.id}')" class="px-3 py-1.5 rounded text-[11px] font-bold bg-amber-500 hover:bg-amber-600 text-slate-950">
-                  Kommentar speichern
+                  Als Tomas speichern
                 </button>
               </div>
             </div>
@@ -1083,7 +1084,7 @@
         if (error) {
           alert("Fehler: " + error.message);
         } else {
-          alert("Kommentar gespeichert und Ticket als erledigt markiert!");
+          alert("Kommentar gespeichert und als von Tomas Kardos (Developer) erledigt markiert!");
           loadTicketsData();
           checkPendingTicketsBadge();
         }
@@ -1097,11 +1098,11 @@
         if (!text) return alert("Bitte Neuigkeit eingeben.");
 
         const { error } = await _supabase.from('support_tickets').insert([{
-          author_email: currentLoggedInUserEmail || 'Admin',
+          author_email: currentLoggedInUserEmail || 'Tomas Kardos',
           message: text,
           status: 'resolved',
           is_changelog: true,
-          admin_comment: 'Neuigkeit veröffentlicht'
+          admin_comment: 'Veröffentlicht von Tomas Kardos (Developer)'
         }]);
 
         if (error) {
@@ -1125,7 +1126,7 @@
           return `
             <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 text-xs">
               <div class="flex justify-between items-center mb-1 text-[11px] text-amber-400 font-bold">
-                <span>Update / Notiz</span>
+                <span>Update (Tomas Kardos - Developer)</span>
                 <span class="text-slate-500">${dateStr}</span>
               </div>
               <p class="text-slate-300">${item.message}</p>
@@ -1134,18 +1135,17 @@
         }).join('');
       }
 
-      // Pridáme aj statické hlavné verzie
       container.innerHTML = dynamicHtml + `
         <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 text-xs">
           <div class="flex justify-between items-center mb-1 text-[11px] text-amber-400 font-bold">
-            <span>Version v3.0.20</span>
+            <span>Version v3.0.21</span>
             <span class="text-slate-500">Oktober 2026</span>
           </div>
-          <p class="text-slate-300">Integriertes Ticket-System für Bar-Anfragen und interaktiver Changelog direkt in der App.</p>
+          <p class="text-slate-300">Integriertes Ticket-System, nahtlose Zuordnung von Entwickler-Kommentaren und diskrete Blink-Indikatoren.</p>
         </div>
         <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 text-xs">
           <div class="flex justify-between items-center mb-1 text-[11px] text-amber-400 font-bold">
-            <span>Version v3.0.17 - v3.0.19</span>
+            <span>Version v3.0.17 - v3.0.20</span>
             <span class="text-slate-500">Oktober 2026</span>
           </div>
           <p class="text-slate-300">Behebung von Druckfehlern beim Einkaufszettel, Logo-Korrektur (durchgezogener Macron), automatisches Laden der Getränke beim Start.</p>
@@ -1161,7 +1161,7 @@
       "„Ein perfekter Drink ist wie Kunst. Und ihr seid die Künstler heute Abend!“ 🎨🍾",
       "„Fokus, Teamwork und ein guter Cocktail – das Erfolgsrezept für jeden Abend!“ 🔥",
       "„Egal wie lang die Schlange ist: Einen Drink nach dem anderen. Du schaffst das!“ 💪",
-      "„Weißt du, wer der beste Spüler im Salonplafond ist? Natürlich Tomas, der auch diese App für euch erstellt hat, um euch die Arbeit zu erleichtern! Er grüßt euch und freut sich, dass ihr diese App nutzt, da ihn die Programmierung viel Arbeit gekostet hat!“ 🧽✨",
+      "„Weißt du, wer der beste Spüler im Salonplafond ist? Natürlich Tomas Kardos, der auch diese App für euch programmiert hat! Er grüßt euch und freut sich, dass ihr diese App nutzt!“ 🧽✨",
       "„Wer nie vom Weg abkommt, bleibt auf der Strecke. Weitermachen, Team!“ 🚀",
       "„Gute Getränke heben die Laune, aber ein starkes Team rockt den ganzen Abend!“ 🍸",
       "„Auch der längste Shift geht einmal vorbei. Tschakka, du schaffst das!“ 💪",
