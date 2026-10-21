@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.10</title>
+  <title>Salonplafond BAR v3.0.11</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- SheetJS pre Excel Import -->
+  <!-- SheetJS pre Excel Import & Export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -110,10 +110,32 @@
       animation: showCocktail 7s ease-in-out infinite;
     }
 
+    /* Čistá tlač bez bordelu */
     @media print {
-      @page { size: portrait; margin: 10mm; }
+      @page { size: portrait; margin: 15mm; }
       body { background: white !important; color: black !important; padding: 0 !important; }
-      body > *:not(#drinkModal):not(#supportModal):not(#seasonModal):not(#motivationModal):not(#shoppingModal):not(#importModal):not(#authModal):not(#adminModal):not(#multiViewModal):not(#photoPreviewModal) { display: none !important; }
+      body > *:not(#drinkModal) { display: none !important; }
+      #drinkModal {
+        position: absolute !important;
+        inset: 0 !important;
+        background: white !important;
+        padding: 0 !important;
+        overflow: visible !important;
+        display: flex !important;
+      }
+      #drinkModal .card {
+        border: none !important;
+        box-shadow: none !important;
+        background: white !important;
+        color: black !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+      }
+      .no-print, button, .modal-bg { display: none !important; }
+      
+      /* Skrytie obrázka v tlači ak je zvolený režim bez obrázka */
+      body.print-no-images #printModalImage { display: none !important; }
     }
   </style>
 </head>
@@ -132,7 +154,7 @@
       <div>
         <h1 class="text-xl md:text-2xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-2xl md:text-3xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-400 font-medium mt-1 block">v3.0.10 • Sichere Authentifizierung</span>
+        <span class="text-xs text-slate-400 font-medium mt-1 block">v3.0.11 • Sichere Authentifizierung</span>
       </div>
 
       <form id="loginForm" onsubmit="handleLogin(event)" autocomplete="off" class="w-full bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl space-y-4 text-left mt-2">
@@ -168,7 +190,7 @@
         </div>
         <div>
           <h1 class="text-3xl font-bold tracking-tight text-amber-400">Salonplafond BAR</h1>
-          <span class="text-xs text-slate-400 font-medium">v3.0.10 • Angemeldet: <span id="currentUserEmail" class="text-amber-300 font-bold"></span></span>
+          <span class="text-xs text-slate-400 font-medium">v3.0.11 • Angemeldet: <span id="currentUserEmail" class="text-amber-300 font-bold"></span></span>
         </div>
       </div>
 
@@ -194,7 +216,7 @@
           <button onclick="toggleSettingsMenu(event)" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs flex items-center gap-1 shadow-lg transition">
             ⚙️ Menü
           </button>
-          <div id="settingsDropdown" class="hidden absolute right-0 mt-2 w-56 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl p-2 z-50 flex flex-col gap-1.5">
+          <div id="settingsDropdown" class="hidden absolute right-0 mt-2 w-64 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl p-2 z-50 flex flex-col gap-1.5">
             
             <button onclick="toggleMode()" id="modeBtn" class="w-full text-left px-2.5 py-2 rounded bg-slate-900 hover:bg-slate-700 text-xs font-bold text-amber-400 flex items-center justify-between border border-slate-700">
               <span>👤 Modus:</span> <span id="modeStatusText">Kellner</span>
@@ -219,12 +241,8 @@
               🛒 Einkaufsliste / Inventur
             </button>
             
-            <button onclick="exportToCSV()" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-2">
-              📊 Export CSV
-            </button>
-
-            <button onclick="openImportModal()" id="btnMenuImportExcel" class="hidden w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-700 text-xs font-semibold text-slate-200 items-center gap-2">
-              📥 Excel Import (Assistent)
+            <button onclick="openImportExportModal()" id="btnMenuImportExport" class="hidden w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-700 text-xs font-semibold text-amber-300 items-center gap-2">
+              📥📤 Import & Export (Zentrale)
             </button>
 
             <button onclick="openSupportModal()" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-700 text-xs font-semibold text-amber-400 flex items-center gap-2">
@@ -290,7 +308,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.10 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.11 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div> <!-- /Koniec appContainer -->
@@ -464,7 +482,7 @@
     </div>
   </div>
 
-  <!-- Modal Detail View (s tlačidlom "Foto anzeigen" na rýchly náhľad) -->
+  <!-- Modal Detail View (s tlačidlom "Drucken" na výber tlače s/bez obrázka) -->
   <div id="drinkModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
     <div class="card max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 relative flex flex-col justify-between">
       <div>
@@ -484,11 +502,29 @@
         <button id="modalDeleteBtn" class="px-4 py-3 bg-red-600/80 hover:bg-red-600 text-white font-bold rounded-xl transition text-sm flex items-center justify-center gap-2">
           🗑️ Löschen
         </button>
-        <button onclick="window.print()" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold rounded-xl transition text-sm flex items-center justify-center gap-2 border border-slate-700">
+        <button onclick="openPrintOptionsModal()" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold rounded-xl transition text-sm flex items-center justify-center gap-2 border border-slate-700">
           🖨️ Drucken / PDF
         </button>
         <button onclick="closeModal()" class="flex-1 py-3.5 bg-slate-800 hover:bg-slate-700 active:scale-[0.99] text-amber-400 font-extrabold text-sm rounded-xl border-2 border-amber-500/50 transition shadow-lg tracking-wide">
           ✕ Schließen
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Print Options Dialog Modal -->
+  <div id="printOptionsModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[260]">
+    <div class="card max-w-sm w-full p-6 relative flex flex-col gap-4 text-center border-amber-500/50 shadow-2xl">
+      <button onclick="closePrintOptionsModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
+      <div class="w-12 h-12 bg-amber-500/20 text-amber-400 rounded-xl mx-auto flex items-center justify-center text-2xl border border-amber-500/30">🖨️</div>
+      <h3 class="text-lg font-bold text-amber-400">Drucken-Optionen</h3>
+      <p class="text-xs text-slate-300">Wähle aus, wie das Rezept gedruckt werden soll:</p>
+      <div class="flex flex-col gap-2.5 mt-2">
+        <button onclick="executePrint(true)" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl text-xs transition shadow flex items-center justify-center gap-2">
+          🖼️ Mit Bild drucken
+        </button>
+        <button onclick="executePrint(false)" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition border border-slate-700 flex items-center justify-center gap-2">
+          📄 Ohne Bild drucken (Text pur)
         </button>
       </div>
     </div>
@@ -502,28 +538,62 @@
     </div>
   </div>
 
-  <!-- Excel Import Wizard Modal -->
-  <div id="importModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-    <div class="card max-w-lg w-full p-6 relative flex flex-col gap-4">
-      <button onclick="closeImportModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
-      <h3 class="text-xl font-bold text-amber-400">📥 Excel Import Assistent</h3>
-      <p class="text-xs text-slate-300">Laden Sie eine Excel-Datei mit Rezepten hoch und wählen Sie die Ziel-Saison:</p>
+  <!-- Jednotný Import & Export Dialog Modal -->
+  <div id="importExportModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="card max-w-xl w-full p-6 relative flex flex-col gap-6 max-h-[90vh] overflow-y-auto border-amber-500/50">
+      <button onclick="closeImportExportModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
       
+      <div>
+        <h3 class="text-xl font-bold text-amber-400 flex items-center gap-2">📥📤 Daten-Zentrale: Import & Export</h3>
+        <p class="text-xs text-slate-400 mt-1">Verwalte deine Rezept-Datenbank zentral durch Export oder geführten Import.</p>
+      </div>
+
+      <!-- EXPORT SEKCIA -->
       <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col gap-3">
-        <label class="text-xs font-semibold text-slate-400">1. Excel-Datei auswählen (.xlsx, .xls):</label>
-        <input type="file" id="wizardExcelFile" accept=".xlsx, .xls" class="text-xs text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-600 cursor-pointer">
+        <h4 class="text-sm font-bold text-white flex items-center gap-1.5">📊 Daten exportieren</h4>
+        <p class="text-[11px] text-slate-400 leading-relaxed">
+          Exportiere alle Getränke der aktuellen oder gesamten Datenbank in dein bevorzugtes Format. Ideal für Backups, Analysen oder den Ausdruck von Listen.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-1">
+          <button onclick="exportToPDF()" class="py-2.5 px-3 bg-slate-900 hover:bg-slate-800 text-amber-400 font-bold rounded-lg text-xs border border-slate-700 transition flex items-center justify-center gap-1.5">
+            🖨️ Als PDF / Print
+          </button>
+          <button onclick="exportToExcel()" class="py-2.5 px-3 bg-slate-900 hover:bg-slate-800 text-amber-400 font-bold rounded-lg text-xs border border-slate-700 transition flex items-center justify-center gap-1.5">
+            📗 Excel (.xlsx)
+          </button>
+          <button onclick="exportToCSV()" class="py-2.5 px-3 bg-slate-900 hover:bg-slate-800 text-amber-400 font-bold rounded-lg text-xs border border-slate-700 transition flex items-center justify-center gap-1.5">
+            📊 CSV-Tabelle
+          </button>
+        </div>
       </div>
 
-      <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col gap-2">
-        <label class="text-xs font-semibold text-slate-400">2. Ziel-Saison für den Import:</label>
-        <select id="wizardSeasonSelect" onchange="handleWizardSeasonChange(this)" class="p-3 rounded bg-slate-900 border border-slate-700 text-white text-xs"></select>
+      <!-- IMPORT SEKCIA -->
+      <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col gap-3">
+        <h4 class="text-sm font-bold text-white flex items-center gap-1.5">📥 Rezepte importieren (Assistent)</h4>
+        <p class="text-[11px] text-slate-400 leading-relaxed">
+          Lade eine strukturierte Excel-Datei (.xlsx, .xls) hoch, um neue Rezepte direkt in eine gewählte Saison einzuspielen. Der Assistent liest Kategorien, Zutaten und Preise automatisch aus.
+        </p>
+        
+        <div class="flex flex-col gap-2.5 mt-1">
+          <div>
+            <label class="text-[11px] font-semibold text-slate-300 mb-1 block">1. Excel-Datei auswählen:</label>
+            <input type="file" id="wizardExcelFile" accept=".xlsx, .xls" class="text-xs text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-600 cursor-pointer w-full bg-slate-900 p-2 rounded-lg border border-slate-800">
+          </div>
+          <div>
+            <label class="text-[11px] font-semibold text-slate-300 mb-1 block">2. Ziel-Saison für den Import:</label>
+            <select id="wizardSeasonSelect" onchange="handleWizardSeasonChange(this)" class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 text-white text-xs w-full"></select>
+          </div>
+        </div>
+
+        <div id="wizardStatus" class="text-xs text-amber-400 font-medium text-center"></div>
+
+        <button onclick="executeWizardImport()" class="py-3 bg-amber-500 hover:bg-amber-600 font-bold text-slate-950 rounded-xl text-xs transition shadow-lg mt-1">
+          🚀 Import starten
+        </button>
       </div>
 
-      <div id="wizardStatus" class="text-xs text-amber-400 font-medium text-center"></div>
-
-      <div class="flex gap-2 mt-2">
-        <button onclick="executeWizardImport()" class="flex-1 py-3 bg-amber-500 hover:bg-amber-600 font-bold text-slate-950 rounded-xl text-xs transition shadow-lg">Import starten</button>
-        <button onclick="closeImportModal()" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 font-bold text-white rounded-xl text-xs transition">Abbrechen</button>
+      <div class="flex justify-end pt-2 border-t border-slate-800">
+        <button onclick="closeImportExportModal()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 font-bold text-white rounded-xl text-xs transition">Schließen</button>
       </div>
     </div>
   </div>
@@ -670,15 +740,15 @@
       
       document.getElementById('modeStatusText').innerText = isAdmin ? "Manager" : "Kellner";
       
-      const btnMenuImport = document.getElementById('btnMenuImportExcel');
+      const btnMenuImportExport = document.getElementById('btnMenuImportExport');
       const addBtnCont = document.getElementById('addDrinkBtnContainer');
       if (isAdmin) {
-        btnMenuImport.classList.remove('hidden');
-        btnMenuImport.classList.add('flex');
+        btnMenuImportExport.classList.remove('hidden');
+        btnMenuImportExport.classList.add('flex');
         addBtnCont.classList.remove('hidden');
       } else {
-        btnMenuImport.classList.add('hidden');
-        btnMenuImport.classList.remove('flex');
+        btnMenuImportExport.classList.add('hidden');
+        btnMenuImportExport.classList.remove('flex');
         addBtnCont.classList.add('hidden');
       }
 
@@ -723,8 +793,8 @@
       } else {
         isAdmin = true;
         document.getElementById('modeStatusText').innerText = "Manager";
-        document.getElementById('btnMenuImportExcel').classList.remove('hidden');
-        document.getElementById('btnMenuImportExcel').classList.add('flex');
+        document.getElementById('btnMenuImportExport').classList.remove('hidden');
+        document.getElementById('btnMenuImportExport').classList.add('flex');
         document.getElementById('addDrinkBtnContainer').classList.remove('hidden');
         
         closeAuthModal();
@@ -1268,8 +1338,36 @@
       if (d) openDrinkModal(id);
     }
 
+    /* Funkcie pre Export (PDF/Druck, Excel, CSV) */
+    function exportToPDF() {
+      document.getElementById('settingsDropdown').classList.add('hidden');
+      closeImportExportModal();
+      window.print();
+    }
+
+    function exportToExcel() {
+      if (!allDrinks || allDrinks.length === 0) return alert("Keine Getränke vorhanden.");
+      let dataToExport = allDrinks.map(d => ({
+        Name: d.name || '',
+        Category: d.category || '',
+        Season: d.season || '',
+        Glass: d.glass_type || '',
+        Method: d.method || '',
+        Ice: d.ice || '',
+        Garnish: d.garnish || '',
+        SellingPrice: d.selling_price || 0,
+        CostPrice: d.cost_price || 0,
+        Allergens: d.allergens || '',
+        Recipe: d.recipe || ''
+      }));
+      let worksheet = XLSX.utils.json_to_sheet(dataToExport);
+      let workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Getränke");
+      XLSX.writeFile(workbook, `salonplafond_rezepte_${currentSeasonFilter || 'export'}.xlsx`);
+    }
+
     function exportToCSV() {
-      if (!allDrinks || allDrinks.length === 0) return alert("Keine Getränke.");
+      if (!allDrinks || allDrinks.length === 0) return alert("Keine Getränke vorhanden.");
       let csvContent = "data:text/csv;charset=utf-8,Name;Category;Season;SellingPrice;CostPrice\r\n";
       allDrinks.forEach(d => {
         csvContent += `"${(d.name || '').replace(/"/g, '""')}";"${(d.category || '').replace(/"/g, '""')}";"${(d.season || '')}";${d.selling_price || 0};${d.cost_price || 0}\r\n`;
@@ -1400,7 +1498,7 @@
       }
 
       let html = '';
-      if (d.photo_url) html += `<img src="${d.photo_url}" onclick="openPhotoPreview('${d.photo_url}')" class="w-full h-64 object-cover rounded-xl mb-4 shadow cursor-pointer hover:opacity-95 transition" title="Klicken für Großansicht" alt="${d.name}">`;
+      if (d.photo_url) html += `<img id="printModalImage" src="${d.photo_url}" onclick="openPhotoPreview('${d.photo_url}')" class="w-full h-64 object-cover rounded-xl mb-4 shadow cursor-pointer hover:opacity-95 transition" title="Klicken für Großansicht" alt="${d.name}">`;
       let priceText = d.selling_price ? ` (€ ${parseFloat(d.selling_price).toFixed(2)})` : '';
       html += `<div class="flex items-center gap-2 mb-2 flex-wrap"><span class="text-xs font-semibold px-2.5 py-1 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">${d.category || 'Getränk'}</span></div>`;
       html += `<h2 class="text-3xl font-bold mb-4">${d.name}${priceText}</h2>`;
@@ -1410,7 +1508,7 @@
         let cp = parseFloat(d.cost_price);
         let profit = sp - cp;
         let margin = ((profit / sp) * 100).toFixed(1);
-        html += `<div class="mb-4 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs flex justify-between items-center text-amber-300"><span>💶 Marge: <b>${margin}%</b> (Gewinn: <b>${profit.toFixed(2)} €</b>)</span><span class="text-[10px] text-slate-400">Wareneinsatz: ${cp.toFixed(2)} €</span></div>`;
+        html += `<div class="no-print mb-4 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs flex justify-between items-center text-amber-300"><span>💶 Marge: <b>${margin}%</b> (Gewinn: <b>${profit.toFixed(2)} €</b>)</span><span class="text-[10px] text-slate-400">Wareneinsatz: ${cp.toFixed(2)} €</span></div>`;
       }
 
       html += `<div class="mb-6 border border-slate-700 rounded-xl overflow-hidden bg-slate-950 text-xs text-slate-200">`;
@@ -1439,7 +1537,7 @@
 
       if (d.updated_at) {
         let updateDate = new Date(d.updated_at).toLocaleString();
-        html += `<div class="text-[10px] text-slate-400 mt-2">🕒 Letzte Änderung: ${updateDate}</div>`;
+        html += `<div class="no-print text-[10px] text-slate-400 mt-2">🕒 Letzte Änderung: ${updateDate}</div>`;
       }
 
       document.getElementById('modalContent').innerHTML = html;
@@ -1469,20 +1567,43 @@
       document.getElementById('drinkModal').classList.add('hidden');
     }
 
+    /* Print Options Dialog Handlers */
+    function openPrintOptionsModal() {
+      const modal = document.getElementById('printOptionsModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closePrintOptionsModal() {
+      const modal = document.getElementById('printOptionsModal');
+      modal.classList.remove('flex');
+      modal.classList.add('hidden');
+    }
+
+    function executePrint(withImage) {
+      closePrintOptionsModal();
+      if (withImage) {
+        document.body.classList.remove('print-no-images');
+      } else {
+        document.body.classList.add('print-no-images');
+      }
+      window.print();
+    }
+
     function toggleMode() {
       if (!isAdmin) {
         checkManagerAuth(() => {
           document.getElementById('modeStatusText').innerText = "Manager";
-          document.getElementById('btnMenuImportExcel').classList.remove('hidden');
-          document.getElementById('btnMenuImportExcel').classList.add('flex');
+          document.getElementById('btnMenuImportExport').classList.remove('hidden');
+          document.getElementById('btnMenuImportExport').classList.add('flex');
           document.getElementById('addDrinkBtnContainer').classList.remove('hidden');
           renderDrinks();
         });
       } else {
         isAdmin = false;
         document.getElementById('modeStatusText').innerText = "Kellner";
-        document.getElementById('btnMenuImportExcel').classList.add('hidden');
-        document.getElementById('btnMenuImportExcel').classList.remove('flex');
+        document.getElementById('btnMenuImportExport').classList.add('hidden');
+        document.getElementById('btnMenuImportExport').classList.remove('flex');
         document.getElementById('addDrinkBtnContainer').classList.add('hidden');
         resetForm();
         renderDrinks();
@@ -1597,20 +1718,21 @@
       });
     }
 
-    function openImportModal() {
+    /* Jednotný Import/Export Dialog riadenie */
+    function openImportExportModal() {
       document.getElementById('settingsDropdown').classList.add('hidden');
       checkManagerAuth(() => {
         renderWizardSeasonSelect();
         document.getElementById('wizardExcelFile').value = '';
         document.getElementById('wizardStatus').innerText = '';
-        document.getElementById('importModal').classList.remove('hidden');
-        document.getElementById('importModal').classList.add('flex');
+        document.getElementById('importExportModal').classList.remove('hidden');
+        document.getElementById('importExportModal').classList.add('flex');
       });
     }
 
-    function closeImportModal() {
-      document.getElementById('importModal').classList.remove('flex');
-      document.getElementById('importModal').classList.add('hidden');
+    function closeImportExportModal() {
+      document.getElementById('importExportModal').classList.remove('flex');
+      document.getElementById('importExportModal').classList.add('hidden');
     }
 
     function renderWizardSeasonSelect() {
@@ -1724,7 +1846,7 @@
             statusEl.innerText = "Fehler: " + error.message;
           } else {
             alert(`Erfolg! ${parsedDrinks.length} Drinks für die Saison (${targetSeason}) importiert.`);
-            closeImportModal();
+            closeImportExportModal();
             loadDrinks();
           }
         } else {
