@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.11</title>
+  <title>Salonplafond BAR v3.0.12</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import & Export -->
@@ -154,7 +154,7 @@
       <div>
         <h1 class="text-xl md:text-2xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-2xl md:text-3xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-400 font-medium mt-1 block">v3.0.11 • Sichere Authentifizierung</span>
+        <span class="text-xs text-slate-400 font-medium mt-1 block">v3.0.12 • Sichere Authentifizierung</span>
       </div>
 
       <form id="loginForm" onsubmit="handleLogin(event)" autocomplete="off" class="w-full bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl space-y-4 text-left mt-2">
@@ -190,7 +190,7 @@
         </div>
         <div>
           <h1 class="text-3xl font-bold tracking-tight text-amber-400">Salonplafond BAR</h1>
-          <span class="text-xs text-slate-400 font-medium">v3.0.11 • Angemeldet: <span id="currentUserEmail" class="text-amber-300 font-bold"></span></span>
+          <span class="text-xs text-slate-400 font-medium">v3.0.12 • Angemeldet: <span id="currentUserEmail" class="text-amber-300 font-bold"></span></span>
         </div>
       </div>
 
@@ -308,7 +308,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.11 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.12 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div> <!-- /Koniec appContainer -->
@@ -550,28 +550,31 @@
 
       <!-- EXPORT SEKCIA -->
       <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col gap-3">
-        <h4 class="text-sm font-bold text-white flex items-center gap-1.5">📊 Daten exportieren</h4>
+        <h4 class="text-sm font-bold text-white flex items-center gap-1.5">📊 📤 Daten exportieren</h4>
         <p class="text-[11px] text-slate-400 leading-relaxed">
-          Exportiere alle Getränke der aktuellen oder gesamten Datenbank in dein bevorzugtes Format. Ideal für Backups, Analysen oder den Ausdruck von Listen.
+          Wähle die gewünschte Saison aus und exportiere die Rezepte in dein bevorzugtes Format (Excel oder CSV).
         </p>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-1">
-          <button onclick="exportToPDF()" class="py-2.5 px-3 bg-slate-900 hover:bg-slate-800 text-amber-400 font-bold rounded-lg text-xs border border-slate-700 transition flex items-center justify-center gap-1.5">
-            🖨️ Als PDF / Print
-          </button>
+        
+        <div class="flex flex-col gap-2 mt-1">
+          <label class="text-[11px] font-semibold text-slate-300">Saison für Export wählen:</label>
+          <select id="exportSeasonSelect" class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 text-white text-xs w-full"></select>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
           <button onclick="exportToExcel()" class="py-2.5 px-3 bg-slate-900 hover:bg-slate-800 text-amber-400 font-bold rounded-lg text-xs border border-slate-700 transition flex items-center justify-center gap-1.5">
-            📗 Excel (.xlsx)
+            📗 Excel (.xlsx) exportieren
           </button>
           <button onclick="exportToCSV()" class="py-2.5 px-3 bg-slate-900 hover:bg-slate-800 text-amber-400 font-bold rounded-lg text-xs border border-slate-700 transition flex items-center justify-center gap-1.5">
-            📊 CSV-Tabelle
+            📊 CSV-Tabelle exportieren
           </button>
         </div>
       </div>
 
       <!-- IMPORT SEKCIA -->
       <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col gap-3">
-        <h4 class="text-sm font-bold text-white flex items-center gap-1.5">📥 Rezepte importieren (Assistent)</h4>
+        <h4 class="text-sm font-bold text-white flex items-center gap-1.5">📥 📥 Rezepte importieren (Assistent)</h4>
         <p class="text-[11px] text-slate-400 leading-relaxed">
-          Lade eine strukturierte Excel-Datei (.xlsx, .xls) hoch, um neue Rezepte direkt in eine gewählte Saison einzuspielen. Der Assistent liest Kategorien, Zutaten und Preise automatisch aus.
+          Lade eine strukturierte Excel-Datei (.xlsx, .xls) hoch, um neue Rezepte direkt in eine gewählte Saison einzuspielen.
         </p>
         
         <div class="flex flex-col gap-2.5 mt-1">
@@ -1338,16 +1341,18 @@
       if (d) openDrinkModal(id);
     }
 
-    /* Funkcie pre Export (PDF/Druck, Excel, CSV) */
-    function exportToPDF() {
-      document.getElementById('settingsDropdown').classList.add('hidden');
-      closeImportExportModal();
-      window.print();
-    }
-
+    /* Funkcie pre Export s výberom sezóny (Excel & CSV) */
     function exportToExcel() {
       if (!allDrinks || allDrinks.length === 0) return alert("Keine Getränke vorhanden.");
-      let dataToExport = allDrinks.map(d => ({
+      let selectedExportSeason = document.getElementById('exportSeasonSelect').value;
+      
+      let filtered = selectedExportSeason === 'ALL' 
+        ? allDrinks 
+        : allDrinks.filter(d => (d.season || '') === selectedExportSeason);
+
+      if (filtered.length === 0) return alert("Keine Getränke für diese Saison gefunden.");
+
+      let dataToExport = filtered.map(d => ({
         Name: d.name || '',
         Category: d.category || '',
         Season: d.season || '',
@@ -1363,18 +1368,26 @@
       let worksheet = XLSX.utils.json_to_sheet(dataToExport);
       let workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "Getränke");
-      XLSX.writeFile(workbook, `salonplafond_rezepte_${currentSeasonFilter || 'export'}.xlsx`);
+      XLSX.writeFile(workbook, `salonplafond_rezepte_${selectedExportSeason}.xlsx`);
     }
 
     function exportToCSV() {
       if (!allDrinks || allDrinks.length === 0) return alert("Keine Getränke vorhanden.");
+      let selectedExportSeason = document.getElementById('exportSeasonSelect').value;
+      
+      let filtered = selectedExportSeason === 'ALL' 
+        ? allDrinks 
+        : allDrinks.filter(d => (d.season || '') === selectedExportSeason);
+
+      if (filtered.length === 0) return alert("Keine Getränke für diese Saison gefunden.");
+
       let csvContent = "data:text/csv;charset=utf-8,Name;Category;Season;SellingPrice;CostPrice\r\n";
-      allDrinks.forEach(d => {
+      filtered.forEach(d => {
         csvContent += `"${(d.name || '').replace(/"/g, '""')}";"${(d.category || '').replace(/"/g, '""')}";"${(d.season || '')}";${d.selling_price || 0};${d.cost_price || 0}\r\n`;
       });
       let link = document.createElement("a");
       link.setAttribute("href", encodeURI(csvContent));
-      link.setAttribute("download", `salonplafond_export.csv`);
+      link.setAttribute("download", `salonplafond_export_${selectedExportSeason}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -1723,6 +1736,7 @@
       document.getElementById('settingsDropdown').classList.add('hidden');
       checkManagerAuth(() => {
         renderWizardSeasonSelect();
+        renderExportSeasonSelect();
         document.getElementById('wizardExcelFile').value = '';
         document.getElementById('wizardStatus').innerText = '';
         document.getElementById('importExportModal').classList.remove('hidden');
@@ -1744,6 +1758,18 @@
       });
       html += `<option value="addNew">➕ Neue Saison erstellen...</option>`;
       select.innerHTML = html;
+      if (currentSeasonFilter) select.value = currentSeasonFilter;
+    }
+
+    function renderExportSeasonSelect() {
+      const seasons = getAllSeasons();
+      const select = document.getElementById('exportSeasonSelect');
+      let html = `<option value="ALL">🌐 Alle Saisons (Gesamte Datenbank)</option>`;
+      seasons.forEach(s => {
+        html += `<option value="${s}">📦 ${s}</option>`;
+      });
+      select.innerHTML = html;
+      if (currentSeasonFilter) select.value = currentSeasonFilter;
     }
 
     function handleWizardSeasonChange(selectEl) {
