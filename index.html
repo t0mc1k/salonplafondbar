@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.09</title>
+  <title>Salonplafond BAR v3.0.10</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import -->
@@ -132,7 +132,7 @@
       <div>
         <h1 class="text-xl md:text-2xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-2xl md:text-3xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-400 font-medium mt-1 block">v3.0.09 • Sichere Authentifizierung</span>
+        <span class="text-xs text-slate-400 font-medium mt-1 block">v3.0.10 • Sichere Authentifizierung</span>
       </div>
 
       <form id="loginForm" onsubmit="handleLogin(event)" autocomplete="off" class="w-full bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl space-y-4 text-left mt-2">
@@ -168,7 +168,7 @@
         </div>
         <div>
           <h1 class="text-3xl font-bold tracking-tight text-amber-400">Salonplafond BAR</h1>
-          <span class="text-xs text-slate-400 font-medium">v3.0.09 • Angemeldet: <span id="currentUserEmail" class="text-amber-300 font-bold"></span></span>
+          <span class="text-xs text-slate-400 font-medium">v3.0.10 • Angemeldet: <span id="currentUserEmail" class="text-amber-300 font-bold"></span></span>
         </div>
       </div>
 
@@ -290,7 +290,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.09 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.10 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div> <!-- /Koniec appContainer -->
@@ -1282,7 +1282,7 @@
       document.body.removeChild(link);
     }
 
-    /* Nahrávanie fotiek upravené presne na bucket 'DRINKS' (veľké písmená) */
+    /* Nahrávanie fotiek upravené presne na bucket 'drinks' (malé písmená) */
     async function uploadImageToSupabase(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1290,7 +1290,7 @@
       status.innerText = "Wird hochgeladen...";
       
       const fileName = `${Date.now()}_${file.name}`;
-      let { data, error } = await _supabase.storage.from('DRINKS').upload(fileName, file);
+      let { data, error } = await _supabase.storage.from('drinks').upload(fileName, file);
       
       if (error) {
         console.error("Supabase Storage Error:", error);
@@ -1298,7 +1298,7 @@
         return;
       }
       
-      let { data: publicURLData } = _supabase.storage.from('DRINKS').getPublicUrl(fileName);
+      let { data: publicURLData } = _supabase.storage.from('drinks').getPublicUrl(fileName);
       if (publicURLData && publicURLData.publicUrl) {
         document.getElementById('dPhoto').value = publicURLData.publicUrl;
         status.innerText = '✔ Foto erfolgreich hochgeladen!';
