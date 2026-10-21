@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.14</title>
+  <title>Salonplafond BAR v3.0.15</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import & Export -->
@@ -65,27 +65,9 @@
       transform: scale(1.1) rotate(5deg);
     }
     
-    .logo-main-char {
-      font-size: 1.35rem;
-      font-weight: 900;
-      color: #0f172a;
-      line-height: 1;
-    }
-    .logo-macron {
-      font-size: 8px;
-      font-weight: 900;
-      color: #0f172a;
-      line-height: 1;
-      margin-top: -2px;
-      letter-spacing: 2px;
-    }
-    .logo-dot {
-      font-size: 8px;
-      font-weight: 900;
-      color: #0f172a;
-      line-height: 1;
-      margin-top: -2px;
-    }
+    .logo-main-char { font-size: 1.35rem; font-weight: 900; color: #0f172a; line-height: 1; }
+    .logo-macron { font-size: 8px; font-weight: 900; color: #0f172a; line-height: 1; margin-top: -2px; letter-spacing: 2px; }
+    .logo-dot { font-size: 8px; font-weight: 900; color: #0f172a; line-height: 1; margin-top: -2px; }
 
     @keyframes salonLogoPlayful {
       0% { transform: translateY(0) rotate(0deg) scale(1); }
@@ -102,8 +84,8 @@
     @media print {
       @page { size: portrait; margin: 15mm; }
       body { background: white !important; color: black !important; padding: 0 !important; }
-      body > *:not(#drinkModal) { display: none !important; }
-      #drinkModal {
+      body > *:not(#drinkModal):not(#shoppingModal) { display: none !important; }
+      #drinkModal, #shoppingModal {
         position: absolute !important;
         inset: 0 !important;
         background: white !important;
@@ -111,7 +93,7 @@
         overflow: visible !important;
         display: flex !important;
       }
-      #drinkModal .card {
+      #drinkModal .card, #shoppingModal .card {
         border: none !important;
         box-shadow: none !important;
         background: white !important;
@@ -140,7 +122,7 @@
       <div>
         <h1 class="text-xl md:text-2xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-2xl md:text-3xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-400 font-medium mt-1 block">v3.0.14 • Sichere Authentifizierung</span>
+        <span class="text-xs text-slate-400 font-medium mt-1 block">v3.0.15 • Sichere Authentifizierung</span>
       </div>
 
       <form id="loginForm" onsubmit="handleLogin(event)" autocomplete="off" class="w-full bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl space-y-4 text-left mt-2">
@@ -177,7 +159,7 @@
         </div>
         <div>
           <h1 class="text-3xl font-bold tracking-tight text-amber-400">Salonplafond BAR</h1>
-          <span class="text-xs text-slate-400 font-medium">v3.0.14 • Angemeldet: <span id="currentUserEmail" class="text-amber-300 font-bold"></span></span>
+          <span class="text-xs text-slate-400 font-medium">v3.0.15 • Angemeldet: <span id="currentUserEmail" class="text-amber-300 font-bold"></span></span>
         </div>
       </div>
 
@@ -292,7 +274,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.14 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.15 • Erstellt von <span class="text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div> <!-- /Koniec appContainer -->
@@ -313,7 +295,36 @@
     </div>
   </div>
 
-  <!-- Unified Settings Modal (Zjednotené nastavenia z menu) -->
+  <!-- Shopping List / Inventory Modal (Prepracovaný dialóg) -->
+  <div id="shoppingModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="card max-w-3xl w-full p-6 relative flex flex-col gap-4 max-h-[85vh] overflow-y-auto border-amber-500/50 shadow-2xl">
+      <button onclick="closeShoppingModal()" class="no-print absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
+      
+      <div>
+        <h3 class="text-xl font-bold text-amber-400 flex items-center gap-2">🛒 Einkaufsliste & Inventur</h3>
+        <p class="text-xs text-slate-400 mt-1">Übersicht aller benötigten Zutaten für die aktive Saison: <span id="shoppingSeasonName" class="font-bold text-amber-300"></span></p>
+      </div>
+
+      <!-- Akčné tlačidlá pre tlač a export nákupnej zoznamu -->
+      <div class="no-print flex flex-wrap gap-2 pt-1 pb-2 border-b border-slate-800">
+        <button onclick="printShoppingList()" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl text-xs transition shadow flex items-center gap-1.5">
+          🖨️ Einkaufsliste drucken
+        </button>
+        <button onclick="exportShoppingListExcel()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold rounded-xl text-xs transition border border-slate-700 flex items-center gap-1.5">
+          📗 Als Excel exportieren
+        </button>
+      </div>
+
+      <!-- Prehľadná tabuľka / zoznam -->
+      <div id="shoppingListContainer" class="flex flex-col gap-2 mt-1 bg-slate-950/60 p-4 rounded-xl border border-slate-800 text-xs max-h-[50vh] overflow-y-auto"></div>
+
+      <div class="no-print flex justify-end pt-3 border-t border-slate-800">
+        <button onclick="closeShoppingModal()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 font-bold text-white rounded-xl text-xs transition">Schließen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Unified Settings Modal -->
   <div id="unifiedSettingsModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
     <div class="card max-w-md w-full p-6 relative flex flex-col gap-5 border-amber-500/50 shadow-2xl">
       <button onclick="closeUnifiedSettingsModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
@@ -351,7 +362,7 @@
     </div>
   </div>
 
-  <!-- Modal Multi-View (Zobrazenie viacerých drinkov vedľa seba s fotkami - max 6) -->
+  <!-- Modal Multi-View -->
   <div id="multiViewModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
     <div class="card max-w-7xl w-full max-h-[90vh] overflow-y-auto p-6 relative flex flex-col gap-4 border-amber-500/50">
       <button onclick="closeMultiViewModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
@@ -363,7 +374,7 @@
     </div>
   </div>
 
-  <!-- Modal pre Pridanie / Úpravu Drinku (Admin Dialog) -->
+  <!-- Modal pre Pridanie / Úpravu Drinku -->
   <div id="adminModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
     <div class="card max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 relative flex flex-col gap-4 border-amber-500/50">
       <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
@@ -651,19 +662,6 @@
       <div class="flex gap-2 mt-4">
         <button onclick="verifyManagerAuthModal()" class="flex-1 py-3 bg-amber-500 hover:bg-amber-600 font-extrabold text-slate-950 rounded-xl text-xs transition shadow-lg">Autorisieren</button>
         <button onclick="closeAuthModal()" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 font-bold text-white rounded-xl text-xs transition">Abbrechen</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Shopping List / Inventory Modal -->
-  <div id="shoppingModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-    <div class="card max-w-lg w-full p-6 relative flex flex-col gap-4 max-h-[85vh] overflow-y-auto">
-      <button onclick="closeShoppingModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
-      <h3 class="text-xl font-bold text-amber-400">🛒 Zutaten-Einkaufsliste / Inventur</h3>
-      <p>Alle benötigten Zutaten für die aktuell aktive Saison (<span id="shoppingSeasonName" class="font-bold text-amber-400"></span>):</p>
-      <div id="shoppingListContainer" class="flex flex-col gap-1.5 mt-2 bg-slate-950/40 p-3 rounded-xl border border-slate-800 text-xs"></div>
-      <div class="flex justify-end mt-2">
-        <button onclick="closeShoppingModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 font-bold text-white rounded-lg text-xs transition">Schließen</button>
       </div>
     </div>
   </div>
@@ -989,7 +987,6 @@
       if (dropdown && !dropdown.contains(event.target)) dropdown.classList.add('hidden');
     }
 
-    /* Unified Settings Modal riadenie */
     function openUnifiedSettingsModal() {
       document.getElementById('settingsDropdown').classList.add('hidden');
       renderUnifiedSeasonSelect();
@@ -1046,6 +1043,7 @@
       document.getElementById('seasonModal').classList.add('hidden');
     }
 
+    /* Vylepšený dialóg Einkaufsliste / Inventur */
     function openShoppingModal() {
       document.getElementById('settingsDropdown').classList.add('hidden');
       document.getElementById('shoppingSeasonName').innerText = currentSeasonFilter;
@@ -1065,14 +1063,32 @@
       });
 
       let container = document.getElementById('shoppingListContainer');
-      let keys = Object.keys(ingredientsMap);
+      let keys = Object.keys(ingredientsMap).sort();
       if (keys.length === 0) {
-        container.innerHTML = `<p class="text-slate-500 italic">Keine Zutaten in dieser Saison gefunden.</p>`;
+        container.innerHTML = `<p class="text-slate-500 italic p-4 text-center">Keine Zutaten in dieser Saison gefunden.</p>`;
       } else {
-        container.innerHTML = keys.map(k => {
+        let tableHtml = `
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-slate-700 text-amber-400 text-[11px] uppercase">
+                  <th class="p-2.5 w-1/3">Zutat / Produkt</th>
+                  <th class="p-2.5 w-2/3">Verwendung & Mengen</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800/60">
+        `;
+        keys.forEach(k => {
           let item = ingredientsMap[k];
-          return `<div class="p-2 rounded bg-slate-900 border border-slate-800 flex justify-between items-center"><span class="font-bold text-amber-400">📅 ${item.name}</span><span class="text-[11px] text-slate-400 text-right">${item.amounts.join(', ')}</span></div>`;
-        }).join('');
+          tableHtml += `
+            <tr class="hover:bg-slate-900/60 transition">
+              <td class="p-2.5 font-bold text-white align-top">📦 ${item.name}</td>
+              <td class="p-2.5 text-slate-300 align-top"><div class="flex flex-col gap-0.5">${item.amounts.map(a => `<span class="bg-slate-900 px-2 py-0.5 rounded border border-slate-800 text-[11px]">${a}</span>`).join('')}</div></td>
+            </tr>
+          `;
+        });
+        tableHtml += `</tbody></table></div>`;
+        container.innerHTML = tableHtml;
       }
 
       document.getElementById('shoppingModal').classList.remove('hidden');
@@ -1082,6 +1098,42 @@
     function closeShoppingModal() {
       document.getElementById('shoppingModal').classList.remove('flex');
       document.getElementById('shoppingModal').classList.add('hidden');
+    }
+
+    function printShoppingList() {
+      window.print();
+    }
+
+    function exportShoppingListExcel() {
+      let activeDrinks = allDrinks.filter(d => (d.season || '') === currentSeasonFilter);
+      let ingredientsMap = {};
+      activeDrinks.forEach(d => {
+        if (Array.isArray(d.ingredients_json)) {
+          d.ingredients_json.forEach(ing => {
+            let key = ing.name.toLowerCase().trim();
+            if (!ingredientsMap[key]) {
+              ingredientsMap[key] = { name: ing.name, amounts: [] };
+            }
+            if (ing.amount) ingredientsMap[key].amounts.push(`${ing.amount} (${d.name})`);
+          });
+        }
+      });
+
+      let keys = Object.keys(ingredientsMap).sort();
+      if (keys.length === 0) return alert("Keine Zutaten für den Export vorhanden.");
+
+      let dataToExport = keys.map(k => {
+        let item = ingredientsMap[k];
+        return {
+          Zutat: item.name,
+          Verwendung_und_Mengen: item.amounts.join(', ')
+        };
+      });
+
+      let worksheet = XLSX.utils.json_to_sheet(dataToExport);
+      let workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Einkaufsliste");
+      XLSX.writeFile(workbook, `salonplafond_einkaufsliste_${currentSeasonFilter}.xlsx`);
     }
 
     function getAllSeasons() {
@@ -1238,7 +1290,6 @@
       else if (document.exitFullscreen) document.exitFullscreen();
     }
 
-    /* Rýchly barový panel (Bar Tray) logiky - pre 6 drinkov s väčšou dotykovou plochou */
     function toggleBarTrayItem(id, event) {
       if (event) event.stopPropagation();
       let idx = barTraySelection.indexOf(id);
@@ -1426,7 +1477,6 @@
       if (d) openDrinkModal(id);
     }
 
-    /* Funkcie pre Export s výberom sezóny (Excel & CSV) */
     function exportToExcel() {
       if (!allDrinks || allDrinks.length === 0) return alert("Keine Getränke vorhanden.");
       let selectedExportSeason = document.getElementById('exportSeasonSelect').value;
@@ -1478,7 +1528,6 @@
       document.body.removeChild(link);
     }
 
-    /* Nahrávanie fotiek upravené presne na bucket 'drinks' (malé písmená) */
     async function uploadImageToSupabase(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1563,7 +1612,6 @@
           let isFav = shiftFavorites.includes(d.id);
           let favBtnHtml = `<button onclick="toggleShiftFavorite('${d.id}', event)" class="absolute top-2 left-2 text-sm p-1 rounded-full bg-slate-900/80 hover:bg-slate-900 ${isFav ? 'text-red-500' : 'text-slate-400'}">${isFav ? '❤️' : '🤍'}</button>`;
           let isTray = barTraySelection.includes(d.id);
-          // Zväčšená a pohodlnejšia dotyková plocha pre pripnutie drinku (⭐+ Tray)
           let trayBtnHtml = `<button onclick="toggleBarTrayItem('${d.id}', event)" class="absolute bottom-2 right-2 text-xs px-3 py-2 rounded-xl font-black shadow-lg transition ${isTray ? 'bg-amber-500 text-slate-950 ring-2 ring-amber-300' : 'bg-slate-900/90 text-amber-400 border border-amber-500/50 hover:bg-slate-900'}">${isTray ? '⭐ Im Tray' : '⭐+ Tray'}</button>`;
           let priceText = d.selling_price ? ` (€ ${parseFloat(d.selling_price).toFixed(2)})` : '';
           return `<div onclick="openDrinkModal('${d.id}')" class="card overflow-hidden cursor-pointer flex flex-col justify-between group"><div class="relative h-48 bg-slate-800">${photoHtml}${badgeHtml}${favBtnHtml}${trayBtnHtml}<span class="absolute bottom-2 left-2 text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-900/85 text-amber-400 border border-amber-500/30">${d.category || 'Getränk'}</span></div><div class="p-4 text-center"><h3 class="text-lg font-bold group-hover:text-amber-400 transition">${d.name}${priceText}</h3><span class="text-xs text-slate-400 mt-1 inline-block">Klicken für Rezept</span></div></div>`;
@@ -1666,7 +1714,6 @@
       document.getElementById('drinkModal').classList.add('hidden');
     }
 
-    /* Print Options Dialog Handlers */
     function openPrintOptionsModal() {
       const modal = document.getElementById('printOptionsModal');
       modal.classList.remove('hidden');
@@ -1818,7 +1865,6 @@
       });
     }
 
-    /* Jednotný Import/Export Dialog riadenie */
     function openImportExportModal() {
       document.getElementById('settingsDropdown').classList.add('hidden');
       checkManagerAuth(() => {
