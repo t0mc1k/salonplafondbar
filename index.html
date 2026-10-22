@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.28</title>
+  <title>Salonplafond BAR v3.0.29</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import & Export -->
@@ -123,7 +123,7 @@
 </head>
 <body class="dark-mode p-4 md:p-8 max-w-6xl mx-auto pb-32" onclick="closeDropdowns(event)">
 
-  <!-- 1. PRIHLASOVACIA OBRAZOVKA (Meno + PIN, so zálohou na e-mail) -->
+  <!-- 1. PRIHLASOVACIA OBRAZOVKA (Výber mena + Dotyková numerická klávesnica s auto-loginom) -->
   <div id="authContainer" class="fixed inset-0 z-[200] bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
     <div class="flex flex-col items-center gap-4 w-full max-w-md">
       
@@ -136,10 +136,10 @@
       <div>
         <h1 class="text-xl md:text-2xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-2xl md:text-3xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-400 font-medium mt-1 block">v3.0.28 • Schnell-Login per PIN</span>
+        <span class="text-xs text-slate-400 font-medium mt-1 block">v3.0.29 • Touch PIN-Login</span>
       </div>
 
-      <!-- HLAVNÝ PIN LOGIN FORMULÁR -->
+      <!-- HLAVNÝ PIN LOGIN FORMULÁR S NUMPADOM -->
       <div id="pinLoginForm" class="w-full bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl space-y-4 text-left mt-2">
         <div>
           <label class="block text-xs font-semibold uppercase mb-1 text-slate-300">1. Wer bist du? (Personal)</label>
@@ -147,23 +147,40 @@
             <option value="">Personal wird geladen...</option>
           </select>
         </div>
-        <div>
-          <label class="block text-xs font-semibold uppercase mb-1 text-slate-300">2. PIN-Code</label>
-          <input type="password" id="loginPinInput" autocomplete="current-password" placeholder="••••" maxlength="6" class="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400">
-        </div>
-        <div id="pinAuthError" class="text-xs text-red-400 hidden font-medium"></div>
-        <button type="button" onclick="handlePinLogin()" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold rounded-xl text-xs transition shadow-lg flex items-center justify-center gap-2">
-          <span>Einloggen mit PIN 🍸</span>
-        </button>
 
-        <div class="pt-3 border-t border-slate-800 text-center">
+        <div>
+          <label class="block text-xs font-semibold uppercase mb-1 text-slate-300">2. PIN-Code eingeben</label>
+          <div class="relative">
+            <input type="password" id="loginPinInput" readonly placeholder="••••" class="w-full p-3 text-center tracking-widest text-lg rounded-xl bg-slate-950 border border-slate-800 text-amber-400 font-black focus:outline-none focus:border-amber-400">
+          </div>
+        </div>
+
+        <!-- Dotyková numerická klávesnica -->
+        <div class="grid grid-cols-3 gap-2 pt-1">
+          <button type="button" onclick="appendPinNum('1')" class="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-white text-base font-bold rounded-xl transition">1</button>
+          <button type="button" onclick="appendPinNum('2')" class="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-white text-base font-bold rounded-xl transition">2</button>
+          <button type="button" onclick="appendPinNum('3')" class="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-white text-base font-bold rounded-xl transition">3</button>
+          <button type="button" onclick="appendPinNum('4')" class="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-white text-base font-bold rounded-xl transition">4</button>
+          <button type="button" onclick="appendPinNum('5')" class="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-white text-base font-bold rounded-xl transition">5</button>
+          <button type="button" onclick="appendPinNum('6')" class="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-white text-base font-bold rounded-xl transition">6</button>
+          <button type="button" onclick="appendPinNum('7')" class="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-white text-base font-bold rounded-xl transition">7</button>
+          <button type="button" onclick="appendPinNum('8')" class="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-white text-base font-bold rounded-xl transition">8</button>
+          <button type="button" onclick="appendPinNum('9')" class="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-white text-base font-bold rounded-xl transition">9</button>
+          <button type="button" onclick="clearPinInput()" class="p-3 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 text-red-400 text-xs font-bold rounded-xl transition">C</button>
+          <button type="button" onclick="appendPinNum('0')" class="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-white text-base font-bold rounded-xl transition">0</button>
+          <button type="button" onclick="backspacePinInput()" class="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-amber-400 text-xs font-bold rounded-xl transition">⌫</button>
+        </div>
+
+        <div id="pinAuthError" class="text-xs text-red-400 hidden font-medium text-center"></div>
+
+        <div class="pt-2 border-t border-slate-800 text-center">
           <button type="button" onclick="toggleEmailLoginMode()" class="text-[11px] text-slate-400 hover:text-amber-400 underline transition font-medium">
             Möchtest du dich per E-Mail & Passwort anmelden? (Legacy)
           </button>
         </div>
       </div>
 
-      <!-- ZÁLOŽNÝ STARÝ EMAIL LOGIN FORMULÁR (skrytý štandardne) -->
+      <!-- ZÁLOŽNÝ STARÝ EMAIL LOGIN FORMULÁR -->
       <form id="emailLoginForm" onsubmit="handleEmailLogin(event)" autocomplete="off" class="hidden w-full bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl space-y-4 text-left mt-2">
         <div>
           <label class="block text-xs font-semibold uppercase mb-1 text-slate-300">E-Mail</label>
@@ -197,7 +214,7 @@
       <button onclick="closeStaffPinModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
       <div>
         <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400 flex items-center gap-2">👤 Personal & PINs (Zentrale)</h3>
-        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Verwalte hier Čašníci, PIN kódy a ich role priamo v tabuľke <code>staff_presence</code>.</p>
+        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Verwaltung von Personal, PIN-Codes und Zugriffsberechtigungen.</p>
       </div>
 
       <!-- Formulár na pridanie / úpravu -->
@@ -255,11 +272,16 @@
         </div>
         <div>
           <h1 class="text-3xl font-bold tracking-tight text-amber-500 dark:text-amber-400">Salonplafond BAR</h1>
-          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium">v3.0.28 • Angemeldet als: <span id="currentUserEmail" class="text-amber-600 dark:text-amber-300 font-bold"></span> <button onclick="openStaffPinModalFromMenu()" class="ml-2 text-[10px] bg-amber-500/20 hover:bg-amber-500/30 text-amber-600 dark:text-amber-300 font-bold px-2 py-0.5 rounded border border-amber-500/30 transition">✏️ Ändern</button></span>
+          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium">v3.0.29 • Angemeldet als: <span id="currentUserEmail" class="text-amber-600 dark:text-amber-300 font-bold"></span></span>
         </div>
       </div>
 
       <div class="flex flex-wrap items-center gap-2">
+        <!-- Tlačidlo Ändern presunuté sem hore vedľa Vollbild -->
+        <button onclick="handleLogout()" class="px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-600 dark:text-amber-400 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm" title="Benutzer wechseln">
+          ✏️ Ändern
+        </button>
+
         <button onclick="toggleFullscreen()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-lg text-xs font-semibold border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-300 flex items-center gap-1 transition">
           ⛶ Vollbild
         </button>
@@ -316,7 +338,7 @@
             <div class="border-t border-slate-200 dark:border-slate-700 my-0.5"></div>
 
             <button onclick="handleLogout()" class="w-full text-left px-2.5 py-2 rounded bg-red-50 dark:bg-red-600/20 hover:bg-red-100 dark:hover:bg-red-600/30 text-xs font-bold text-red-600 dark:text-red-400 flex items-center gap-2 border border-red-200 dark:border-red-500/30">
-              🚪 Abmelden
+              🚪 Abmelden / Wechseln
             </button>
 
           </div>
@@ -378,7 +400,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-300 dark:border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.28 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.29 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div>
@@ -833,52 +855,59 @@
 
         <div id="adminChangelogFormContainer" class="hidden custom-box p-4 rounded-xl border flex flex-col gap-2.5">
           <label class="text-xs font-bold text-amber-600 dark:text-amber-300">➕ Neue Neuigkeit hinzufügen (Tomas - Developer):</label>
-          <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.28: Schnell-Login mit PIN..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
+          <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.29: Touch PINpad & Auto-Login..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
           <button onclick="submitNewChangelog()" class="py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs transition shadow">Als Neuigkeit veröffentlichen</button>
         </div>
 
         <div class="flex flex-col gap-2.5 max-h-[45vh] overflow-y-auto pr-1" id="changelogListContainer">
           <div class="custom-box p-3.5 rounded-xl border text-xs">
             <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-              <span>Version v3.0.28 (Tomas Kardos - Developer)</span>
+              <span>Version v3.0.29 (Tomas Kardos - Developer)</span>
               <span class="text-slate-500">Oktober 2026</span>
             </div>
-            <p>Einführung des direkten PIN-Logins für das Personal beim App-Start, Bereinigung der Hauptkopfzeile (Abmelden und Aktualisieren in das Menü verschoben).</p>
+            <p>Einführung der dot-basierten numerischen Touch-Tastatur (Numpad) mit automatischem Login nach vollständiger PIN-Eingabe. Tausch-Button (Ändern) in die Kopfzeile verschoben und deutscher Text in der Personal-Zentrale vereinfacht.</p>
+          </div>
+          <div class="custom-box p-3.5 rounded-xl border text-xs">
+            <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
+              <span>Version v3.0.28</span>
+              <span class="text-slate-500">Oktober 2026</span>
+            </div>
+            <p>Einführung des direkten PIN-Logins für das Personal beim App-Start.</p>
           </div>
           <div class="custom-box p-3.5 rounded-xl border text-xs">
             <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
               <span>Version v3.0.27</span>
               <span class="text-slate-500">Oktober 2026</span>
             </div>
-            <p>Einführung der zentralen Personal- & PIN-Verwaltung direkt in der App (für Manager/Developer).</p>
+            <p>Einführung der zentralen Personal- & PIN-Verwaltung direkt in der App.</p>
           </div>
           <div class="custom-box p-3.5 rounded-xl border text-xs">
             <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
               <span>Version v3.0.26</span>
               <span class="text-slate-500">Oktober 2026</span>
             </div>
-            <p>Vollständige Konsolidierung und Stabilisierung auf v3.0.26 mit kompletter Beibehaltung aller Features.</p>
+            <p>Vollständige Konsolidierung und Stabilisierung.</p>
           </div>
           <div class="custom-box p-3.5 rounded-xl border text-xs">
             <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
               <span>Version v3.0.25</span>
               <span class="text-slate-500">Oktober 2026</span>
             </div>
-            <p>Verknüpfung der Personal-Schnellauswahl mit der Supabase-Tabelle staff_presence.</p>
+            <p>Verknüpfung der Personal-Schnellauswahl mit Supabase.</p>
           </div>
           <div class="custom-box p-3.5 rounded-xl border text-xs">
             <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
               <span>Version v3.0.24</span>
               <span class="text-slate-500">Oktober 2026</span>
             </div>
-            <p>Oprava bielych pozadí formulárových polí v tmavom režime.</p>
+            <p>Oprava bielych pozadí formulárových polí.</p>
           </div>
           <div class="custom-box p-3.5 rounded-xl border text-xs">
             <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
               <span>Version v3.0.23</span>
               <span class="text-slate-500">Oktober 2026</span>
             </div>
-            <p>Vollständige Überarbeitung des Light-Modus und Erweiterung des Changelogs.</p>
+            <p>Vollständige Überarbeitung des Light-Modus.</p>
           </div>
           <div class="custom-box p-3.5 rounded-xl border text-xs">
             <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
@@ -901,13 +930,6 @@
             </div>
             <p>Optimierung der Bar Tray Schnellansicht.</p>
           </div>
-          <div class="custom-box p-3.5 rounded-xl border text-xs">
-            <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-              <span>Version v3.0.19</span>
-              <span class="text-slate-500">Oktober 2026</span>
-            </div>
-            <p>Korrektur des Logos und Start-Optimierungen.</p>
-          </div>
         </div>
       </div>
 
@@ -927,14 +949,19 @@
     let currentLoggedInUserEmail = "";
     let currentWaiterName = localStorage.getItem('salon_waiter_name') || "";
     let staffDatabaseRecords = [];
+    let currentEnteredPin = "";
 
     window.addEventListener("DOMContentLoaded", async () => {
       window.addEventListener('scroll', handleScrollPosition);
       await loadStaffPresenceRecordsForLogin();
 
       const { data: { session } } = await _supabase.auth.getSession();
-      if (session && session.user) {
-        await handleSessionAfterLogin(session.user);
+      if (session && session.user && currentWaiterName) {
+        let staffRec = staffDatabaseRecords.find(s => s.name.toLowerCase() === currentWaiterName.toLowerCase()) || { name: currentWaiterName, role: 'staff' };
+        await finalizeAppStartForStaff(staffRec);
+      } else if (currentWaiterName) {
+        let staffRec = staffDatabaseRecords.find(s => s.name.toLowerCase() === currentWaiterName.toLowerCase()) || { name: currentWaiterName, role: 'staff' };
+        await finalizeAppStartForStaff(staffRec);
       } else {
         document.getElementById('authContainer').classList.remove('hidden');
       }
@@ -979,49 +1006,65 @@
       `).join('');
     }
 
-    async function handlePinLogin() {
+    /* --- NUMPAD FUNKCIE A AUTO-LOGIN --- */
+    function appendPinNum(num) {
+      if (currentEnteredPin.length < 6) {
+        currentEnteredPin += num;
+        updatePinDisplay();
+        checkAutoPinLogin();
+      }
+    }
+
+    function clearPinInput() {
+      currentEnteredPin = "";
+      updatePinDisplay();
+      document.getElementById('pinAuthError').classList.add('hidden');
+    }
+
+    function backspacePinInput() {
+      currentEnteredPin = currentEnteredPin.slice(0, -1);
+      updatePinDisplay();
+      document.getElementById('pinAuthError').classList.add('hidden');
+    }
+
+    function updatePinDisplay() {
+      const inputEl = document.getElementById('loginPinInput');
+      inputEl.value = "•".repeat(currentEnteredPin.length);
+    }
+
+    async function checkAutoPinLogin() {
       const selectEl = document.getElementById('loginWaiterSelect');
-      const pinInput = document.getElementById('loginPinInput');
       const errDiv = document.getElementById('pinAuthError');
       errDiv.classList.add('hidden');
 
       const selectedName = selectEl.value;
-      const enteredPin = pinInput.value.trim();
-
-      if (!selectedName) {
-        errDiv.innerText = "Bitte wähle deinen Namen aus der Liste.";
-        errDiv.classList.remove('hidden');
-        return;
-      }
+      if (!selectedName) return;
 
       const staffRecord = staffDatabaseRecords.find(s => s.name === selectedName);
-      if (!staffRecord) {
-        errDiv.innerText = "Mitarbeiter wurde nicht gefunden.";
-        errDiv.classList.remove('hidden');
-        return;
-      }
+      if (!staffRecord) return;
 
-      // Overenie PIN kódu (ak má nastavený PIN v databáze)
-      if (staffRecord.pin && staffRecord.pin !== enteredPin) {
+      // Ak PIN zodpovedá dĺžkou alebo presnou hodnotou
+      let requiredPin = staffRecord.pin ? String(staffRecord.pin).trim() : "";
+      
+      if (currentEnteredPin === requiredPin || (requiredPin === "" && currentEnteredPin.length >= 4)) {
+        // Úspešné auto-prihlásenie
+        currentWaiterName = staffRecord.name;
+        localStorage.setItem('salon_waiter_name', currentWaiterName);
+        
+        _supabase.from('staff_presence').update({ last_used_at: new Date().toISOString() }).eq('name', currentWaiterName).then();
+
+        const { data: { session } } = await _supabase.auth.getSession();
+        if (session && session.user) {
+          await handleSessionAfterLogin(session.user);
+        } else {
+          await finalizeAppStartForStaff(staffRecord);
+        }
+      } else if (staffRecord.pin && currentEnteredPin.length >= staffRecord.pin.length) {
+        // Ak zadal nesprávny PIN v plnej dĺžke
         errDiv.innerText = "Falscher PIN-Code!";
         errDiv.classList.remove('hidden');
-        return;
-      }
-
-      // Úspešné prihlásenie cez PIN
-      currentWaiterName = staffRecord.name;
-      localStorage.setItem('salon_waiter_name', currentWaiterName);
-      
-      // Update last_used_at
-      _supabase.from('staff_presence').update({ last_used_at: new Date().toISOString() }).eq('name', currentWaiterName).then();
-
-      // Skúsime získať aktuálnu Supabase session alebo nastavíme rolu lokálne
-      const { data: { session } } = await _supabase.auth.getSession();
-      if (session && session.user) {
-        await handleSessionAfterLogin(session.user);
-      } else {
-        // Ak nie je aktívna Supabase session, overíme či existuje anonymná/generická session alebo presmerujeme na aplikáciu s administrátorskými právami ak je developer/manager
-        await finalizeAppStartForStaff(staffRecord);
+        currentEnteredPin = "";
+        updatePinDisplay();
       }
     }
 
@@ -1200,12 +1243,15 @@
     }
 
     async function handleLogout() {
+      document.getElementById('settingsDropdown').classList.add('hidden');
       await _supabase.auth.signOut();
       localStorage.removeItem('salon_waiter_name');
       currentWaiterName = "";
+      currentEnteredPin = "";
+      updatePinDisplay();
+      document.getElementById('loginWaiterSelect').value = "";
       document.getElementById('appContainer').classList.add('hidden');
       document.getElementById('authContainer').classList.remove('hidden');
-      document.getElementById('loginPinInput').value = '';
       await loadStaffPresenceRecordsForLogin();
     }
 
@@ -1495,10 +1541,10 @@
       container.innerHTML = dynamicHtml + `
         <div class="custom-box p-3.5 rounded-xl border text-xs">
           <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-            <span>Version v3.0.28 (Tomas Kardos - Developer)</span>
+            <span>Version v3.0.29 (Tomas Kardos - Developer)</span>
             <span class="text-slate-500">Oktober 2026</span>
           </div>
-          <p>Einführung des direkten PIN-Logins für das Personal beim App-Start, Bereinigung der Hauptkopfzeile (Abmelden und Aktualisieren in das Menü verschoben).</p>
+          <p>Einführung der dot-basierten numerischen Touch-Tastatur (Numpad) mit automatischem Login nach vollständiger PIN-Eingabe.</p>
         </div>
       `;
     }
