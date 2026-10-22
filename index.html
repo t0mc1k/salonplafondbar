@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.25</title>
+  <title>Salonplafond BAR v3.0.26</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import & Export -->
@@ -136,7 +136,7 @@
       <div>
         <h1 class="text-xl md:text-2xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-2xl md:text-3xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-400 font-medium mt-1 block">v3.0.25 • Sichere Authentifizierung</span>
+        <span class="text-xs text-slate-400 font-medium mt-1 block">v3.0.26 • Sichere Authentifizierung</span>
       </div>
 
       <form id="loginForm" onsubmit="handleLogin(event)" autocomplete="off" class="w-full bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl space-y-4 text-left mt-2">
@@ -195,7 +195,7 @@
         </div>
         <div>
           <h1 class="text-3xl font-bold tracking-tight text-amber-500 dark:text-amber-400">Salonplafond BAR</h1>
-          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium">v3.0.25 • Angemeldet als: <span id="currentUserEmail" class="text-amber-600 dark:text-amber-300 font-bold"></span> <button onclick="openWaiterModalFromHeader()" class="ml-2 text-[10px] bg-amber-500/20 hover:bg-amber-500/30 text-amber-600 dark:text-amber-300 font-bold px-2 py-0.5 rounded border border-amber-500/30 transition">✏️ Ändern</button></span>
+          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium">v3.0.26 • Angemeldet als: <span id="currentUserEmail" class="text-amber-600 dark:text-amber-300 font-bold"></span> <button onclick="openWaiterModalFromHeader()" class="ml-2 text-[10px] bg-amber-500/20 hover:bg-amber-500/30 text-amber-600 dark:text-amber-300 font-bold px-2 py-0.5 rounded border border-amber-500/30 transition">✏️ Ändern</button></span>
         </div>
       </div>
 
@@ -317,7 +317,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-300 dark:border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.25 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.26 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div>
@@ -772,14 +772,21 @@
 
         <div id="adminChangelogFormContainer" class="hidden custom-box p-4 rounded-xl border flex flex-col gap-2.5">
           <label class="text-xs font-bold text-amber-600 dark:text-amber-300">➕ Neue Neuigkeit hinzufügen (Tomas - Developer):</label>
-          <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.25: Personal-Auswahl direkt aus staff_presence..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
+          <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.26: Performance-Optimierung..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
           <button onclick="submitNewChangelog()" class="py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs transition shadow">Als Neuigkeit veröffentlichen</button>
         </div>
 
         <div class="flex flex-col gap-2.5 max-h-[45vh] overflow-y-auto pr-1" id="changelogListContainer">
           <div class="custom-box p-3.5 rounded-xl border text-xs">
             <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-              <span>Version v3.0.25 (Tomas Kardos - Developer)</span>
+              <span>Version v3.0.26 (Tomas Kardos - Developer)</span>
+              <span class="text-slate-500">Oktober 2026</span>
+            </div>
+            <p>Vollständige Konsolidierung und Stabilisierung auf v3.0.26 mit kompletter Beibehaltung aller Features, Dialoge, Supabase-Tabellen und Import/Export-Assistenten.</p>
+          </div>
+          <div class="custom-box p-3.5 rounded-xl border text-xs">
+            <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
+              <span>Version v3.0.25</span>
               <span class="text-slate-500">Oktober 2026</span>
             </div>
             <p>Verknüpfung der Personal-Schnellauswahl mit der Supabase-Tabelle staff_presence, Schnellumschalter im Header und automatische Aktualisierung von last_used_at.</p>
@@ -839,13 +846,6 @@
               <span class="text-slate-500">Oktober 2026</span>
             </div>
             <p>Erweiterung der Import- und Export-Assistenten für Excel-Dateien.</p>
-          </div>
-          <div class="custom-box p-3.5 rounded-xl border text-xs">
-            <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-              <span>Version v3.0.16</span>
-              <span class="text-slate-500">Oktober 2026</span>
-            </div>
-            <p>Integration von Multi-View und direktem Rezeptvergleich.</p>
           </div>
         </div>
       </div>
@@ -926,7 +926,7 @@
       const { data, error } = await _supabase.from('staff_presence').select('name').order('name', { ascending: true });
       const container = document.getElementById('waiterDatabasePresetButtons');
       if (error || !data || data.length === 0) {
-        container.innerHTML = `<span class="text-xs text-slate-500 italic col-span-2 text-center py-2">Keine Namen in staff_presence gefunden.</span>`;
+        container.innerHTML = `<span class="text-xs text-slate-500 italic text-center col-span-2 py-2">Keine Namen in staff_presence gefunden.</span>`;
         return;
       }
       container.innerHTML = data.map(staff => `
@@ -1302,7 +1302,14 @@
       container.innerHTML = dynamicHtml + `
         <div class="custom-box p-3.5 rounded-xl border text-xs">
           <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-            <span>Version v3.0.25 (Tomas Kardos - Developer)</span>
+            <span>Version v3.0.26 (Tomas Kardos - Developer)</span>
+            <span class="text-slate-500">Oktober 2026</span>
+          </div>
+          <p>Vollständige Konsolidierung und Stabilisierung auf v3.0.26 mit kompletter Beibehaltung aller Features, Dialoge, Supabase-Tabellen und Import/Export-Assistenten.</p>
+        </div>
+        <div class="custom-box p-3.5 rounded-xl border text-xs">
+          <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
+            <span>Version v3.0.25</span>
             <span class="text-slate-500">Oktober 2026</span>
           </div>
           <p>Verknüpfung der Personal-Schnellauswahl mit der Supabase-Tabelle staff_presence, Schnellumschalter im Header und automatische Aktualisierung von last_used_at.</p>
@@ -1362,13 +1369,6 @@
             <span class="text-slate-500">Oktober 2026</span>
           </div>
           <p>Erweiterung der Import- und Export-Assistenten für Excel-Dateien.</p>
-        </div>
-        <div class="custom-box p-3.5 rounded-xl border text-xs">
-          <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-            <span>Version v3.0.16</span>
-            <span class="text-slate-500">Oktober 2026</span>
-          </div>
-          <p>Integration von Multi-View und direktem Rezeptvergleich.</p>
         </div>
       `;
     }
