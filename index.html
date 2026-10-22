@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.33</title>
+  <title>Salonplafond BAR v3.0.34</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import & Export -->
@@ -135,7 +135,7 @@
       <div>
         <h1 class="text-lg md:text-xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-xl md:text-2xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.0.33 • Touch-Grid PIN-Login</span>
+        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.0.34 • Touch-Grid PIN-Login</span>
       </div>
 
       <div id="pinLoginForm" class="w-full bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-2xl space-y-4 text-left mt-1">
@@ -210,18 +210,19 @@
     </div>
   </div>
 
-  <!-- SPRÁVCOVSKÝ PANEL PRE PERSONAL & PINs -->
+  <!-- SPRÁVCOVSKÝ PANEL PRE PERSONAL & PINs (S podporou profilových fotiek) -->
   <div id="staffPinManagementModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[260]">
     <div class="card max-w-2xl w-full p-6 relative flex flex-col gap-5 max-h-[85vh] overflow-y-auto border-amber-500/50 shadow-2xl">
       <button onclick="closeStaffPinModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
       <div>
         <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400 flex items-center gap-2">👤 Personal & PINs (Zentrale)</h3>
-        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Verwaltung von Personal, PIN-Codes und Zugriffsberechtigungen.</p>
+        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Verwaltung von Personal, PIN-Codes, Profilbildern und Zugriffsberechtigungen.</p>
       </div>
 
       <div class="custom-box p-4 rounded-xl border flex flex-col gap-3">
         <h4 class="text-xs font-bold uppercase text-amber-600 dark:text-amber-400" id="staffFormTitle">➕ Neuen Mitarbeiter hinzufügen</h4>
         <input type="hidden" id="editingStaffOriginalName" value="">
+        <input type="hidden" id="staffInputAvatar" value="">
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
           <div>
             <label class="block text-[10px] font-semibold uppercase mb-1">Name / Vorname</label>
@@ -240,6 +241,15 @@
             </select>
           </div>
         </div>
+
+        <div>
+          <label class="block text-[10px] font-semibold uppercase mb-1">Profilbild hochladen:</label>
+          <div class="flex gap-2 items-center">
+            <input type="file" id="staffAvatarFile" accept="image/*" onchange="uploadStaffAvatarToSupabase(event)" class="text-xs file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-600 cursor-pointer">
+            <span id="staffAvatarStatus" class="text-[11px] text-amber-500 font-medium"></span>
+          </div>
+        </div>
+
         <div class="flex gap-2 mt-1">
           <button onclick="saveStaffMember()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs transition">Speichern</button>
           <button onclick="resetStaffForm()" class="px-4 py-2 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold rounded-lg text-xs transition border">Zurücksetzen</button>
@@ -262,7 +272,7 @@
   <!-- Celá aplikácia -->
   <div id="appContainer" class="hidden">
 
-    <!-- Header -->
+    <!-- Header (S profilovou fotkou aktuálne prihláseného používateľa) -->
     <header class="flex flex-col md:flex-row justify-between items-center gap-4 mb-4 pb-4 border-b border-slate-300 dark:border-slate-700">
       <div class="flex items-center gap-3">
         <div class="header-logo-container" onclick="showRandomMotivation(event)" title="Klick mich für Osterei-Motivation! 🍸">
@@ -270,9 +280,14 @@
           <span class="logo-main-char">O</span>
           <span class="logo-dot">•</span>
         </div>
-        <div>
-          <h1 class="text-3xl font-bold tracking-tight text-amber-500 dark:text-amber-400">Salonplafond BAR</h1>
-          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium">v3.0.33 • Angemeldet als: <span id="currentUserEmail" class="text-amber-600 dark:text-amber-300 font-bold"></span></span>
+        <div class="flex items-center gap-3">
+          <div id="headerUserAvatarContainer" class="w-10 h-10 rounded-full border-2 border-amber-500 bg-slate-800 overflow-hidden flex items-center justify-center shrink-0">
+            <span class="text-xs font-bold text-amber-400" id="headerAvatarFallback">?</span>
+          </div>
+          <div>
+            <h1 class="text-3xl font-bold tracking-tight text-amber-500 dark:text-amber-400">Salonplafond BAR</h1>
+            <span class="text-xs text-slate-600 dark:text-slate-400 font-medium">v3.0.34 • Angemeldet als: <span id="currentUserEmail" class="text-amber-600 dark:text-amber-300 font-bold"></span></span>
+          </div>
         </div>
       </div>
 
@@ -317,6 +332,10 @@
               <span>👤 Personal & PINs (Zentrale)</span> <span>→</span>
             </button>
 
+            <button onclick="openTeamChatModal()" class="w-full text-left px-2.5 py-2 rounded bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center justify-between border border-slate-200 dark:border-slate-700">
+              <span>💬 Team-Chat</span> <span>→</span>
+            </button>
+
             <button onclick="openUnifiedSettingsModal()" class="w-full text-left px-2.5 py-2 rounded bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center justify-between border border-slate-200 dark:border-slate-700">
               <span>⚙️ Einstellungen (Zentrale)</span> <span>→</span>
             </button>
@@ -347,7 +366,7 @@
       </div>
     </header>
 
-    <!-- Vyhľadávacie pole umiestnené presne namiesto starého podnadpisu -->
+    <!-- Vyhľadávacie pole -->
     <div class="mb-6 flex flex-col md:flex-row justify-between items-center gap-3">
       <div class="relative w-full">
         <input type="text" id="searchInput" autocomplete="off" oninput="onSearchInput()" placeholder="🔍 Getränk oder Zutat suchen..." class="px-4 py-3 pr-10 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white w-full focus:outline-none focus:border-amber-500 text-sm shadow-md font-medium">
@@ -405,7 +424,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-300 dark:border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.33 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.34 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div>
@@ -426,7 +445,33 @@
     </div>
   </div>
 
-  <!-- A3 Print Setup Modal (s novými možnosťami tlače) -->
+  <!-- TEAM CHAT MODAL (Nová funkcia) -->
+  <div id="teamChatModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[280]">
+    <div class="card max-w-2xl w-full p-6 relative flex flex-col gap-4 max-h-[85vh] overflow-y-auto border-amber-500/50 shadow-2xl">
+      <button onclick="closeTeamChatModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
+      <div>
+        <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400 flex items-center gap-2">💬 Salonplafond Team-Chat</h3>
+        <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Echtzeit-Kommunikation für das Bar-Team. Jede Nachricht kann vom Autor oder von Managern/Developern gelöscht werden.</p>
+      </div>
+
+      <div id="chatMessagesContainer" class="custom-box p-4 rounded-xl border flex flex-col gap-3 max-h-[45vh] overflow-y-auto pr-2">
+        <p class="text-slate-500 italic text-xs text-center py-4">Lade Chat-Nachrichten...</p>
+      </div>
+
+      <form onsubmit="handleSendChatMessage(event)" class="flex gap-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+        <input type="text" id="chatMessageInput" autocomplete="off" placeholder="Nachricht an das Team schreiben..." class="flex-1 p-3 rounded-xl border text-xs focus:outline-none focus:border-amber-500">
+        <button type="submit" class="px-5 py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl text-xs transition shadow flex items-center gap-1.5 shrink-0">
+          Senden ➔
+        </button>
+      </form>
+
+      <div class="flex justify-end pt-1">
+        <button onclick="closeTeamChatModal()" class="px-5 py-2 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 font-bold text-slate-800 dark:text-white rounded-xl text-xs transition">Schließen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- A3 Print Setup Modal -->
   <div id="a3PrintSetupModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
     <div class="card max-w-xl w-full p-6 relative flex flex-col gap-4 max-h-[85vh] overflow-y-auto border-amber-500/50 shadow-2xl">
       <button onclick="closeA3PrintSetupModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
@@ -440,7 +485,6 @@
         <select id="a3SeasonSelect" onchange="renderA3DrinkSelectionList()" class="p-2.5 rounded-lg border text-xs w-full"></select>
       </div>
 
-      <!-- Možnosti tlače pre A3 (S obrázkom / S cenou) -->
       <div class="custom-box p-3.5 rounded-xl border flex flex-col gap-2">
         <span class="text-xs font-bold text-amber-600 dark:text-amber-400">⚙️ Druck-Optionen:</span>
         <div class="flex flex-wrap gap-4 text-xs">
@@ -474,7 +518,7 @@
     </div>
   </div>
 
-  <!-- A3 Print Preview Modal (Opravený kontrast: Biely podklad a tmavý text v náhľade) -->
+  <!-- A3 Print Preview Modal -->
   <div id="a3PrintPreviewModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[300]">
     <div class="card max-w-4xl w-full p-8 relative flex flex-col gap-6 max-h-[90vh] overflow-y-auto border-amber-500/50 shadow-2xl bg-white text-slate-900">
       <button onclick="closeA3PrintPreviewModal()" class="no-print absolute top-4 right-4 text-slate-500 hover:text-slate-900 text-2xl font-bold">&times;</button>
@@ -898,10 +942,10 @@
     </div>
   </div>
 
-  <!-- Support & Tickets Modal (iba developer môže mazać tickety) -->
+  <!-- Support & Tickets Modal -->
   <div id="supportModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
     <div class="card max-w-2xl w-full p-6 relative flex flex-col gap-4 max-h-[85vh] overflow-y-auto border-amber-500/50 shadow-2xl">
-      <button onclick="closeSupportModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
+      <button onclick="closeSupportModal()" class="absolute top-4 right-4 text-slate-500 dark:text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
       
       <div class="flex border-b border-slate-200 dark:border-slate-800 pb-3 gap-2">
         <button onclick="switchSupportTab('tickets')" id="tabBtnTickets" class="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition">💬 Support & Tickets</button>
@@ -936,24 +980,24 @@
 
         <div id="adminChangelogFormContainer" class="hidden custom-box p-4 rounded-xl border flex flex-col gap-2.5">
           <label class="text-xs font-bold text-amber-600 dark:text-amber-300">➕ Neue Neuigkeit hinzufügen (Tomas - Developer):</label>
-          <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.33: A3 Druck-Optionen & Schutz..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
+          <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.34: Team-Chat & Profilbilder..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
           <button onclick="submitNewChangelog()" class="py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs transition shadow">Als Neuigkeit veröffentlichen</button>
         </div>
 
         <div class="flex flex-col gap-2.5 max-h-[45vh] overflow-y-auto pr-1" id="changelogListContainer">
           <div class="custom-box p-3.5 rounded-xl border text-xs">
             <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-              <span>Version v3.0.33 (Tomas Kardos - Developer)</span>
+              <span>Version v3.0.34 (Tomas Kardos - Developer)</span>
               <span class="text-slate-500">Oktober 2026</span>
             </div>
-            <p>A3 Druckoptionen (Bild & Preis ein/aus), perfekter Kontrast im A3 Vorschau-Dialog, Schutz des Developer-Accounts vor Löschung und exklusives Ticket-Löschen nur für den Developer.</p>
+            <p>Einführung des Salonplafond Team-Chats mit Echtzeit-Nachrichten und intelligentem Löschschutz, sowie persönliche Profilbilder für das Personal (Touch-Grid, Header & Chat).</p>
           </div>
           <div class="custom-box p-3.5 rounded-xl border text-xs">
             <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-              <span>Version v3.0.32</span>
+              <span>Version v3.0.33</span>
               <span class="text-slate-500">Oktober 2026</span>
             </div>
-            <p>Entfernung des Drag & Drop, Multi-View Tausch-Funktion und Suchfeld-Umplatzierung.</p>
+            <p>A3 Druckoptionen und Schutz des Developer-Accounts.</p>
           </div>
         </div>
       </div>
@@ -973,6 +1017,7 @@
     let currentPhotoPreviewUrl = null;
     let currentLoggedInUserEmail = "";
     let currentWaiterName = localStorage.getItem('salon_waiter_name') || "";
+    let currentWaiterAvatar = "";
     let staffDatabaseRecords = [];
     let currentEnteredPin = "";
     let selectedWaiterForPin = "";
@@ -1028,12 +1073,19 @@
       }
       staffDatabaseRecords = data;
       
-      gridContainer.innerHTML = data.map(staff => `
-        <button type="button" onclick="selectWaiterForLogin('${staff.name}')" class="p-3 bg-slate-950 hover:bg-amber-500/20 hover:border-amber-500 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1 transition group">
-          <span class="text-xs font-black text-white group-hover:text-amber-400 truncate w-full">${staff.name}</span>
-          <span class="text-[10px] text-slate-400 uppercase tracking-wider">${staff.role || 'staff'}</span>
-        </button>
-      `).join('');
+      gridContainer.innerHTML = data.map(staff => {
+        let avatarHtml = staff.avatar_url 
+          ? `<img src="${staff.avatar_url}" class="w-12 h-12 rounded-full object-cover border border-amber-500/50 shadow" alt="${staff.name}">` 
+          : `<div class="w-12 h-12 rounded-full bg-slate-800 text-amber-400 font-black flex items-center justify-center border border-slate-700 text-sm">${staff.name.charAt(0).toUpperCase()}</div>`;
+
+        return `
+          <button type="button" onclick="selectWaiterForLogin('${staff.name}')" class="p-3 bg-slate-950 hover:bg-amber-500/20 hover:border-amber-500 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 transition group">
+            ${avatarHtml}
+            <span class="text-xs font-black text-white group-hover:text-amber-400 truncate w-full">${staff.name}</span>
+            <span class="text-[9px] text-slate-400 uppercase tracking-wider">${staff.role || 'staff'}</span>
+          </button>
+        `;
+      }).join('');
     }
 
     function selectWaiterForLogin(name) {
@@ -1094,6 +1146,7 @@
       
       if (currentEnteredPin === requiredPin || (requiredPin === "" && currentEnteredPin.length >= 4)) {
         currentWaiterName = staffRecord.name;
+        currentWaiterAvatar = staffRecord.avatar_url || "";
         localStorage.setItem('salon_waiter_name', currentWaiterName);
         
         _supabase.from('staff_presence').update({ last_used_at: new Date().toISOString() }).eq('name', currentWaiterName).then();
@@ -1115,6 +1168,9 @@
     async function finalizeAppStartForStaff(staffRecord) {
       document.getElementById('authContainer').classList.add('hidden');
       document.getElementById('appContainer').classList.remove('hidden');
+
+      currentWaiterAvatar = staffRecord.avatar_url || "";
+      updateHeaderAvatarUI();
 
       isAdmin = (staffRecord.role === 'manager' || staffRecord.role === 'developer' || currentWaiterName.toLowerCase() === 'amim');
       
@@ -1147,6 +1203,15 @@
 
       await loadDrinks();
       await checkPendingTicketsBadge();
+    }
+
+    function updateHeaderAvatarUI() {
+      const container = document.getElementById('headerUserAvatarContainer');
+      if (currentWaiterAvatar) {
+        container.innerHTML = `<img src="${currentWaiterAvatar}" class="w-full h-full object-cover" alt="${currentWaiterName}">`;
+      } else {
+        container.innerHTML = `<span class="text-xs font-bold text-amber-400">${currentWaiterName ? currentWaiterName.charAt(0).toUpperCase() : '?'}</span>`;
+      }
     }
 
     async function handleEmailLogin(e) {
@@ -1182,129 +1247,97 @@
       await finalizeAppStartForStaff(staffRec);
     }
 
-    /* --- A3 TLAČ KARIET (s voľbami pre obrázok a cenu) --- */
-    function openA3PrintSetupModal() {
+    /* --- TEAM CHAT (Nová funkcia) --- */
+    function openTeamChatModal() {
       document.getElementById('settingsDropdown').classList.add('hidden');
-      const seasons = getAllSeasons();
-      const seasonSelect = document.getElementById('a3SeasonSelect');
-      seasonSelect.innerHTML = seasons.map(s => `<option value="${s}" ${currentSeasonFilter === s ? 'selected' : ''}>📅 ${s}</option>`).join('');
-      
-      renderA3DrinkSelectionList();
-      const modal = document.getElementById('a3PrintSetupModal');
+      loadChatMessages();
+      const modal = document.getElementById('teamChatModal');
       modal.classList.remove('hidden');
       modal.classList.add('flex');
     }
 
-    function closeA3PrintSetupModal() {
-      const modal = document.getElementById('a3PrintSetupModal');
+    function closeTeamChatModal() {
+      const modal = document.getElementById('teamChatModal');
       modal.classList.remove('flex');
       modal.classList.add('hidden');
     }
 
-    function renderA3DrinkSelectionList() {
-      const selectedSeason = document.getElementById('a3SeasonSelect').value;
-      const container = document.getElementById('a3DrinkCheckboxList');
-      const seasonDrinks = allDrinks.filter(d => (d.season || '') === selectedSeason);
+    async function loadChatMessages() {
+      const container = document.getElementById('chatMessagesContainer');
+      container.innerHTML = `<p class="text-slate-500 italic text-xs text-center py-4">Lade Nachrichten...</p>`;
 
-      if (seasonDrinks.length === 0) {
-        container.innerHTML = `<p class="text-slate-500 italic text-xs text-center py-4">Keine Getränke in dieser Saison gefunden.</p>`;
+      const { data, error } = await _supabase.from('team_chat').select('*').order('created_at', { ascending: true });
+      if (error) {
+        container.innerHTML = `<p class="text-red-400 text-xs text-center py-4">Fehler: ${error.message}</p>`;
         return;
       }
 
-      container.innerHTML = seasonDrinks.map(d => `
-        <label class="flex items-center gap-2.5 p-2 rounded-lg custom-box border hover:border-amber-500 cursor-pointer text-xs">
-          <input type="checkbox" name="a3DrinkCheckbox" value="${d.id}" onchange="checkA3SelectionLimit(this)" class="accent-amber-500 w-4 h-4">
-          <span class="font-bold">${d.name}</span>
-          <span class="text-[10px] text-slate-400 ml-auto">${d.category || ''}</span>
-        </label>
-      `).join('');
-      updateA3SelectedCount();
-    }
-
-    function checkA3SelectionLimit(checkbox) {
-      const checkedBoxes = document.querySelectorAll('input[name="a3DrinkCheckbox"]:checked');
-      if (checkedBoxes.length > 3) {
-        alert("Du kannst maximal 3 Getränke für eine A3-Karte auswählen!");
-        checkbox.checked = false;
-      }
-      updateA3SelectedCount();
-    }
-
-    function updateA3SelectedCount() {
-      const count = document.querySelectorAll('input[name="a3DrinkCheckbox"]:checked').length;
-      document.getElementById('a3SelectedCountBadge').innerText = `${count} / 3 gewählt`;
-    }
-
-    function generateA3PrintPreview() {
-      const checkedBoxes = document.querySelectorAll('input[name="a3DrinkCheckbox"]:checked');
-      if (checkedBoxes.length === 0) {
-        alert("Bitte wähle mindestens 1 Getränk aus!");
+      if (!data || data.length === 0) {
+        container.innerHTML = `<p class="text-slate-500 italic text-xs text-center py-4">Noch keine Nachrichten im Team-Chat. Starte die Unterhaltung! 💬</p>`;
         return;
       }
 
-      const selectedSeason = document.getElementById('a3SeasonSelect').value;
-      document.getElementById('a3PrintSeasonName').innerText = selectedSeason;
+      const isUserDevOrManager = (isAdmin || currentWaiterName.toLowerCase() === 'tomas' || currentWaiterName.toLowerCase() === 'tomas kardos');
 
-      const withImage = document.getElementById('a3OptionImage').checked;
-      const withPrice = document.getElementById('a3OptionPrice').checked;
+      container.innerHTML = data.map(msg => {
+        let isOwner = (msg.author_name.toLowerCase() === currentWaiterName.toLowerCase());
+        let canDelete = isOwner || isUserDevOrManager;
 
-      let selectedIds = Array.from(checkedBoxes).map(cb => cb.value);
-      let drinksToPrint = selectedIds.map(id => allDrinks.find(d => d.id === id)).filter(Boolean);
+        let staffRecord = staffDatabaseRecords.find(s => s.name.toLowerCase() === msg.author_name.toLowerCase());
+        let avatarUrl = (staffRecord && staffRecord.avatar_url) ? staffRecord.avatar_url : "";
+        let avatarHtml = avatarUrl 
+          ? `<img src="${avatarUrl}" class="w-8 h-8 rounded-full object-cover border border-amber-500/50 shrink-0" alt="${msg.author_name}">` 
+          : `<div class="w-8 h-8 rounded-full bg-slate-800 text-amber-400 font-bold flex items-center justify-center border border-slate-700 text-xs shrink-0">${msg.author_name.charAt(0).toUpperCase()}</div>`;
 
-      const listContainer = document.getElementById('a3PrintDrinksList');
-      listContainer.innerHTML = drinksToPrint.map((d, index) => {
-        let photoHtml = (withImage && d.photo_url) ? `<img src="${d.photo_url}" class="w-48 h-48 object-cover rounded-xl shadow border border-slate-300 shrink-0" alt="${d.name}">` : '';
-        let priceText = (withPrice && d.selling_price) ? ` (€ ${parseFloat(d.selling_price).toFixed(2)})` : '';
-        
-        let ingredientsHtml = '';
-        if (Array.isArray(d.ingredients_json) && d.ingredients_json.length > 0) {
-          ingredientsHtml = d.ingredients_json.map(i => `<div class="grid grid-cols-2 py-1 border-b border-slate-200 text-sm"><span class="font-medium text-slate-900">${i.name}</span><span class="font-bold text-slate-900">${i.amount || '-'}</span></div>`).join('');
-        } else {
-          ingredientsHtml = `<div class="italic text-slate-500 text-sm">Keine Zutaten angegeben</div>`;
-        }
+        let timeStr = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
         return `
-          <div class="p-6 rounded-2xl border-2 border-slate-900 bg-white text-slate-900 flex flex-col gap-4 page-break-inside-avoid shadow-sm">
-            <div class="flex items-start justify-between gap-4">
-              <div>
-                <span class="text-xs font-black uppercase tracking-widest text-amber-600">${d.category || 'Getränk'} #${index + 1}</span>
-                <h3 class="text-3xl font-black text-slate-900 mt-1">${d.name}${priceText}</h3>
+          <div class="flex items-start gap-2.5 p-2.5 rounded-xl custom-box border text-xs relative group">
+            ${avatarHtml}
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-amber-600 dark:text-amber-400">${msg.author_name}</span>
+                <span class="text-[10px] text-slate-500">${timeStr}</span>
               </div>
-              ${photoHtml}
+              <p class="mt-1 text-slate-200 break-words">${msg.message}</p>
             </div>
-
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-100 text-slate-900 p-3 rounded-xl border text-xs font-semibold">
-              <div><b>Glass:</b> ${d.glass_type || '-'}</div>
-              <div><b>Method:</b> ${d.method || '-'}</div>
-              <div><b>Ice:</b> ${d.ice || '-'}</div>
-              <div><b>Garnish:</b> ${d.garnish || '-'}</div>
-            </div>
-
-            <div class="flex flex-col gap-1">
-              <span class="text-xs font-bold uppercase text-slate-800">Zutaten & Mengen:</span>
-              <div class="border rounded-xl p-3 bg-slate-50 text-slate-900">${ingredientsHtml}</div>
-            </div>
-
-            ${d.recipe ? `<div class="text-xs bg-slate-50 text-slate-900 p-3 rounded-xl border"><span class="font-bold uppercase text-slate-800 block mb-1">Zubereitung:</span><p class="whitespace-pre-line text-slate-900">${d.recipe}</p></div>` : ''}
-            
-            ${d.allergens ? `<div class="text-[11px] text-slate-700"><b>Allergene:</b> ${d.allergens}</div>` : ''}
+            ${canDelete ? `<button onclick="deleteChatMessage('${msg.id}')" class="text-slate-500 hover:text-red-400 font-bold p-1 transition" title="Nachricht löschen">&times;</button>` : ''}
           </div>
         `;
       }).join('');
-
-      closeA3PrintSetupModal();
-      const previewModal = document.getElementById('a3PrintPreviewModal');
-      previewModal.classList.remove('hidden');
-      previewModal.classList.add('flex');
+      container.scrollTop = container.scrollHeight;
     }
 
-    function closeA3PrintPreviewModal() {
-      const modal = document.getElementById('a3PrintPreviewModal');
-      modal.classList.remove('flex');
-      modal.classList.add('hidden');
+    async function handleSendChatMessage(e) {
+      e.preventDefault();
+      const input = document.getElementById('chatMessageInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const { error } = await _supabase.from('team_chat').insert([{
+        author_name: currentWaiterName,
+        message: text
+      }]);
+
+      if (error) {
+        alert("Fehler beim Senden: " + error.message);
+      } else {
+        input.value = '';
+        loadChatMessages();
+      }
     }
 
-    /* --- SPRÁVCOVSKÝ PANEL PRE PERSONAL & PINs (S ochranou developera pred zmazaním) --- */
+    async function deleteChatMessage(id) {
+      if (!confirm("Möchtest du diese Nachricht löschen?")) return;
+      const { error } = await _supabase.from('team_chat').delete().eq('id', id);
+      if (error) {
+        alert("Fehler beim Löschen: " + error.message);
+      } else {
+        loadChatMessages();
+      }
+    }
+
+    /* --- SPRÁVCOVSKÝ PANEL PRE PERSONAL & PINs (S podporou avatarov) --- */
     function openStaffPinModal() {
       document.getElementById('settingsDropdown').classList.add('hidden');
       checkManagerAuth(() => {
@@ -1332,7 +1365,31 @@
       document.getElementById('staffInputName').value = '';
       document.getElementById('staffInputPin').value = '';
       document.getElementById('staffInputRole').value = 'staff';
+      document.getElementById('staffInputAvatar').value = '';
+      document.getElementById('staffAvatarFile').value = '';
+      document.getElementById('staffAvatarStatus').innerText = '';
       document.getElementById('staffFormTitle').innerText = "➕ Neuen Mitarbeiter hinzufügen";
+    }
+
+    async function uploadStaffAvatarToSupabase(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const status = document.getElementById('staffAvatarStatus');
+      status.innerText = "Wird hochgeladen...";
+      
+      const fileName = `avatar_${Date.now()}_${file.name}`;
+      let { data, error } = await _supabase.storage.from('drinks').upload(fileName, file);
+      
+      if (error) {
+        status.innerText = 'Fehler: ' + error.message;
+        return;
+      }
+      
+      let { data: publicURLData } = _supabase.storage.from('drinks').getPublicUrl(fileName);
+      if (publicURLData && publicURLData.publicUrl) {
+        document.getElementById('staffInputAvatar').value = publicURLData.publicUrl;
+        status.innerText = '✔ Profilbild bereit!';
+      }
     }
 
     async function loadStaffManagementList() {
@@ -1356,15 +1413,22 @@
           ? `<span class="text-[10px] text-amber-500 font-bold px-2 py-1 bg-amber-500/10 rounded border border-amber-500/30" title="Developer-Account ist geschützt">🔒 Geschützt</span>`
           : `<button onclick='deleteStaffMember("${staff.name}")' class="px-2.5 py-1 bg-red-600/20 hover:bg-red-600/40 text-red-400 font-bold rounded text-[11px]">🗑️ Löschen</button>`;
 
+        let avatarImg = staff.avatar_url 
+          ? `<img src="${staff.avatar_url}" class="w-8 h-8 rounded-full object-cover border border-amber-500/50 shrink-0" alt="">` 
+          : `<div class="w-8 h-8 rounded-full bg-slate-800 text-amber-400 font-bold flex items-center justify-center border border-slate-700 text-xs shrink-0">${staff.name.charAt(0).toUpperCase()}</div>`;
+
         return `
           <div class="custom-box p-3 rounded-xl border flex items-center justify-between gap-2 text-xs">
-            <div>
-              <span class="font-bold text-amber-600 dark:text-amber-400">👤 ${staff.name}</span>
-              <span class="ml-2 px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px]">PIN: ${staff.pin || 'Nicht gesetzt'}</span>
-              <span class="ml-1 px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px]">Rolle: ${staff.role || 'staff'}</span>
+            <div class="flex items-center gap-2.5">
+              ${avatarImg}
+              <div>
+                <span class="font-bold text-amber-600 dark:text-amber-400">${staff.name}</span>
+                <span class="ml-2 px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px]">PIN: ${staff.pin || 'Nicht gesetzt'}</span>
+                <span class="ml-1 px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px]">Rolle: ${staff.role || 'staff'}</span>
+              </div>
             </div>
             <div class="flex gap-1.5 items-center">
-              <button onclick='editStaffMember("${staff.name}", "${staff.pin || ''}", "${staff.role || 'staff'}")' class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 font-bold rounded text-[11px]">✏️ Bearbeiten</button>
+              <button onclick='editStaffMember("${staff.name}", "${staff.pin || ''}", "${staff.role || 'staff'}", "${staff.avatar_url || ''}")' class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 font-bold rounded text-[11px]">✏️ Bearbeiten</button>
               ${deleteBtnHtml}
             </div>
           </div>
@@ -1372,11 +1436,13 @@
       }).join('');
     }
 
-    function editStaffMember(name, pin, role) {
+    function editStaffMember(name, pin, role, avatarUrl) {
       document.getElementById('editingStaffOriginalName').value = name;
       document.getElementById('staffInputName').value = name;
       document.getElementById('staffInputPin').value = pin;
       document.getElementById('staffInputRole').value = role;
+      document.getElementById('staffInputAvatar').value = avatarUrl || '';
+      document.getElementById('staffAvatarStatus').innerText = avatarUrl ? '✔ Bild vorhanden' : '';
       document.getElementById('staffFormTitle').innerText = `✏️ Mitarbeiter bearbeiten (${name})`;
     }
 
@@ -1385,6 +1451,7 @@
       const newName = document.getElementById('staffInputName').value.trim();
       const pin = document.getElementById('staffInputPin').value.trim();
       const role = document.getElementById('staffInputRole').value;
+      const avatar_url = document.getElementById('staffInputAvatar').value.trim();
 
       if (!newName) return alert("Bitte Name eingeben.");
 
@@ -1392,10 +1459,10 @@
         if (originalName !== newName) {
           await _supabase.from('staff_presence').delete().eq('name', originalName);
         }
-        const { error } = await _supabase.from('staff_presence').upsert([{ name: newName, pin, role }]);
+        const { error } = await _supabase.from('staff_presence').upsert([{ name: newName, pin, role, avatar_url }]);
         if (error) return alert("Fehler beim Speichern: " + error.message);
       } else {
-        const { error } = await _supabase.from('staff_presence').insert([{ name: newName, pin, role }]);
+        const { error } = await _supabase.from('staff_presence').insert([{ name: newName, pin, role, avatar_url }]);
         if (error) return alert("Fehler beim Hinzufügen: " + error.message);
       }
 
@@ -1426,6 +1493,7 @@
       await _supabase.auth.signOut();
       localStorage.removeItem('salon_waiter_name');
       currentWaiterName = "";
+      currentWaiterAvatar = "";
       currentEnteredPin = "";
       selectedWaiterForPin = "";
       updatePinDisplay();
@@ -1587,7 +1655,6 @@
         return;
       }
 
-      // Zistenie, či je prihlásený používateľ vývojár (Developer) pre povolenie mazania ticketov
       const isDevUser = (currentWaiterName.toLowerCase() === 'tomas' || currentWaiterName.toLowerCase() === 'tomas kardos' || currentLoggedInUserEmail === 'kdstom@outlook.com');
 
       container.innerHTML = data.map(t => {
@@ -1729,10 +1796,10 @@
       container.innerHTML = dynamicHtml + `
         <div class="custom-box p-3.5 rounded-xl border text-xs">
           <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-            <span>Version v3.0.33 (Tomas Kardos - Developer)</span>
+            <span>Version v3.0.34 (Tomas Kardos - Developer)</span>
             <span class="text-slate-500">Oktober 2026</span>
           </div>
-          <p>A3 Druckoptionen (Bild & Preis ein/aus), perfekter Kontrast im A3 Vorschau-Dialog, Schutz des Developer-Accounts vor Löschung und exklusives Ticket-Löschen nur für den Developer.</p>
+          <p>Einführung des Salonplafond Team-Chats mit Echtzeit-Nachrichten und intelligentem Löschschutz, sowie persönliche Profilbilder für das Personal (Touch-Grid, Header & Chat).</p>
         </div>
       `;
     }
