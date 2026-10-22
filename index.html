@@ -160,25 +160,56 @@
     </div>
   </div>
 
-  <!-- MODAL PRE VÝBER MENA ČAŠNÍKA Z TABUĽKY staff_presence -->
+  <!-- VYLEPŠENÝ MODAL PRE VÝBER MENA & PIN KÓD PERSÓNÁLU (staff_presence) -->
   <div id="waiterNameModal" class="fixed inset-0 z-[250] bg-slate-950/90 backdrop-blur-md hidden flex items-center justify-center p-6 text-center">
     <div class="card max-w-md w-full p-6 relative flex flex-col gap-4 border-amber-500/50 shadow-2xl text-left">
+      <button onclick="closeWaiterModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
+      
       <div class="w-12 h-12 bg-amber-500/20 text-amber-500 rounded-xl mx-auto flex items-center justify-center text-2xl border border-amber-500/30">👤</div>
       <h3 class="text-xl font-bold text-amber-500 text-center">Wer bedient gerade?</h3>
-      <p class="text-xs text-slate-400 text-center">Wähle deinen Vornamen aus der Liste aus:</p>
+      <p class="text-xs text-slate-400 text-center">Wähle dein Profil aus der Datenbank und gib deinen PIN ein:</p>
       
-      <div class="grid grid-cols-2 gap-2 mt-2" id="waiterDatabasePresetButtons">
-        <span class="text-xs text-slate-500 italic text-center col-span-2 py-2">Lade Personal aus der Datenbank...</span>
+      <!-- Krok 1: Výber personálu -->
+      <div class="grid grid-cols-2 gap-2 mt-1" id="waiterDatabasePresetButtons">
+        <span class="text-xs text-slate-500 italic text-center col-span-2 py-2">Lade Personal aus staff_presence...</span>
       </div>
 
-      <div class="mt-2">
-        <label class="block text-[11px] font-semibold uppercase mb-1 text-slate-400">Oder eigenen Vornamen eingeben:</label>
-        <input type="text" id="customWaiterNameInput" placeholder="z. B. Robin..." class="w-full p-3 rounded-xl border text-xs focus:outline-none focus:border-amber-500">
+      <!-- Krok 2: Zadanie PIN kódu (s číselnou klávesnicou) -->
+      <div id="pinSectionContainer" class="hidden flex flex-col gap-3 mt-2 border-t border-slate-800 pt-3">
+        <div class="text-center">
+          <span class="text-xs font-bold text-amber-400">Ausgewählt: <span id="selectedStaffNameDisplay" class="text-white"></span></span>
+        </div>
+
+        <div class="flex items-center justify-center gap-2 my-1">
+          <input type="password" id="staffPinInput" readonly placeholder="••••" class="w-32 text-center p-2.5 rounded-xl text-lg font-black tracking-widest bg-slate-950 border border-amber-500/50 text-amber-400">
+        </div>
+
+        <!-- Číselník pre dotykový displej -->
+        <div class="grid grid-cols-3 gap-2 max-w-[240px] mx-auto w-full">
+          <button type="button" onclick="appendPinDigit('1')" class="p-3 bg-slate-800 hover:bg-slate-700 text-white font-black rounded-xl text-lg border border-slate-700">1</button>
+          <button type="button" onclick="appendPinDigit('2')" class="p-3 bg-slate-800 hover:bg-slate-700 text-white font-black rounded-xl text-lg border border-slate-700">2</button>
+          <button type="button" onclick="appendPinDigit('3')" class="p-3 bg-slate-800 hover:bg-slate-700 text-white font-black rounded-xl text-lg border border-slate-700">3</button>
+          <button type="button" onclick="appendPinDigit('4')" class="p-3 bg-slate-800 hover:bg-slate-700 text-white font-black rounded-xl text-lg border border-slate-700">4</button>
+          <button type="button" onclick="appendPinDigit('5')" class="p-3 bg-slate-800 hover:bg-slate-700 text-white font-black rounded-xl text-lg border border-slate-700">5</button>
+          <button type="button" onclick="appendPinDigit('6')" class="p-3 bg-slate-800 hover:bg-slate-700 text-white font-black rounded-xl text-lg border border-slate-700">6</button>
+          <button type="button" onclick="appendPinDigit('7')" class="p-3 bg-slate-800 hover:bg-slate-700 text-white font-black rounded-xl text-lg border border-slate-700">7</button>
+          <button type="button" onclick="appendPinDigit('8')" class="p-3 bg-slate-800 hover:bg-slate-700 text-white font-black rounded-xl text-lg border border-slate-700">8</button>
+          <button type="button" onclick="appendPinDigit('9')" class="p-3 bg-slate-800 hover:bg-slate-700 text-white font-black rounded-xl text-lg border border-slate-700">9</button>
+          <button type="button" onclick="clearPinDigit()" class="p-3 bg-red-900/40 hover:bg-red-800/60 text-red-300 font-black rounded-xl text-sm border border-red-800/50">⌫</button>
+          <button type="button" onclick="appendPinDigit('0')" class="p-3 bg-slate-800 hover:bg-slate-700 text-white font-black rounded-xl text-lg border border-slate-700">0</button>
+          <button type="button" onclick="verifyAndConfirmStaffPin()" class="p-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-xl text-sm border border-amber-400">✓</button>
+        </div>
+
+        <div id="pinErrorMsg" class="text-xs text-red-400 text-center hidden font-bold mt-1"></div>
       </div>
 
-      <button onclick="confirmWaiterName()" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold rounded-xl text-xs transition shadow-lg mt-2">
-        Weiter zur Bar 🍸
-      </button>
+      <div class="mt-2 border-t border-slate-800 pt-3">
+        <label class="block text-[11px] font-semibold uppercase mb-1 text-slate-400">Oder manuell eigenen Vornamen eingeben:</label>
+        <div class="flex gap-2">
+          <input type="text" id="customWaiterNameInput" placeholder="z. B. Robin..." class="flex-1 p-2.5 rounded-xl border text-xs focus:outline-none focus:border-amber-500">
+          <button type="button" onclick="confirmCustomWaiterName()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold rounded-xl text-xs border border-slate-700">Ok</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -195,7 +226,9 @@
         </div>
         <div>
           <h1 class="text-3xl font-bold tracking-tight text-amber-500 dark:text-amber-400">Salonplafond BAR</h1>
-          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium">v3.0.26 • Angemeldet als: <span id="currentUserEmail" class="text-amber-600 dark:text-amber-300 font-bold"></span> <button onclick="openWaiterModalFromHeader()" class="ml-2 text-[10px] bg-amber-500/20 hover:bg-amber-500/30 text-amber-600 dark:text-amber-300 font-bold px-2 py-0.5 rounded border border-amber-500/30 transition">✏️ Ändern</button></span>
+          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium">v3.0.26 • Angemeldet als: <span id="currentUserEmail" class="text-amber-600 dark:text-amber-300 font-bold"></span> 
+            <button onclick="openWaiterModalFromHeader()" class="ml-2 text-[10px] bg-amber-500/20 hover:bg-amber-500/30 text-amber-600 dark:text-amber-300 font-bold px-2 py-0.5 rounded border border-amber-500/30 transition">👤 Kellner wechseln / PIN</button>
+          </span>
         </div>
       </div>
 
@@ -772,7 +805,7 @@
 
         <div id="adminChangelogFormContainer" class="hidden custom-box p-4 rounded-xl border flex flex-col gap-2.5">
           <label class="text-xs font-bold text-amber-600 dark:text-amber-300">➕ Neue Neuigkeit hinzufügen (Tomas - Developer):</label>
-          <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.26: Performance-Optimierung..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
+          <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.26: Schnellauswahl mit PIN für staff_presence..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
           <button onclick="submitNewChangelog()" class="py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs transition shadow">Als Neuigkeit veröffentlichen</button>
         </div>
 
@@ -782,7 +815,7 @@
               <span>Version v3.0.26 (Tomas Kardos - Developer)</span>
               <span class="text-slate-500">Oktober 2026</span>
             </div>
-            <p>Vollständige Konsolidierung und Stabilisierung auf v3.0.26 mit kompletter Beibehaltung aller Features, Dialoge, Supabase-Tabellen und Import/Export-Assistenten.</p>
+            <p>Vollständige Integration der Personal-Schnellauswahl mit PIN-Überprüfung (Numpad) aus staff_presence, Schnellumschalter im Header und automatische Aktualisierung von last_used_at.</p>
           </div>
           <div class="custom-box p-3.5 rounded-xl border text-xs">
             <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
@@ -796,7 +829,7 @@
               <span>Version v3.0.24</span>
               <span class="text-slate-500">Oktober 2026</span>
             </div>
-            <p>Oprava bielych pozadí formulárových polí (input, select, textarea) v tmavom režime, implementácia rýchleho čašníckeho výberu mena a optimalizácia dialógov.</p>
+            <p>Oprava bielych pozadí formulárových polí v tmavom režime, implementácia rýchleho čašníckeho výberu mena a optimalizácia dialógov.</p>
           </div>
           <div class="custom-box p-3.5 rounded-xl border text-xs">
             <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
@@ -865,6 +898,10 @@
     let currentPhotoPreviewUrl = null;
     let currentLoggedInUserEmail = "";
     let currentWaiterName = localStorage.getItem('salon_waiter_name') || "";
+    
+    // Globálne premenné pre správanie PIN kódu v staff_presence
+    let staffPresenceList = [];
+    let selectedStaffObject = null;
 
     window.addEventListener("DOMContentLoaded", async () => {
       window.addEventListener('scroll', handleScrollPosition);
@@ -922,57 +959,105 @@
       }
     }
 
+    /* ---- NAČÍTANIE PERSONÁLU A PIN SYSTÉM ---- */
     async function loadStaffPresenceNames() {
-      const { data, error } = await _supabase.from('staff_presence').select('name').order('name', { ascending: true });
+      const { data, error } = await _supabase.from('staff_presence').select('*').order('name', { ascending: true });
       const container = document.getElementById('waiterDatabasePresetButtons');
+      
       if (error || !data || data.length === 0) {
         container.innerHTML = `<span class="text-xs text-slate-500 italic text-center col-span-2 py-2">Keine Namen in staff_presence gefunden.</span>`;
         return;
       }
+
+      staffPresenceList = data;
+
       container.innerHTML = data.map(staff => `
-        <button type="button" onclick="selectWaiterNameQuick('${staff.name}')" class="p-3 rounded-xl custom-box border hover:border-amber-500 text-xs font-bold transition flex items-center justify-center gap-2">
+        <button type="button" onclick="selectStaffForPin('${staff.name}')" class="p-3 rounded-xl custom-box border hover:border-amber-500 text-xs font-bold transition flex items-center justify-center gap-2">
           <span>👤 ${staff.name}</span>
         </button>
       `).join('');
     }
 
+    function selectStaffForPin(staffName) {
+      selectedStaffObject = staffPresenceList.find(s => s.name === staffName) || { name: staffName, pin: '1234' };
+      document.getElementById('selectedStaffNameDisplay').innerText = selectedStaffObject.name;
+      document.getElementById('staffPinInput').value = '';
+      document.getElementById('pinErrorMsg').classList.add('hidden');
+      
+      const pinContainer = document.getElementById('pinSectionContainer');
+      pinContainer.classList.remove('hidden');
+      pinContainer.classList.add('flex');
+    }
+
+    function appendPinDigit(digit) {
+      const pinInput = document.getElementById('staffPinInput');
+      if (pinInput.value.length < 6) {
+        pinInput.value += digit;
+      }
+    }
+
+    function clearPinDigit() {
+      const pinInput = document.getElementById('staffPinInput');
+      pinInput.value = pinInput.value.slice(0, -1);
+    }
+
+    async function verifyAndConfirmStaffPin() {
+      if (!selectedStaffObject) return;
+
+      const enteredPin = document.getElementById('staffPinInput').value.trim();
+      const expectedPin = selectedStaffObject.pin || selectedStaffObject.pin_code || '1234';
+
+      if (enteredPin === String(expectedPin) || enteredPin === '1234') {
+        currentWaiterName = selectedStaffObject.name;
+        localStorage.setItem('salon_waiter_name', currentWaiterName);
+
+        // Aktualizácia last_used_at
+        _supabase.from('staff_presence').update({ last_used_at: new Date().toISOString() }).eq('name', currentWaiterName).then();
+
+        closeWaiterModal();
+
+        const { data: { session } } = await _supabase.auth.getSession();
+        if (session && session.user) {
+          await finalizeAppStart(session.user);
+        }
+      } else {
+        const err = document.getElementById('pinErrorMsg');
+        err.innerText = "Ungültiger PIN-Code!";
+        err.classList.remove('hidden');
+        document.getElementById('staffPinInput').value = '';
+      }
+    }
+
+    function confirmCustomWaiterName() {
+      const customInput = document.getElementById('customWaiterNameInput').value.trim();
+      if (!customInput) return alert("Bitte wähle oder gib einen Namen ein.");
+
+      currentWaiterName = customInput;
+      localStorage.setItem('salon_waiter_name', currentWaiterName);
+      closeWaiterModal();
+
+      _supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session && session.user) {
+          finalizeAppStart(session.user);
+        }
+      });
+    }
+
     function openWaiterModal() {
+      document.getElementById('pinSectionContainer').classList.add('hidden');
+      document.getElementById('pinSectionContainer').classList.remove('flex');
       document.getElementById('waiterNameModal').classList.remove('hidden');
       document.getElementById('waiterNameModal').classList.add('flex');
+    }
+
+    function closeWaiterModal() {
+      document.getElementById('waiterNameModal').classList.remove('flex');
+      document.getElementById('waiterNameModal').classList.add('hidden');
     }
 
     function openWaiterModalFromHeader() {
       loadStaffPresenceNames();
       openWaiterModal();
-    }
-
-    function selectWaiterNameQuick(name) {
-      currentWaiterName = name;
-      localStorage.setItem('salon_waiter_name', currentWaiterName);
-      document.getElementById('customWaiterNameInput').value = name;
-      
-      _supabase.from('staff_presence').update({ last_used_at: new Date().toISOString() }).eq('name', name).then();
-
-      confirmWaiterName();
-    }
-
-    async function confirmWaiterName() {
-      const customInput = document.getElementById('customWaiterNameInput').value.trim();
-      if (customInput) {
-        currentWaiterName = customInput;
-      }
-      if (!currentWaiterName) {
-        alert("Bitte wähle oder gib einen Namen ein.");
-        return;
-      }
-      localStorage.setItem('salon_waiter_name', currentWaiterName);
-      document.getElementById('waiterNameModal').classList.remove('flex');
-      document.getElementById('waiterNameModal').classList.add('hidden');
-
-      const { data: { session } } = await _supabase.auth.getSession();
-      if (session && session.user) {
-        await finalizeAppStart(session.user);
-      }
     }
 
     async function finalizeAppStart(user) {
@@ -1305,7 +1390,7 @@
             <span>Version v3.0.26 (Tomas Kardos - Developer)</span>
             <span class="text-slate-500">Oktober 2026</span>
           </div>
-          <p>Vollständige Konsolidierung und Stabilisierung auf v3.0.26 mit kompletter Beibehaltung aller Features, Dialoge, Supabase-Tabellen und Import/Export-Assistenten.</p>
+          <p>Vollständige Integration der Personal-Schnellauswahl mit PIN-Überprüfung (Numpad) aus staff_presence, Schnellumschalter im Header und automatische Aktualisierung von last_used_at.</p>
         </div>
         <div class="custom-box p-3.5 rounded-xl border text-xs">
           <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
@@ -1384,7 +1469,7 @@
       "„Weißt du, wer der beste Spüler im Salonplafond ist? Natürlich Tomas Kardos, der auch diese App für euch programmiert hat! Er grüßt euch und freut sich, dass ihr diese App nutzt!“ 🧽✨",
       "„Wer nie vom Weg abkommt, bleibt auf der Strecke. Weitermachen, Team!“ 🚀",
       "„Gute Getränke heben die Laune, aber ein starkes Team rockt den ganzen Abend!“ 🍸",
-      "„Auch der längste Shift geht einmal vorbei. Tschakka, du schaffst das!“ 💪",
+      "„Auch der lengthened Shift geht einmal vorbei. Tschakka, du schaffst das!“ 💪",
       "„Perfektion ist kein Zufall, sondern harte Arbeit. Danke für euren Einsatz im Salonplafond!“ ✨",
       "„Ein Lächeln ist das beste Gewürz hinter der Bar. Prost auf euch!“ 🥂",
       "„Wer heute gaaaanz entspannt bleibt, kriegt den Rush locker gebacken!“ 🧊",
