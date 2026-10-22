@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.26</title>
+  <title>Salonplafond BAR v3.0.25</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import & Export -->
@@ -123,76 +123,39 @@
 </head>
 <body class="dark-mode p-4 md:p-8 max-w-6xl mx-auto pb-32" onclick="closeDropdowns(event)">
 
-  <!-- 1. PRIHLASOVACIA OBRAZOVKA (Nová PIN Authentifizierung + E-Mail Fallback) -->
+  <!-- 1. PRIHLASOVACIA OBRAZOVKA -->
   <div id="authContainer" class="fixed inset-0 z-[200] bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
-    <div class="flex flex-col items-center gap-4 w-full max-w-sm bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl">
+    <div class="flex flex-col items-center gap-4 w-full max-w-md">
       
-      <div class="login-logo-advanced w-16 h-16 bg-amber-400 rounded-2xl flex flex-col items-center justify-center shadow-2xl p-1 text-slate-950 font-bold select-none border-2 border-amber-300 mx-auto">
-        <div class="text-[12px] font-black tracking-[1px] leading-none mb-0.5">——</div>
-        <div class="text-2xl font-black leading-none my-0">O</div>
-        <div class="text-[9px] font-black leading-none mt-0.5">•</div>
+      <div class="login-logo-advanced w-20 h-20 bg-amber-400 rounded-2xl flex flex-col items-center justify-center shadow-2xl p-1 text-slate-950 font-bold select-none border-2 border-amber-300 mx-auto">
+        <div class="text-[14px] font-black tracking-[1px] leading-none mb-0.5">——</div>
+        <div class="text-3xl font-black leading-none my-0">O</div>
+        <div class="text-[11px] font-black leading-none mt-0.5">•</div>
       </div>
 
       <div>
-        <h1 class="text-lg font-black tracking-wider text-white uppercase">Anmeldung</h1>
-        <h2 class="text-xl font-extrabold text-amber-400 tracking-tight">Salonplafond BAR</h2>
-        <span class="text-[11px] text-slate-400 font-medium block mt-0.5">v3.0.26 • PIN Authentifizierung</span>
+        <h1 class="text-xl md:text-2xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
+        <h2 class="text-2xl md:text-3xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
+        <span class="text-xs text-slate-400 font-medium mt-1 block">v3.0.25 • Sichere Authentifizierung</span>
       </div>
 
-      <!-- Výber mena čašníka z tabuľky staff_presence -->
-      <div class="w-full text-left">
-        <label class="block text-[11px] font-semibold uppercase mb-1 text-slate-300">Wer bist du?</label>
-        <select id="pinUserSelect" class="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400">
-          <option value="">Lade Personal...</option>
-        </select>
-      </div>
-
-      <!-- Zobrazenie zadaného PINu (bodky) -->
-      <div class="w-full">
-        <label class="block text-[11px] font-semibold uppercase mb-1 text-slate-300">PIN eingeben</label>
-        <div id="pinDisplay" class="w-full tracking-[8px] text-xl font-bold bg-slate-950 p-3 rounded-xl border border-slate-800 text-amber-400 h-12 flex items-center justify-center"></div>
-      </div>
-
-      <!-- Číselná klávesnica (PIN pad) -->
-      <div class="grid grid-cols-3 gap-2 w-full">
-        <button type="button" onclick="appendPin('1')" class="py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-sm transition">1</button>
-        <button type="button" onclick="appendPin('2')" class="py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-sm transition">2</button>
-        <button type="button" onclick="appendPin('3')" class="py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-sm transition">3</button>
-        <button type="button" onclick="appendPin('4')" class="py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-sm transition">4</button>
-        <button type="button" onclick="appendPin('5')" class="py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-sm transition">5</button>
-        <button type="button" onclick="appendPin('6')" class="py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-sm transition">6</button>
-        <button type="button" onclick="appendPin('7')" class="py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-sm transition">7</button>
-        <button type="button" onclick="appendPin('8')" class="py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-sm transition">8</button>
-        <button type="button" onclick="appendPin('9')" class="py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-sm transition">9</button>
-        <button type="button" onclick="clearPin()" class="py-3 bg-slate-800 hover:bg-red-900/40 text-red-400 font-bold rounded-xl text-xs transition">C</button>
-        <button type="button" onclick="appendPin('0')" class="py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-sm transition">0</button>
-        <button type="button" onclick="verifyPinLogin()" class="py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold rounded-xl text-xs transition">OK</button>
-      </div>
-
-      <div id="pinAuthError" class="text-xs text-red-400 hidden font-medium"></div>
-
-      <!-- Záložný e-mailový Admin Login -->
-      <div class="border-t border-slate-800 pt-3 w-full text-center">
-        <button type="button" onclick="toggleAdminEmailLogin()" class="text-[11px] text-slate-400 hover:text-amber-400 underline transition">🔒 Admin E-Mail Login (Fallback)</button>
-      </div>
-
-      <!-- Skrytý formulár pre klasický e-mailový login -->
-      <form id="adminEmailLoginForm" onsubmit="handleEmailLogin(event)" autocomplete="off" class="w-full space-y-3 text-left hidden pt-2 border-t border-slate-800">
+      <form id="loginForm" onsubmit="handleLogin(event)" autocomplete="off" class="w-full bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl space-y-4 text-left mt-2">
         <div>
-          <label class="block text-[10px] font-semibold uppercase mb-0.5 text-slate-300">E-Mail</label>
-          <input type="email" id="loginEmail" autocomplete="off" placeholder="name@salonplafond.wien" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400">
+          <label class="block text-xs font-semibold uppercase mb-1 text-slate-300">E-Mail</label>
+          <input type="email" id="loginEmail" autocomplete="off" required placeholder="name@salonplafond.wien" class="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400">
         </div>
         <div>
-          <label class="block text-[10px] font-semibold uppercase mb-0.5 text-slate-300">Passwort</label>
-          <input type="password" id="loginPassword" autocomplete="new-password" class="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400">
+          <label class="block text-xs font-semibold uppercase mb-1 text-slate-300">Passwort</label>
+          <input type="password" id="loginPassword" autocomplete="new-password" required class="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400">
         </div>
-        <button type="submit" id="loginSubmitBtn" class="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold rounded-xl text-xs transition">
-          <span>Mit E-Mail einloggen</span>
+        <div id="authError" class="text-xs text-red-400 hidden font-medium"></div>
+        <button type="submit" id="loginSubmitBtn" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold rounded-xl text-xs transition shadow-lg flex items-center justify-center gap-2">
+          <span>Einloggen</span>
         </button>
       </form>
 
-      <div class="mt-2">
-        <span class="text-[10px] text-slate-500 font-extrabold block">Erstellt von © T0mc1k (Tomas Kardos)</span>
+      <div class="mt-4 flex flex-col items-center gap-2">
+        <span class="text-xs text-slate-300 font-extrabold block">Erstellt von © T0mc1k (Tomas Kardos)</span>
       </div>
     </div>
   </div>
@@ -232,7 +195,7 @@
         </div>
         <div>
           <h1 class="text-3xl font-bold tracking-tight text-amber-500 dark:text-amber-400">Salonplafond BAR</h1>
-          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium">v3.0.26 • Angemeldet als: <span id="currentUserEmail" class="text-amber-600 dark:text-amber-300 font-bold"></span> <button onclick="openWaiterModalFromHeader()" class="ml-2 text-[10px] bg-amber-500/20 hover:bg-amber-500/30 text-amber-600 dark:text-amber-300 font-bold px-2 py-0.5 rounded border border-amber-500/30 transition">✏️ Ändern</button></span>
+          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium">v3.0.25 • Angemeldet als: <span id="currentUserEmail" class="text-amber-600 dark:text-amber-300 font-bold"></span> <button onclick="openWaiterModalFromHeader()" class="ml-2 text-[10px] bg-amber-500/20 hover:bg-amber-500/30 text-amber-600 dark:text-amber-300 font-bold px-2 py-0.5 rounded border border-amber-500/30 transition">✏️ Ändern</button></span>
         </div>
       </div>
 
@@ -354,7 +317,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-300 dark:border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.26 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.25 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div>
@@ -803,27 +766,20 @@
       <!-- OBSAH 2: CHANGELOG / NOVINKY (10 verzií) -->
       <div id="supportTabChangelog" class="hidden flex flex-col gap-4">
         <div>
-          <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400">🚀 Neuigkeiten & Updates (Letzte Versionen)</h3>
+          <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400">🚀 Neuigkeiten & Updates (Letzte 10 Versionen)</h3>
           <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Hier siehst du die Historie der letzten Aktualisierungen und Verbesserungen.</p>
         </div>
 
         <div id="adminChangelogFormContainer" class="hidden custom-box p-4 rounded-xl border flex flex-col gap-2.5">
           <label class="text-xs font-bold text-amber-600 dark:text-amber-300">➕ Neue Neuigkeit hinzufügen (Tomas - Developer):</label>
-          <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.26: Schneller PIN-Login..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
+          <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.25: Personal-Auswahl direkt aus staff_presence..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
           <button onclick="submitNewChangelog()" class="py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs transition shadow">Als Neuigkeit veröffentlichen</button>
         </div>
 
         <div class="flex flex-col gap-2.5 max-h-[45vh] overflow-y-auto pr-1" id="changelogListContainer">
           <div class="custom-box p-3.5 rounded-xl border text-xs">
             <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-              <span>Version v3.0.26 (Tomas Kardos - Developer)</span>
-              <span class="text-slate-500">Oktober 2026</span>
-            </div>
-            <p>Einführung des schnellen PIN-basierten Logins über staff_presence mit Rollenauswahl (developer, manager, staff) und E-Mail-Fallback.</p>
-          </div>
-          <div class="custom-box p-3.5 rounded-xl border text-xs">
-            <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-              <span>Version v3.0.25</span>
+              <span>Version v3.0.25 (Tomas Kardos - Developer)</span>
               <span class="text-slate-500">Oktober 2026</span>
             </div>
             <p>Verknüpfung der Personal-Schnellauswahl mit der Supabase-Tabelle staff_presence, Schnellumschalter im Header und automatische Aktualisierung von last_used_at.</p>
@@ -833,7 +789,7 @@
               <span>Version v3.0.24</span>
               <span class="text-slate-500">Oktober 2026</span>
             </div>
-            <p>Oprava bielych pozadí formulárových polí v tmavom režime, implementácia rýchleho čašníckeho výberu mena a optimalizácia dialógov.</p>
+            <p>Oprava bielych pozadí formulárových polí (input, select, textarea) v tmavom režime, implementácia rýchleho čašníckeho výberu mena a optimalizácia dialógov.</p>
           </div>
           <div class="custom-box p-3.5 rounded-xl border text-xs">
             <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
@@ -884,6 +840,13 @@
             </div>
             <p>Erweiterung der Import- und Export-Assistenten für Excel-Dateien.</p>
           </div>
+          <div class="custom-box p-3.5 rounded-xl border text-xs">
+            <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
+              <span>Version v3.0.16</span>
+              <span class="text-slate-500">Oktober 2026</span>
+            </div>
+            <p>Integration von Multi-View und direktem Rezeptvergleich.</p>
+          </div>
         </div>
       </div>
 
@@ -902,36 +865,14 @@
     let currentPhotoPreviewUrl = null;
     let currentLoggedInUserEmail = "";
     let currentWaiterName = localStorage.getItem('salon_waiter_name') || "";
-    let currentRole = localStorage.getItem('salon_user_role') || "staff";
-    let staffList = [];
-    let enteredPin = "";
 
     window.addEventListener("DOMContentLoaded", async () => {
       window.addEventListener('scroll', handleScrollPosition);
-      
-      // 1. Skontrolovať uloženej relácie z PIN loginu v localStorage
-      const savedUser = localStorage.getItem('salon_logged_staff');
-      if (savedUser) {
-        try {
-          const userObj = JSON.parse(savedUser);
-          currentWaiterName = userObj.name;
-          currentRole = userObj.role || 'staff';
-          await finalizeAppStartAfterPinLogin(userObj);
-          return;
-        } catch (e) {
-          console.error(e);
-        }
-      }
-
-      // 2. Fallback na Supabase Auth reláciu (ak bol prihlásený cez e-mail)
       const { data: { session } } = await _supabase.auth.getSession();
       if (session && session.user) {
-        currentRole = 'developer';
-        currentWaiterName = session.user.email === "kdstom@outlook.com" ? "Tomas (Dev)" : "Admin";
-        await finalizeAppStartAfterPinLogin({ name: currentWaiterName, role: 'developer' });
+        await handleSessionAfterLogin(session.user);
       } else {
         document.getElementById('authContainer').classList.remove('hidden');
-        loadStaffForPinLogin();
       }
     });
 
@@ -948,146 +889,41 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    /* ---- PIN LOGIN LOGIKA (v3.0.26) ---- */
-    async function loadStaffForPinLogin() {
-      const { data, error } = await _supabase.from('staff_presence').select('*').order('name', { ascending: true });
-      const select = document.getElementById('pinUserSelect');
-      if (error || !data || data.length === 0) {
-        select.innerHTML = `<option value="">Kein Personal gefunden (Prüfe Supabase)</option>`;
-        staffList = [];
-        return;
-      }
-      staffList = data;
-      select.innerHTML = `<option value="">-- Wähle deinen Namen --</option>` + data.map(s => `
-        <option value="${s.id}">${s.name} (${s.role || 'staff'})</option>
-      `).join('');
-    }
-
-    function appendPin(digit) {
-      if (enteredPin.length < 6) {
-        enteredPin += digit;
-        updatePinDisplay();
-      }
-    }
-
-    function clearPin() {
-      enteredPin = "";
-      updatePinDisplay();
-    }
-
-    function updatePinDisplay() {
-      document.getElementById('pinDisplay').textContent = "•".repeat(enteredPin.length);
-    }
-
-    async function verifyPinLogin() {
-      const selectId = document.getElementById('pinUserSelect').value;
-      const errDiv = document.getElementById('pinAuthError');
-      errDiv.classList.add('hidden');
-
-      if (!selectId) {
-        errDiv.textContent = "Bitte wähle zuerst deinen Namen aus!";
-        errDiv.classList.remove('hidden');
-        return;
-      }
-
-      const user = staffList.find(s => s.id === selectId);
-      if (!user) {
-        errDiv.textContent = "Ungültiger Benutzer!";
-        errDiv.classList.remove('hidden');
-        return;
-      }
-
-      if (user.pin && user.pin === enteredPin) {
-        localStorage.setItem('salon_logged_staff', JSON.stringify(user));
-        localStorage.setItem('salon_waiter_name', user.name);
-        localStorage.setItem('salon_user_role', user.role || 'staff');
-        
-        currentWaiterName = user.name;
-        currentRole = user.role || 'staff';
-
-        _supabase.from('staff_presence').update({ last_used_at: new Date().toISOString() }).eq('id', user.id).then();
-
-        document.getElementById('authContainer').classList.add('hidden');
-        await finalizeAppStartAfterPinLogin(user);
-      } else {
-        errDiv.textContent = "Falscher PIN!";
-        errDiv.classList.remove('hidden');
-        clearPin();
-      }
-    }
-
-    function toggleAdminEmailLogin() {
-      const form = document.getElementById('adminEmailLoginForm');
-      form.classList.toggle('hidden');
-    }
-
-    async function handleEmailLogin(e) {
+    async function handleLogin(e) {
       e.preventDefault();
       const email = document.getElementById("loginEmail").value;
       const password = document.getElementById("loginPassword").value;
+      const errDiv = document.getElementById("authError");
       const btnText = document.getElementById("loginSubmitBtn").querySelector('span');
+      errDiv.classList.add("hidden");
       btnText.innerText = "Wird eingeloggt...";
 
       const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
       if (error) {
-        alert("Fehler: " + error.message);
-        btnText.innerText = "Mit E-Mail einloggen";
+        errDiv.innerText = "Fehler: " + error.message;
+        errDiv.classList.remove("hidden");
+        btnText.innerText = "Einloggen";
       } else {
         if (data && data.user) {
-          currentRole = 'developer';
-          currentWaiterName = "Tomas (Dev)";
-          localStorage.setItem('salon_waiter_name', currentWaiterName);
-          localStorage.setItem('salon_user_role', 'developer');
-          document.getElementById('authContainer').classList.add('hidden');
-          await finalizeAppStartAfterPinLogin({ name: currentWaiterName, role: 'developer' });
+          await handleSessionAfterLogin(data.user);
         }
       }
     }
 
-    async function finalizeAppStartAfterPinLogin(user) {
-      document.getElementById('appContainer').classList.remove('hidden');
+    async function handleSessionAfterLogin(user) {
+      currentLoggedInUserEmail = user.email;
+      document.getElementById('authContainer').classList.add('hidden');
       
-      isAdmin = (user.role === 'developer' || user.role === 'manager' || currentWaiterName.toLowerCase() === 'amim' || currentWaiterName.toLowerCase().includes('tomas'));
-      
-      if (user.role === 'developer') {
-        document.getElementById('currentUserEmail').innerHTML = `<span class="text-amber-600 dark:text-amber-400 font-black">${currentWaiterName} (Developer 🚀)</span>`;
-      } else if (user.role === 'manager') {
-        document.getElementById('currentUserEmail').innerHTML = `<span class="text-amber-600 dark:text-amber-400 font-black">${currentWaiterName} (Manager ⚙️)</span>`;
+      await loadStaffPresenceNames();
+      if (!currentWaiterName) {
+        openWaiterModal();
       } else {
-        document.getElementById('currentUserEmail').innerHTML = `<span class="text-amber-600 dark:text-amber-400 font-black">${currentWaiterName} (Staff 🍸)</span>`;
+        await finalizeAppStart(user);
       }
-      
-      const btnMenuImportExport = document.getElementById('btnMenuImportExport');
-      const menuAddDrinkBtn = document.getElementById('menuAddDrinkBtn');
-      const addBtnCont = document.getElementById('addDrinkBtnContainer');
-      const adminChangelogCont = document.getElementById('adminChangelogFormContainer');
-
-      if (isAdmin) {
-        if (btnMenuImportExport) { btnMenuImportExport.classList.remove('hidden'); btnMenuImportExport.classList.add('flex'); }
-        if (menuAddDrinkBtn) { menuAddDrinkBtn.classList.remove('hidden'); menuAddDrinkBtn.classList.add('flex'); }
-        if (addBtnCont) addBtnCont.classList.remove('hidden');
-        if (adminChangelogCont) adminChangelogCont.classList.remove('hidden');
-      } else {
-        if (btnMenuImportExport) { btnMenuImportExport.classList.add('hidden'); btnMenuImportExport.classList.remove('flex'); }
-        if (menuAddDrinkBtn) { menuAddDrinkBtn.classList.add('hidden'); menuAddDrinkBtn.classList.remove('flex'); }
-        if (addBtnCont) addBtnCont.classList.add('hidden');
-        if (adminChangelogCont) adminChangelogCont.classList.add('hidden');
-      }
-
-      await loadDrinks();
-      await checkPendingTicketsBadge();
-    }
-
-    async function handleLogout() {
-      localStorage.removeItem('salon_logged_staff');
-      localStorage.removeItem('salon_waiter_name');
-      localStorage.removeItem('salon_user_role');
-      await _supabase.auth.signOut();
-      window.location.reload();
     }
 
     async function loadStaffPresenceNames() {
-      const { data, error } = await _supabase.from('staff_presence').select('*').order('name', { ascending: true });
+      const { data, error } = await _supabase.from('staff_presence').select('name').order('name', { ascending: true });
       const container = document.getElementById('waiterDatabasePresetButtons');
       if (error || !data || data.length === 0) {
         container.innerHTML = `<span class="text-xs text-slate-500 italic col-span-2 text-center py-2">Keine Namen in staff_presence gefunden.</span>`;
@@ -1133,16 +969,57 @@
       document.getElementById('waiterNameModal').classList.remove('flex');
       document.getElementById('waiterNameModal').classList.add('hidden');
 
-      const savedUser = localStorage.getItem('salon_logged_staff');
-      if (savedUser) {
-        await finalizeAppStartAfterPinLogin(JSON.parse(savedUser));
-      } else {
-        window.location.reload();
+      const { data: { session } } = await _supabase.auth.getSession();
+      if (session && session.user) {
+        await finalizeAppStart(session.user);
       }
     }
 
+    async function finalizeAppStart(user) {
+      document.getElementById('appContainer').classList.remove('hidden');
+      
+      if (user.email === "kdstom@outlook.com" || currentWaiterName.toLowerCase() === "amim" || user.email.includes("amim@salonplafond.wien")) {
+        isAdmin = true;
+        document.getElementById('currentUserEmail').innerHTML = `<span class="text-amber-600 dark:text-amber-400 font-black">${currentWaiterName} (Developer / Manager)</span>`;
+      } else {
+        isAdmin = false;
+        document.getElementById('currentUserEmail').innerHTML = `<span class="text-amber-600 dark:text-amber-400 font-black">${currentWaiterName}</span>`;
+      }
+      
+      const btnMenuImportExport = document.getElementById('btnMenuImportExport');
+      const menuAddDrinkBtn = document.getElementById('menuAddDrinkBtn');
+      const addBtnCont = document.getElementById('addDrinkBtnContainer');
+      const adminChangelogCont = document.getElementById('adminChangelogFormContainer');
+
+      if (isAdmin) {
+        btnMenuImportExport.classList.remove('hidden');
+        btnMenuImportExport.classList.add('flex');
+        menuAddDrinkBtn.classList.remove('hidden');
+        menuAddDrinkBtn.classList.add('flex');
+        addBtnCont.classList.remove('hidden');
+        if (adminChangelogCont) adminChangelogCont.classList.remove('hidden');
+      } else {
+        btnMenuImportExport.classList.add('hidden');
+        btnMenuImportExport.classList.remove('flex');
+        menuAddDrinkBtn.classList.add('hidden');
+        menuAddDrinkBtn.classList.remove('flex');
+        addBtnCont.classList.add('hidden');
+        if (adminChangelogCont) adminChangelogCont.classList.add('hidden');
+      }
+
+      await loadDrinks();
+      await checkPendingTicketsBadge();
+    }
+
+    async function handleLogout() {
+      await _supabase.auth.signOut();
+      document.getElementById('appContainer').classList.add('hidden');
+      document.getElementById('authContainer').classList.remove('hidden');
+      document.getElementById('loginSubmitBtn').querySelector('span').innerText = "Einloggen";
+    }
+
     function checkManagerAuth(callback) {
-      if (isAdmin || currentRole === 'developer' || currentRole === 'manager') {
+      if (isAdmin) {
         if (callback) callback();
         return;
       }
@@ -1173,19 +1050,25 @@
       }
 
       const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
-      if (error || !data.user) {
+      if (error || !data.user || (data.user.email !== "kdstom@outlook.com" && !data.user.email.includes("amim@salonplafond.wien"))) {
         errDiv.innerText = "Ungültige Administrator-Anmeldedaten!";
         errDiv.classList.remove('hidden');
       } else {
         isAdmin = true;
-        currentRole = 'developer';
+        document.getElementById('btnMenuImportExport').classList.remove('hidden');
+        document.getElementById('btnMenuImportExport').classList.add('flex');
+        document.getElementById('menuAddDrinkBtn').classList.remove('hidden');
+        document.getElementById('menuAddDrinkBtn').classList.add('flex');
+        document.getElementById('addDrinkBtnContainer').classList.remove('hidden');
+        const adminChangelogCont = document.getElementById('adminChangelogFormContainer');
+        if (adminChangelogCont) adminChangelogCont.classList.remove('hidden');
+        
         closeAuthModal();
         alert("Erfolgreich als Administrator autorisiert!");
         if (pendingAuthCallback) {
           pendingAuthCallback();
           pendingAuthCallback = null;
         }
-        window.location.reload();
       }
     }
 
@@ -1251,7 +1134,7 @@
       const text = msgInput.value.trim();
       if (!text) return alert("Bitte geben Sie eine Nachricht ein.");
 
-      const authorString = `${currentWaiterName} (${currentRole})`;
+      const authorString = `${currentWaiterName} (${currentLoggedInUserEmail || 'Staff'})`;
 
       const { error } = await _supabase.from('support_tickets').insert([{
         author_email: authorString,
@@ -1417,13 +1300,6 @@
       }
 
       container.innerHTML = dynamicHtml + `
-        <div class="custom-box p-3.5 rounded-xl border text-xs">
-          <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-            <span>Version v3.0.26 (Tomas Kardos - Developer)</span>
-            <span class="text-slate-500">Oktober 2026</span>
-          </div>
-          <p>Einführung des schnellen PIN-basierten Logins über staff_presence mit Rollenauswahl (developer, manager, staff) und E-Mail-Fallback.</p>
-        </div>
         <div class="custom-box p-3.5 rounded-xl border text-xs">
           <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
             <span>Version v3.0.25 (Tomas Kardos - Developer)</span>
