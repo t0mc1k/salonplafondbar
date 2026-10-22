@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.31</title>
+  <title>Salonplafond BAR v3.0.32</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import & Export -->
@@ -47,7 +47,6 @@
       100% { transform: scale(1) rotate(360deg); box-shadow: 0 0 15px rgba(245, 158, 11, 0.4); }
     }
 
-    /* Interaktívne animované logo v hlavičke */
     .header-logo-container {
       position: relative;
       width: 3rem;
@@ -123,7 +122,7 @@
 </head>
 <body class="dark-mode p-4 md:p-8 max-w-6xl mx-auto pb-32" onclick="closeDropdowns(event)">
 
-  <!-- 1. PRIHLASOVACIA OBRAZOVKA (Veľká dotyková mriežka mien + PIN numpad s auto-loginom) -->
+  <!-- 1. PRIHLASOVACIA OBRAZOVKA -->
   <div id="authContainer" class="fixed inset-0 z-[200] bg-slate-950 flex flex-col items-center justify-center p-4 md:p-6 text-center overflow-y-auto">
     <div class="flex flex-col items-center gap-4 w-full max-w-lg my-auto">
       
@@ -136,13 +135,10 @@
       <div>
         <h1 class="text-lg md:text-xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-xl md:text-2xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.0.31 • Touch-Grid PIN-Login</span>
+        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.0.32 • Touch-Grid PIN-Login</span>
       </div>
 
-      <!-- HLAVNÝ LOGIN BOX S DRIED KATEGÓRIAMI (Mriežka mien) -->
       <div id="pinLoginForm" class="w-full bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-2xl space-y-4 text-left mt-1">
-        
-        <!-- Krok 1: Výber mena cez dlaždice -->
         <div>
           <label class="block text-xs font-semibold uppercase mb-2 text-slate-300 flex items-center justify-between">
             <span>1. Wer bist du? (Personal wählen)</span>
@@ -153,7 +149,6 @@
           </div>
         </div>
 
-        <!-- Krok 2: Zadanie PINu cez numerickú klávesnicu -->
         <div id="pinInputSection" class="hidden border-t border-slate-800 pt-3">
           <div class="flex items-center justify-between mb-1">
             <label class="block text-xs font-semibold uppercase text-slate-300">2. PIN-Code eingeben</label>
@@ -163,7 +158,6 @@
             <input type="password" id="loginPinInput" readonly placeholder="••••" class="w-full p-2.5 text-center tracking-widest text-base rounded-xl bg-slate-950 border border-slate-800 text-amber-400 font-black focus:outline-none focus:border-amber-400">
           </div>
 
-          <!-- Dotyková numerická klávesnica -->
           <div class="grid grid-cols-3 gap-1.5">
             <button type="button" onclick="appendPinNum('1')" class="p-2.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-white text-sm font-bold rounded-xl transition">1</button>
             <button type="button" onclick="appendPinNum('2')" class="p-2.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-white text-sm font-bold rounded-xl transition">2</button>
@@ -189,7 +183,6 @@
         </div>
       </div>
 
-      <!-- ZÁLOŽNÝ STARÝ EMAIL LOGIN FORMULÁR -->
       <form id="emailLoginForm" onsubmit="handleEmailLogin(event)" autocomplete="off" class="hidden w-full bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl space-y-4 text-left mt-2">
         <div>
           <label class="block text-xs font-semibold uppercase mb-1 text-slate-300">E-Mail</label>
@@ -217,7 +210,7 @@
     </div>
   </div>
 
-  <!-- SPRÁVCOVSKÝ PANEL PRE PERSONAL & PINs (Zentrale) -->
+  <!-- SPRÁVCOVSKÝ PANEL PRE PERSONAL & PINs -->
   <div id="staffPinManagementModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[260]">
     <div class="card max-w-2xl w-full p-6 relative flex flex-col gap-5 max-h-[85vh] overflow-y-auto border-amber-500/50 shadow-2xl">
       <button onclick="closeStaffPinModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
@@ -226,7 +219,6 @@
         <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Verwaltung von Personal, PIN-Codes und Zugriffsberechtigungen.</p>
       </div>
 
-      <!-- Formulár na pridanie / úpravu -->
       <div class="custom-box p-4 rounded-xl border flex flex-col gap-3">
         <h4 class="text-xs font-bold uppercase text-amber-600 dark:text-amber-400" id="staffFormTitle">➕ Neuen Mitarbeiter hinzufügen</h4>
         <input type="hidden" id="editingStaffOriginalName" value="">
@@ -254,7 +246,6 @@
         </div>
       </div>
 
-      <!-- Zoznam personálu -->
       <div class="flex flex-col gap-2">
         <h4 class="text-xs font-bold uppercase tracking-wider">Aktuelles Personal in der Datenbank:</h4>
         <div id="staffManagementListContainer" class="flex flex-col gap-2 max-h-[35vh] overflow-y-auto pr-1">
@@ -272,7 +263,7 @@
   <div id="appContainer" class="hidden">
 
     <!-- Header -->
-    <header class="flex flex-col md:flex-row justify-between items-center gap-4 mb-8 pb-4 border-b border-slate-300 dark:border-slate-700">
+    <header class="flex flex-col md:flex-row justify-between items-center gap-4 mb-4 pb-4 border-b border-slate-300 dark:border-slate-700">
       <div class="flex items-center gap-3">
         <div class="header-logo-container" onclick="showRandomMotivation(event)" title="Klick mich für Osterei-Motivation! 🍸">
           <span class="logo-macron">——</span>
@@ -281,7 +272,7 @@
         </div>
         <div>
           <h1 class="text-3xl font-bold tracking-tight text-amber-500 dark:text-amber-400">Salonplafond BAR</h1>
-          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium">v3.0.31 • Angemeldet als: <span id="currentUserEmail" class="text-amber-600 dark:text-amber-300 font-bold"></span></span>
+          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium">v3.0.32 • Angemeldet als: <span id="currentUserEmail" class="text-amber-600 dark:text-amber-300 font-bold"></span></span>
         </div>
       </div>
 
@@ -294,11 +285,6 @@
           ⛶ Vollbild
         </button>
 
-        <div class="relative w-48 md:w-64">
-          <input type="text" id="searchInput" autocomplete="off" oninput="onSearchInput()" placeholder="🔍 Suchen..." class="px-4 py-1.5 pr-8 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white w-full focus:outline-none focus:border-amber-500 text-xs shadow-sm">
-          <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs font-bold bg-slate-700/50 hover:bg-slate-700 w-4 h-4 rounded-full items-center justify-center">&times;</button>
-        </div>
-
         <div class="relative">
           <button onclick="toggleSettingsMenu(event)" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs flex items-center gap-1 shadow-md transition relative">
             ⚙️ Menü
@@ -307,15 +293,24 @@
           
           <div id="settingsDropdown" class="hidden absolute right-0 mt-2 w-64 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl shadow-2xl p-2 z-50 flex flex-col gap-1.5 text-slate-900 dark:text-slate-100">
             
+            <!-- Bod 4: Daten aktualisieren je teraz nad voľbou sezóny -->
             <button onclick="refreshData()" class="w-full text-left px-2.5 py-2 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
               🔄 Daten aktualisieren
             </button>
+
+            <button onclick="openSeasonModal()" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+              📅 Saison wählen...
+            </button>
+
+            <div class="border-t border-slate-200 dark:border-slate-700 my-0.5"></div>
 
             <button onclick="openAddDrinkModalFromMenu()" id="menuAddDrinkBtn" class="hidden w-full text-left px-2.5 py-2 rounded bg-amber-500 text-slate-950 hover:bg-amber-600 text-xs font-black items-center gap-2 shadow-sm">
               ➕ Neues Getränk hinzufügen
             </button>
 
-            <!-- Nová položka v menu pre tlač A3 kariet -->
+            <!-- Bod 4: Čiara pod pridaním nového drinku -->
+            <div id="menuDividerDrink" class="hidden border-t border-slate-200 dark:border-slate-700 my-0.5"></div>
+
             <button onclick="openA3PrintSetupModal()" class="w-full text-left px-2.5 py-2 rounded bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center justify-between border border-slate-200 dark:border-slate-700">
               <span>🖨️ Karten-Druck (A3)</span> <span>→</span>
             </button>
@@ -329,10 +324,6 @@
             </button>
 
             <div class="border-t border-slate-200 dark:border-slate-700 my-0.5"></div>
-
-            <button onclick="openSeasonModal()" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
-              📅 Saison wählen...
-            </button>
 
             <button onclick="openShoppingModal()" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
               🛒 Einkaufsliste / Inventur
@@ -358,10 +349,14 @@
       </div>
     </header>
 
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 mb-6 -mt-4">
-      <p class="text-sm text-slate-600 dark:text-slate-400">Salonplafond • Rezepte & Getränkehandbuch</p>
-      <div id="activeSeasonBadge" onclick="openSeasonModal()" title="Klicken, um Saison zu wechseln" class="hidden cursor-pointer px-3 py-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-full text-amber-700 dark:text-amber-400 text-xs font-semibold flex items-center gap-1.5 transition">
-        <span>📅 Aktive Saison:</span> <span id="activeSeasonName"></span>
+    <!-- Bod 3: Vyhľadávacie pole umiestnené presne namiesto starého podnadpisu -->
+    <div class="mb-6 flex flex-col md:flex-row justify-between items-center gap-3">
+      <div class="relative w-full">
+        <input type="text" id="searchInput" autocomplete="off" oninput="onSearchInput()" placeholder="🔍 Getränk oder Zutat suchen..." class="px-4 py-3 pr-10 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white w-full focus:outline-none focus:border-amber-500 text-sm shadow-md font-medium">
+        <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-sm font-bold bg-slate-700/50 hover:bg-slate-700 w-5 h-5 rounded-full items-center justify-center">&times;</button>
+      </div>
+      <div id="activeSeasonBadge" onclick="openSeasonModal()" title="Klicken, um Saison zu wechseln" class="hidden cursor-pointer px-4 py-2.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-xl text-amber-700 dark:text-amber-400 text-xs font-bold flex items-center gap-2 transition shrink-0 shadow-sm">
+        <span>📅 Saison:</span> <span id="activeSeasonName"></span>
       </div>
     </div>
 
@@ -412,7 +407,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-300 dark:border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.31 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.32 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div>
@@ -553,7 +548,7 @@
     </div>
   </div>
 
-  <!-- Modal Multi-View -->
+  <!-- Modal Multi-View s možnosťou nahradenia drinku (Bod 2) -->
   <div id="multiViewModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
     <div class="card max-w-7xl w-full max-h-[90vh] overflow-y-auto p-6 relative flex flex-col gap-4 border-amber-500/50 shadow-2xl">
       <button onclick="closeMultiViewModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 dark:hover:text-white text-2xl font-bold">&times;</button>
@@ -562,6 +557,17 @@
       <div class="flex justify-end pt-3 border-t border-slate-200 dark:border-slate-800">
         <button onclick="closeMultiViewModal()" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 font-bold text-slate-800 dark:text-white rounded-xl text-xs transition border border-slate-300 dark:border-slate-700">Schließen</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Modal pre Výber náhradného drinku v Multi-View (Bod 2) -->
+  <div id="replaceDrinkModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[270]">
+    <div class="card max-w-md w-full p-6 relative flex flex-col gap-4 border-amber-500/50 shadow-2xl max-h-[80vh] overflow-y-auto">
+      <button onclick="closeReplaceDrinkModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
+      <h3 class="text-lg font-bold text-amber-600 dark:text-amber-400">🔄 Drink ersetzen</h3>
+      <p class="text-xs text-slate-600 dark:text-slate-400">Wähle einen neuen Drink aus der aktuellen Saison aus, der diesen ersetzen soll:</p>
+      <input type="hidden" id="replaceIndexTarget" value="">
+      <div id="replaceDrinkListContainer" class="flex flex-col gap-2 max-h-[50vh] overflow-y-auto pr-1"></div>
     </div>
   </div>
 
@@ -774,7 +780,6 @@
         <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Verwalte deine Rezept-Datenbank zentral durch Export oder geführten Import.</p>
       </div>
 
-      <!-- EXPORT SEKCIA -->
       <div class="custom-box p-4 rounded-xl border flex flex-col gap-3">
         <h4 class="text-sm font-bold flex items-center gap-1.5">📤 Daten exportieren</h4>
         <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
@@ -796,7 +801,6 @@
         </div>
       </div>
 
-      <!-- IMPORT SEKCIA -->
       <div class="custom-box p-4 rounded-xl border flex flex-col gap-3">
         <h4 class="text-sm font-bold flex items-center gap-1.5">📥 Rezepte importieren (Assistent)</h4>
         <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
@@ -886,13 +890,11 @@
     <div class="card max-w-2xl w-full p-6 relative flex flex-col gap-4 max-h-[85vh] overflow-y-auto border-amber-500/50 shadow-2xl">
       <button onclick="closeSupportModal()" class="absolute top-4 right-4 text-slate-500 dark:text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
       
-      <!-- Prepínacie záložky -->
       <div class="flex border-b border-slate-200 dark:border-slate-800 pb-3 gap-2">
         <button onclick="switchSupportTab('tickets')" id="tabBtnTickets" class="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition">💬 Support & Tickets</button>
         <button onclick="switchSupportTab('changelog')" id="tabBtnChangelog" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 transition">🚀 Was ist neu? (Changelog)</button>
       </div>
 
-      <!-- OBSAH 1: TICKETS / POŽIADAVKY -->
       <div id="supportTabTickets" class="flex flex-col gap-4">
         <div>
           <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400">💬 Bar-Tickets & Anfragen</h3>
@@ -913,54 +915,32 @@
         </div>
       </div>
 
-      <!-- OBSAH 2: CHANGELOG / NOVINKY -->
       <div id="supportTabChangelog" class="hidden flex flex-col gap-4">
         <div>
-          <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400">🚀 Neuigkeiten & Updates (Letzte 10 Versionen)</h3>
+          <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400">🚀 Neuigkeiten & Updates (Letzte Versionen)</h3>
           <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Hier siehst du die Historie der letzten Aktualisierungen und Verbesserungen.</p>
         </div>
 
         <div id="adminChangelogFormContainer" class="hidden custom-box p-4 rounded-xl border flex flex-col gap-2.5">
           <label class="text-xs font-bold text-amber-600 dark:text-amber-300">➕ Neue Neuigkeit hinzufügen (Tomas - Developer):</label>
-          <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.31: A3 Karten-Druck..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
+          <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.32: Multi-View Tauschen & Suchfeld..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
           <button onclick="submitNewChangelog()" class="py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs transition shadow">Als Neuigkeit veröffentlichen</button>
         </div>
 
         <div class="flex flex-col gap-2.5 max-h-[45vh] overflow-y-auto pr-1" id="changelogListContainer">
           <div class="custom-box p-3.5 rounded-xl border text-xs">
             <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-              <span>Version v3.0.31 (Tomas Kardos - Developer)</span>
+              <span>Version v3.0.32 (Tomas Kardos - Developer)</span>
               <span class="text-slate-500">Oktober 2026</span>
             </div>
-            <p>Einführung der A3-Karten-Druckfunktion im Menü (Auswahl von bis zu 3 Getränken für den sauberen A3-Ausdruck untereinander).</p>
+            <p>Entfernung des Drag & Drop zugunsten des ⚡-Buttons, Multi-View Tausch-Funktion, Suchfeld direkt oben anstelle des Untertitels und Menü-Umstrukturierung.</p>
           </div>
           <div class="custom-box p-3.5 rounded-xl border text-xs">
             <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-              <span>Version v3.0.30</span>
+              <span>Version v3.0.31</span>
               <span class="text-slate-500">Oktober 2026</span>
             </div>
-            <p>Touch-Grid Login & Multi-View Schnellzugriff.</p>
-          </div>
-          <div class="custom-box p-3.5 rounded-xl border text-xs">
-            <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-              <span>Version v3.0.29</span>
-              <span class="text-slate-500">Oktober 2026</span>
-            </div>
-            <p>Numerická klávesnica (Numpad) a auto-login.</p>
-          </div>
-          <div class="custom-box p-3.5 rounded-xl border text-xs">
-            <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-              <span>Version v3.0.28</span>
-              <span class="text-slate-500">Oktober 2026</span>
-            </div>
-            <p>Direkter PIN-Login für das Personal.</p>
-          </div>
-          <div class="custom-box p-3.5 rounded-xl border text-xs">
-            <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-              <span>Version v3.0.27</span>
-              <span class="text-slate-500">Oktober 2026</span>
-            </div>
-            <p>Zentrale Personal- & PIN-Verwaltung.</p>
+            <p>Einführung der A3-Karten-Druckfunktion im Menü.</p>
           </div>
         </div>
       </div>
@@ -1063,7 +1043,6 @@
       document.getElementById('pinAuthError').classList.add('hidden');
     }
 
-    /* --- NUMPAD FUNKCIE A AUTO-LOGIN --- */
     function appendPinNum(num) {
       if (currentEnteredPin.length < 6) {
         currentEnteredPin += num;
@@ -1132,6 +1111,7 @@
         document.getElementById('btnMenuImportExport').classList.add('flex');
         document.getElementById('menuAddDrinkBtn').classList.remove('hidden');
         document.getElementById('menuAddDrinkBtn').classList.add('flex');
+        document.getElementById('menuDividerDrink').classList.remove('hidden');
         document.getElementById('menuStaffPinBtn').classList.remove('hidden');
         document.getElementById('menuStaffPinBtn').classList.add('flex');
         document.getElementById('addDrinkBtnContainer').classList.remove('hidden');
@@ -1144,6 +1124,7 @@
         document.getElementById('btnMenuImportExport').classList.remove('flex');
         document.getElementById('menuAddDrinkBtn').classList.add('hidden');
         document.getElementById('menuAddDrinkBtn').classList.remove('flex');
+        document.getElementById('menuDividerDrink').classList.add('hidden');
         document.getElementById('menuStaffPinBtn').classList.add('hidden');
         document.getElementById('menuStaffPinBtn').classList.remove('flex');
         document.getElementById('addDrinkBtnContainer').classList.add('hidden');
@@ -1468,6 +1449,7 @@
         document.getElementById('btnMenuImportExport').classList.add('flex');
         document.getElementById('menuAddDrinkBtn').classList.remove('hidden');
         document.getElementById('menuAddDrinkBtn').classList.add('flex');
+        document.getElementById('menuDividerDrink').classList.remove('hidden');
         document.getElementById('menuStaffPinBtn').classList.remove('hidden');
         document.getElementById('menuStaffPinBtn').classList.add('flex');
         document.getElementById('addDrinkBtnContainer').classList.remove('hidden');
@@ -1483,7 +1465,6 @@
       }
     }
 
-    /* ---- SUPPORT & TICKETS LOGIKA ---- */
     async function checkPendingTicketsBadge() {
       const { data, error } = await _supabase.from('support_tickets').select('*').eq('is_changelog', false);
       if (error) return;
@@ -1713,10 +1694,10 @@
       container.innerHTML = dynamicHtml + `
         <div class="custom-box p-3.5 rounded-xl border text-xs">
           <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-            <span>Version v3.0.31 (Tomas Kardos - Developer)</span>
+            <span>Version v3.0.32 (Tomas Kardos - Developer)</span>
             <span class="text-slate-500">Oktober 2026</span>
           </div>
-          <p>Einführung der A3-Karten-Druckfunktion im Menü.</p>
+          <p>Entfernung des Drag & Drop zugunsten des ⚡-Buttons, Multi-View Tausch-Funktion, Suchfeld direkt oben anstelle des Untertitels und Menü-Umstrukturierung.</p>
         </div>
       `;
     }
@@ -1726,7 +1707,7 @@
       "„Keine Zeit!“ ⏱️",
       "„Shaken, einschenken, lächeln! Ihr macht das großartig!“ 🍸✨",
       "„Kein Stress hinter der Bar – die Drinks schmecken besser mit Gelassenheit!“ 🧊",
-      "„Ein perfekter Drink ist wie Kunst. Und ihr seid die Künstler heute Abend!“ 🎨🍾",
+      "„Ein perfekter Drink ist wie Kunst. Und ihr seid die Künstler heute Abend! “ 🎨🍾",
       "„Fokus, Teamwork und ein guter Cocktail – das Erfolgsrezept für jeden Abend!“ 🔥",
       "„Egal wie lang die Schlange ist: Einen Drink nach dem anderen. Du schaffst das!“ 💪",
       "„Weißt du, wer der beste Spüler im Salonplafond ist? Natürlich Tomas Kardos, der auch diese App für euch programmiert hat! Er grüßt euch und freut sich, dass ihr diese App nutzt!“ 🧽✨"
@@ -2195,14 +2176,14 @@
       }).join('');
     }
 
+    /* --- BOD 2: MULTI-VIEW S MOŽNOSŤOU NAHRADENIA DRINKU --- */
     function openMultiViewModal() {
       if (barTraySelection.length === 0) return;
       const container = document.getElementById('multiViewContentContainer');
-      container.innerHTML = barTraySelection.map(id => {
+      container.innerHTML = barTraySelection.map((id, index) => {
         let d = allDrinks.find(item => item.id === id);
         if (!d) return '';
         let priceText = d.selling_price ? ` (€ ${parseFloat(d.selling_price).toFixed(2)})` : '';
-        
         let photoHtml = d.photo_url ? `<img src="${d.photo_url}" class="w-full h-36 object-cover rounded-lg mb-2 shadow cursor-pointer hover:opacity-95 transition" onclick="openPhotoPreview('${d.photo_url}')" alt="${d.name}">` : '';
 
         let ingredientsHtml = '';
@@ -2217,7 +2198,10 @@
             <div>
               <div class="flex items-center justify-between mb-2">
                 <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">${d.category || ''}</span>
-                <button onclick="toggleBarTrayItem('${d.id}', event); openMultiViewModal();" class="text-red-500 hover:text-red-400 text-xs font-bold">&times;</button>
+                <div class="flex items-center gap-1.5">
+                  <button onclick="openReplaceDrinkModal(${index})" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold rounded text-[11px] border border-slate-700">🔄 Tauschen</button>
+                  <button onclick="toggleBarTrayItem('${d.id}', event); openMultiViewModal();" class="text-red-500 hover:text-red-400 text-xs font-bold p-1">&times;</button>
+                </div>
               </div>
               ${photoHtml}
               <h4 class="text-base font-bold mb-3">${d.name}${priceText}</h4>
@@ -2246,6 +2230,40 @@
       const modal = document.getElementById('multiViewModal');
       modal.classList.remove('flex');
       modal.classList.add('hidden');
+    }
+
+    function openReplaceDrinkModal(trayIndex) {
+      document.getElementById('replaceIndexTarget').value = trayIndex;
+      const seasonDrinks = allDrinks.filter(d => (d.season || '') === currentSeasonFilter);
+      const container = document.getElementById('replaceDrinkListContainer');
+      
+      container.innerHTML = seasonDrinks.map(d => `
+        <div onclick="executeReplaceDrink('${d.id}')" class="p-2.5 rounded-lg custom-box border hover:border-amber-500 cursor-pointer flex items-center justify-between text-xs transition">
+          <span class="font-bold">${d.name}</span>
+          <span class="text-[10px] text-slate-400">${d.category || ''}</span>
+        </div>
+      `).join('');
+
+      const modal = document.getElementById('replaceDrinkModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeReplaceDrinkModal() {
+      const modal = document.getElementById('replaceDrinkModal');
+      modal.classList.remove('flex');
+      modal.classList.add('hidden');
+    }
+
+    function executeReplaceDrink(newDrinkId) {
+      let trayIndex = parseInt(document.getElementById('replaceIndexTarget').value);
+      if (!isNaN(trayIndex) && trayIndex >= 0 && trayIndex < barTraySelection.length) {
+        barTraySelection[trayIndex] = newDrinkId;
+        localStorage.setItem('salon_bar_tray', JSON.stringify(barTraySelection));
+        renderBarTrayUI();
+        closeReplaceDrinkModal();
+        openMultiViewModal();
+      }
     }
 
     function openPhotoPreview(url) {
@@ -2601,6 +2619,7 @@
           document.getElementById('btnMenuImportExport').classList.add('flex');
           document.getElementById('menuAddDrinkBtn').classList.remove('hidden');
           document.getElementById('menuAddDrinkBtn').classList.add('flex');
+          document.getElementById('menuDividerDrink').classList.remove('hidden');
           document.getElementById('menuStaffPinBtn').classList.remove('hidden');
           document.getElementById('menuStaffPinBtn').classList.add('flex');
           document.getElementById('addDrinkBtnContainer').classList.remove('hidden');
@@ -2614,6 +2633,7 @@
         document.getElementById('btnMenuImportExport').classList.remove('flex');
         document.getElementById('menuAddDrinkBtn').classList.add('hidden');
         document.getElementById('menuAddDrinkBtn').classList.remove('flex');
+        document.getElementById('menuDividerDrink').classList.add('hidden');
         document.getElementById('menuStaffPinBtn').classList.add('hidden');
         document.getElementById('menuStaffPinBtn').classList.remove('flex');
         document.getElementById('addDrinkBtnContainer').classList.add('hidden');
