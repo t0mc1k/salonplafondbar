@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.36</title>
+  <title>Salonplafond BAR v3.0.37</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import & Export -->
@@ -135,7 +135,7 @@
       <div>
         <h1 class="text-lg md:text-xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-xl md:text-2xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.0.36 • Touch-Grid PIN-Login</span>
+        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.0.37 • Touch-Grid PIN-Login</span>
       </div>
 
       <div id="pinLoginForm" class="w-full bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-2xl space-y-4 text-left mt-1">
@@ -269,6 +269,48 @@
     </div>
   </div>
 
+  <!-- MÓDNY DIALÓG: MÔJ PROFIL (USER PROFILE) -->
+  <div id="userProfileModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[280]">
+    <div class="card max-w-md w-full p-6 relative flex flex-col gap-4 border-amber-500/50 shadow-2xl">
+      <button onclick="closeUserProfileModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
+      <div>
+        <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400 flex items-center gap-2">👤 Mein Profil</h3>
+        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Passe hier dein eigenes Profilbild und deinen PIN-Code an.</p>
+      </div>
+
+      <div class="custom-box p-4 rounded-xl border flex flex-col gap-4 items-center text-center">
+        <div id="profileModalAvatarContainer" class="w-20 h-20 rounded-full border-2 border-amber-500 bg-slate-800 overflow-hidden flex items-center justify-center shadow-lg">
+          <span class="text-lg font-black text-amber-400" id="profileAvatarFallback">?</span>
+        </div>
+        <div>
+          <h4 id="profileModalName" class="text-base font-bold text-white"></h4>
+          <span id="profileModalRole" class="text-[10px] uppercase tracking-wider text-amber-400 font-semibold"></span>
+        </div>
+      </div>
+
+      <div class="custom-box p-4 rounded-xl border flex flex-col gap-3 text-left">
+        <div>
+          <label class="block text-[11px] font-semibold uppercase mb-1">Neuen PIN-Code festlegen:</label>
+          <input type="password" id="profileInputNewPin" placeholder="z. B. 1234" maxlength="6" class="w-full p-2.5 rounded-lg border text-xs tracking-widest text-amber-400 font-black">
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-semibold uppercase mb-1">Neues Profilbild hochladen:</label>
+          <input type="hidden" id="profileInputAvatarUrl" value="">
+          <div class="flex gap-2 items-center">
+            <input type="file" id="profileAvatarFile" accept="image/*" onchange="uploadMyAvatarToSupabase(event)" class="text-xs file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-600 cursor-pointer w-full">
+          </div>
+          <span id="profileAvatarStatus" class="text-[11px] text-amber-500 font-medium mt-1 block"></span>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+        <button onclick="saveMyUserProfile()" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl text-xs transition shadow">Änderungen speichern</button>
+        <button onclick="closeUserProfileModal()" class="px-4 py-2.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 font-bold text-slate-800 dark:text-white rounded-xl text-xs transition">Schließen</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Celá aplikácia -->
   <div id="appContainer" class="hidden">
 
@@ -281,12 +323,13 @@
           <span class="logo-dot">•</span>
         </div>
         <div class="flex items-center gap-3">
-          <div id="headerUserAvatarContainer" class="w-10 h-10 rounded-full border-2 border-amber-500 bg-slate-800 overflow-hidden flex items-center justify-center shrink-0">
+          <!-- Kliknutím na svoju fotku sa otvorí dialóg Môj profil -->
+          <div id="headerUserAvatarContainer" onclick="openUserProfileModal()" class="w-10 h-10 rounded-full border-2 border-amber-500 bg-slate-800 overflow-hidden flex items-center justify-center shrink-0 cursor-pointer hover:scale-105 transition shadow-md" title="Mein Profil öffnen">
             <span class="text-xs font-bold text-amber-400" id="headerAvatarFallback">?</span>
           </div>
           <div>
             <h1 class="text-3xl font-bold tracking-tight text-amber-500 dark:text-amber-400">Salonplafond BAR</h1>
-            <span class="text-xs text-slate-600 dark:text-slate-400 font-medium">v3.0.36 • Angemeldet als: <span id="currentUserEmail" class="text-amber-600 dark:text-amber-300 font-bold"></span></span>
+            <span class="text-xs text-slate-600 dark:text-slate-400 font-medium">v3.0.37 • Angemeldet als: <span id="currentUserEmail" class="text-amber-600 dark:text-amber-300 font-bold"></span></span>
           </div>
         </div>
       </div>
@@ -354,6 +397,11 @@
             
             <button onclick="openImportExportModal()" id="btnMenuImportExport" class="hidden w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-semibold text-amber-600 dark:text-amber-300 items-center gap-2">
               📊 Import & Export
+            </button>
+
+            <!-- Položka Môj profil v menu nad Support -->
+            <button onclick="openUserProfileModalFromMenu()" class="w-full text-left px-2.5 py-2 rounded bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center justify-between border border-slate-200 dark:border-slate-700">
+              <span>👤 Mein Profil</span> <span>→</span>
             </button>
 
             <button onclick="openSupportModal()" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-semibold text-amber-600 dark:text-amber-400 flex items-center justify-between">
@@ -430,7 +478,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-300 dark:border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.36 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.37 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div>
@@ -961,7 +1009,7 @@
   <!-- Support & Tickets Modal -->
   <div id="supportModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
     <div class="card max-w-2xl w-full p-6 relative flex flex-col gap-4 max-h-[85vh] overflow-y-auto border-amber-500/50 shadow-2xl">
-      <button onclick="closeSupportModal()" class="absolute top-4 right-4 text-slate-500 dark:text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
+      <button onclick="closeSupportModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
       
       <div class="flex border-b border-slate-200 dark:border-slate-800 pb-3 gap-2">
         <button onclick="switchSupportTab('tickets')" id="tabBtnTickets" class="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition">💬 Support & Tickets</button>
@@ -996,17 +1044,17 @@
 
         <div id="adminChangelogFormContainer" class="hidden custom-box p-4 rounded-xl border flex flex-col gap-2.5">
           <label class="text-xs font-bold text-amber-600 dark:text-amber-300">➕ Neue Neuigkeit hinzufügen (Tomas - Developer):</label>
-          <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.36: Chat Reply & Header Envelope..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
+          <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.37: Mein Profil Dialog & Avatar/PIN Update..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
           <button onclick="submitNewChangelog()" class="py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs transition shadow">Als Neuigkeit veröffentlichen</button>
         </div>
 
         <div class="flex flex-col gap-2.5 max-h-[45vh] overflow-y-auto pr-1" id="changelogListContainer">
           <div class="custom-box p-3.5 rounded-xl border text-xs">
             <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-              <span>Version v3.0.36 (Tomas Kardos - Developer)</span>
+              <span>Version v3.0.37 (Tomas Kardos - Developer)</span>
               <span class="text-slate-500">Oktober 2026</span>
             </div>
-            <p>Einführung von Chat-Zitaten / Antworten auf konkrete Nachrichten sowie blinkender Notifikations-Obálka (Briefumschlag) direkt in der Kopfzeile.</p>
+            <p>Einführung des persönlichen Profil-Dialogs (Klick auf das eigene Profilbild in der Kopfzeile oder über das Menü), womit jeder Mitarbeiter selbst seinen PIN-Code und sein Profilbild ändern kann.</p>
           </div>
         </div>
       </div>
@@ -1225,6 +1273,100 @@
       }
     }
 
+    /* --- MÔJ PROFIL (USER PROFILE MODAL) --- */
+    async function openUserProfileModal() {
+      document.getElementById('settingsDropdown').classList.add('hidden');
+      if (!currentWaiterName) return alert("Du bist nicht angemeldet!");
+
+      // Načítame čerstvé dáta pre aktuálneho používateľa
+      const { data, error } = await _supabase.from('staff_presence').select('*').eq('name', currentWaiterName).single();
+      if (error || !data) {
+        alert("Fehler beim Laden des Profils.");
+        return;
+      }
+
+      document.getElementById('profileModalName').innerText = data.name;
+      document.getElementById('profileModalRole').innerText = `Rolle: ${data.role || 'staff'}`;
+      document.getElementById('profileInputNewPin').value = '';
+      document.getElementById('profileInputAvatarUrl').value = data.avatar_url || '';
+      document.getElementById('profileAvatarFile').value = '';
+      document.getElementById('profileAvatarStatus').innerText = '';
+
+      const avatarContainer = document.getElementById('profileModalAvatarContainer');
+      if (data.avatar_url) {
+        avatarContainer.innerHTML = `<img src="${data.avatar_url}" class="w-full h-full object-cover" alt="${data.name}">`;
+      } else {
+        avatarContainer.innerHTML = `<span class="text-xl font-black text-amber-400">${data.name.charAt(0).toUpperCase()}</span>`;
+      }
+
+      const modal = document.getElementById('userProfileModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function openUserProfileModalFromMenu() {
+      document.getElementById('settingsDropdown').classList.add('hidden');
+      openUserProfileModal();
+    }
+
+    function closeUserProfileModal() {
+      const modal = document.getElementById('userProfileModal');
+      modal.classList.remove('flex');
+      modal.classList.add('hidden');
+    }
+
+    async function uploadMyAvatarToSupabase(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const status = document.getElementById('profileAvatarStatus');
+      status.innerText = "Bild wird hochgeladen...";
+
+      const fileName = `my_avatar_${Date.now()}_${file.name}`;
+      let { data, error } = await _supabase.storage.from('drinks').upload(fileName, file);
+
+      if (error) {
+        status.innerText = 'Fehler: ' + error.message;
+        return;
+      }
+
+      let { data: publicURLData } = _supabase.storage.from('drinks').getPublicUrl(fileName);
+      if (publicURLData && publicURLData.publicUrl) {
+        document.getElementById('profileInputAvatarUrl').value = publicURLData.publicUrl;
+        const avatarContainer = document.getElementById('profileModalAvatarContainer');
+        avatarContainer.innerHTML = `<img src="${publicURLData.publicUrl}" class="w-full h-full object-cover" alt="">`;
+        status.innerText = '✔ Neues Bild bereit zum Speichern!';
+      }
+    }
+
+    async function saveMyUserProfile() {
+      const newPin = document.getElementById('profileInputNewPin').value.trim();
+      const newAvatarUrl = document.getElementById('profileInputAvatarUrl').value.trim();
+
+      let updatePayload = {};
+      if (newPin !== '') {
+        updatePayload.pin = newPin;
+      }
+      if (newAvatarUrl !== '') {
+        updatePayload.avatar_url = newAvatarUrl;
+        currentWaiterAvatar = newAvatarUrl;
+      }
+
+      if (Object.keys(updatePayload).length === 0) {
+        alert("Keine Änderungen vorgenommen.");
+        return;
+      }
+
+      const { error } = await _supabase.from('staff_presence').update(updatePayload).eq('name', currentWaiterName);
+      if (error) {
+        alert("Fehler beim Speichern: " + error.message);
+      } else {
+        alert("Dein Profil wurde erfolgreich aktualisiert!");
+        updateHeaderAvatarUI();
+        await loadStaffPresenceRecordsForLogin();
+        closeUserProfileModal();
+      }
+    }
+
     async function handleEmailLogin(e) {
       e.preventDefault();
       const email = document.getElementById("loginEmail").value;
@@ -1263,7 +1405,6 @@
       document.getElementById('settingsDropdown').classList.add('hidden');
       loadChatMessages();
       
-      // Označíme v lokálnej pamäti, že chat bol prečítaný (zmažeme notifikáciu)
       localStorage.setItem('salon_chat_last_seen_' + currentWaiterName, new Date().toISOString());
       updateChatEnvelopeBadge(false);
 
@@ -1284,18 +1425,15 @@
         .channel('public:team_chat')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'team_chat' }, payload => {
           let newMsg = payload.new;
-          // Ak nie je chat modal otvorený a správa nie je od aktuálneho používateľa -> rozblikáme obálku
           if (document.getElementById('teamChatModal').classList.contains('hidden') && newMsg.author_name.toLowerCase() !== currentWaiterName.toLowerCase()) {
             updateChatEnvelopeBadge(true);
           }
-          // Ak je chat modal otvorený, automaticky načítame nové správy
           if (!document.getElementById('teamChatModal').classList.contains('hidden')) {
             loadChatMessages();
           }
         })
         .subscribe();
       
-      // Úvodná kontrola pri štarte
       checkForUnreadChatMessages();
     }
 
@@ -1337,7 +1475,6 @@
         return;
       }
 
-      // Vytvoríme mapu ID správ pre rýchle vyhľadanie citácie
       let messagesMap = {};
       data.forEach(m => messagesMap[m.id] = m);
 
@@ -1355,7 +1492,6 @@
 
         let timeStr = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-        // Ak správa na niekoho reaguje (cituje)
         let replyQuoteHtml = '';
         if (msg.reply_to_id && messagesMap[msg.reply_to_id]) {
           let quoted = messagesMap[msg.reply_to_id];
@@ -1434,12 +1570,6 @@
       } else {
         loadChatMessages();
       }
-    }
-
-    /* --- DOKONČENIE TABUĽKY PRE CHAT (Ak by náhodou chýbal stĺpec reply_to_id) --- */
-    // Poznámka: Tabuľka team_chat už existuje, ale ak by chýbal stĺpec pre odpovede, Supabase ho v prípade potreby doplní alebo ho vytvoríme cez SQL.
-    async function ensureChatReplyColumnExists() {
-      // V Supabase SQL Editori stačí spustiť: alter table public.team_chat add column if not exists reply_to_id uuid references public.team_chat(id) on delete set null;
     }
 
     /* --- SPRÁVCOVSKÝ PANEL PRE PERSONAL & PINs --- */
@@ -1901,10 +2031,10 @@
       container.innerHTML = dynamicHtml + `
         <div class="custom-box p-3.5 rounded-xl border text-xs">
           <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-            <span>Version v3.0.36 (Tomas Kardos - Developer)</span>
+            <span>Version v3.0.37 (Tomas Kardos - Developer)</span>
             <span class="text-slate-500">Oktober 2026</span>
           </div>
-          <p>Einführung von Chat-Zitaten / Antworten auf konkrete Nachrichten sowie blinkender Notifikations-Obálka (Briefumschlag) direkt in der Kopfzeile.</p>
+          <p>Einführung des persönlichen Profil-Dialogs (Klick auf das eigene Profilbild in der Kopfzeile oder über das Menü), womit jeder Mitarbeiter selbst seinen PIN-Code und sein Profilbild ändern kann.</p>
         </div>
       `;
     }
@@ -3194,7 +3324,7 @@
               name: col0,
               category: currentCat,
               season: targetSeason,
-              ingredients_json: [],
+            ingredients_json: [],
               is_active: true
             };
             continue;
