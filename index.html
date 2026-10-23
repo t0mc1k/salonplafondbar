@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.37</title>
+  <title>Salonplafond BAR v3.0.38</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import & Export -->
@@ -135,7 +135,7 @@
       <div>
         <h1 class="text-lg md:text-xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-xl md:text-2xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.0.37 • Touch-Grid PIN-Login</span>
+        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.0.38 • Touch-Grid PIN-Login</span>
       </div>
 
       <div id="pinLoginForm" class="w-full bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-2xl space-y-4 text-left mt-1">
@@ -329,7 +329,7 @@
           </div>
           <div>
             <h1 class="text-3xl font-bold tracking-tight text-amber-500 dark:text-amber-400">Salonplafond BAR</h1>
-            <span class="text-xs text-slate-600 dark:text-slate-400 font-medium">v3.0.37 • Angemeldet als: <span id="currentUserEmail" class="text-amber-600 dark:text-amber-300 font-bold"></span></span>
+            <span class="text-xs text-slate-600 dark:text-slate-400 font-medium">v3.0.38 • Angemeldet als: <span id="currentUserEmail" class="text-amber-600 dark:text-amber-300 font-bold"></span></span>
           </div>
         </div>
       </div>
@@ -341,8 +341,9 @@
           <span id="headerChatBadgeDot" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white dark:border-slate-950 pulse-badge-dot"></span>
         </button>
 
-        <button onclick="handleLogout()" class="px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-600 dark:text-amber-400 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm" title="Benutzer wechseln">
-          ✏️ Ändern
+        <!-- Zmenená ikona a premenované tlačidlo pre zmenu užívateľa -->
+        <button onclick="handleLogout()" class="px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-600 dark:text-amber-400 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm" title="Benutzer wechseln">
+          👥 Benutzer wechseln
         </button>
 
         <button onclick="toggleFullscreen()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-lg text-xs font-semibold border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-300 flex items-center gap-1 transition">
@@ -357,28 +358,8 @@
           
           <div id="settingsDropdown" class="hidden absolute right-0 mt-2 w-64 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl shadow-2xl p-2 z-50 flex flex-col gap-1.5 text-slate-900 dark:text-slate-100">
             
-            <button onclick="refreshData()" class="w-full text-left px-2.5 py-2 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
-              🔄 Daten aktualisieren
-            </button>
-
-            <button onclick="openSeasonModal()" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
-              📅 Saison wählen...
-            </button>
-
-            <div class="border-t border-slate-200 dark:border-slate-700 my-0.5"></div>
-
-            <button onclick="openAddDrinkModalFromMenu()" id="menuAddDrinkBtn" class="hidden w-full text-left px-2.5 py-2 rounded bg-amber-500 text-slate-950 hover:bg-amber-600 text-xs font-black items-center gap-2 shadow-sm">
-              ➕ Neues Getränk hinzufügen
-            </button>
-
-            <div id="menuDividerDrink" class="hidden border-t border-slate-200 dark:border-slate-700 my-0.5"></div>
-
             <button onclick="openA3PrintSetupModal()" class="w-full text-left px-2.5 py-2 rounded bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center justify-between border border-slate-200 dark:border-slate-700">
               <span>🖨️ Karten-Druck (A3)</span> <span>→</span>
-            </button>
-
-            <button onclick="openStaffPinModalFromMenu()" id="menuStaffPinBtn" class="hidden w-full text-left px-2.5 py-2 rounded bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center justify-between border border-slate-200 dark:border-slate-700">
-              <span>👤 Personal & PINs (Zentrale)</span> <span>→</span>
             </button>
 
             <button onclick="openTeamChatModal()" class="w-full text-left px-2.5 py-2 rounded bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center justify-between border border-slate-200 dark:border-slate-700">
@@ -389,7 +370,32 @@
               <span>⚙️ Einstellungen (Zentrale)</span> <span>→</span>
             </button>
 
+            <!-- 2. Môj profil hneď pod Einstellungen & Zentrale -->
+            <button onclick="openUserProfileModalFromMenu()" class="w-full text-left px-2.5 py-2 rounded bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center justify-between border border-slate-200 dark:border-slate-700">
+              <span>👤 Mein Profil</span> <span>→</span>
+            </button>
+
+            <!-- 4. Personal & PINs pod Einstellungen v manažérskom režime -->
+            <button onclick="openStaffPinModalFromMenu()" id="menuStaffPinBtn" class="hidden w-full text-left px-2.5 py-2 rounded bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-amber-600 dark:text-amber-400 items-center justify-between border border-slate-200 dark:border-slate-700">
+              <span>👤 Personal & PINs (Zentrale)</span> <span>→</span>
+            </button>
+
             <div class="border-t border-slate-200 dark:border-slate-700 my-0.5"></div>
+
+            <button onclick="openAddDrinkModalFromMenu()" id="menuAddDrinkBtn" class="hidden w-full text-left px-2.5 py-2 rounded bg-amber-500 text-slate-950 hover:bg-amber-600 text-xs font-black items-center gap-2 shadow-sm">
+              ➕ Neues Getränk hinzufügen
+            </button>
+
+            <div id="menuDividerDrink" class="hidden border-t border-slate-200 dark:border-slate-700 my-0.5"></div>
+
+            <!-- 3. Daten aktualisieren a Saison wählen presunuté nad Einkaufsliste -->
+            <button onclick="refreshData()" class="w-full text-left px-2.5 py-2 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+              🔄 Daten aktualisieren
+            </button>
+
+            <button onclick="openSeasonModal()" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+              📅 Saison wählen...
+            </button>
 
             <button onclick="openShoppingModal()" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
               🛒 Einkaufsliste / Inventur
@@ -397,11 +403,6 @@
             
             <button onclick="openImportExportModal()" id="btnMenuImportExport" class="hidden w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-semibold text-amber-600 dark:text-amber-300 items-center gap-2">
               📊 Import & Export
-            </button>
-
-            <!-- Položka Môj profil v menu nad Support -->
-            <button onclick="openUserProfileModalFromMenu()" class="w-full text-left px-2.5 py-2 rounded bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center justify-between border border-slate-200 dark:border-slate-700">
-              <span>👤 Mein Profil</span> <span>→</span>
             </button>
 
             <button onclick="openSupportModal()" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-semibold text-amber-600 dark:text-amber-400 flex items-center justify-between">
@@ -478,7 +479,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-300 dark:border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.37 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.38 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div>
@@ -1038,24 +1039,19 @@
 
       <div id="supportTabChangelog" class="hidden flex flex-col gap-4">
         <div>
-          <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400">🚀 Neuigkeiten & Updates (Letzte Versionen)</h3>
-          <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Hier siehst du die Historie der letzten Aktualisierungen und Verbesserungen.</p>
+          <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400">🚀 Neuigkeiten & Updates (Historie)</h3>
+          <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Hier siehst du die Historie der letzten Aktualisierungen.</p>
         </div>
 
         <div id="adminChangelogFormContainer" class="hidden custom-box p-4 rounded-xl border flex flex-col gap-2.5">
           <label class="text-xs font-bold text-amber-600 dark:text-amber-300">➕ Neue Neuigkeit hinzufügen (Tomas - Developer):</label>
-          <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.37: Mein Profil Dialog & Avatar/PIN Update..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
+          <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.38: Menu Reorganisation & Session Lock..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
           <button onclick="submitNewChangelog()" class="py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs transition shadow">Als Neuigkeit veröffentlichen</button>
         </div>
 
-        <div class="flex flex-col gap-2.5 max-h-[45vh] overflow-y-auto pr-1" id="changelogListContainer">
-          <div class="custom-box p-3.5 rounded-xl border text-xs">
-            <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-              <span>Version v3.0.37 (Tomas Kardos - Developer)</span>
-              <span class="text-slate-500">Oktober 2026</span>
-            </div>
-            <p>Einführung des persönlichen Profil-Dialogs (Klick auf das eigene Profilbild in der Kopfzeile oder über das Menü), womit jeder Mitarbeiter selbst seinen PIN-Code und sein Profilbild ändern kann.</p>
-          </div>
+        <!-- 1. Posuvné okno pre Changelog (20 zápisov) -->
+        <div class="flex flex-col gap-2.5 max-h-[50vh] overflow-y-auto pr-2" id="changelogListContainer">
+          <p class="text-slate-500 italic text-xs text-center py-4">Lade Changelog...</p>
         </div>
       </div>
 
@@ -1073,7 +1069,9 @@
     let pendingAuthCallback = null;
     let currentPhotoPreviewUrl = null;
     let currentLoggedInUserEmail = "";
-    let currentWaiterName = localStorage.getItem('salon_waiter_name') || "";
+    
+    /* Variant A: Použitie sessionStorage namiesto localStorage */
+    let currentWaiterName = sessionStorage.getItem('salon_waiter_name') || "";
     let currentWaiterAvatar = "";
     let staffDatabaseRecords = [];
     let currentEnteredPin = "";
@@ -1205,7 +1203,8 @@
       if (currentEnteredPin === requiredPin || (requiredPin === "" && currentEnteredPin.length >= 4)) {
         currentWaiterName = staffRecord.name;
         currentWaiterAvatar = staffRecord.avatar_url || "";
-        localStorage.setItem('salon_waiter_name', currentWaiterName);
+        /* Variant A: Uloženie len do relácie okna/karty */
+        sessionStorage.setItem('salon_waiter_name', currentWaiterName);
         
         _supabase.from('staff_presence').update({ last_used_at: new Date().toISOString() }).eq('name', currentWaiterName).then();
 
@@ -1278,7 +1277,6 @@
       document.getElementById('settingsDropdown').classList.add('hidden');
       if (!currentWaiterName) return alert("Du bist nicht angemeldet!");
 
-      // Načítame čerstvé dáta pre aktuálneho používateľa
       const { data, error } = await _supabase.from('staff_presence').select('*').eq('name', currentWaiterName).single();
       if (error || !data) {
         alert("Fehler beim Laden des Profils.");
@@ -1400,12 +1398,12 @@
       await finalizeAppStartForStaff(staffRec);
     }
 
-    /* --- TEAM CHAT S CITÁCIOU A REALTIME NOTIFIKÁCIOU --- */
+    /* --- TEAM CHAT --- */
     function openTeamChatModal() {
       document.getElementById('settingsDropdown').classList.add('hidden');
       loadChatMessages();
       
-      localStorage.setItem('salon_chat_last_seen_' + currentWaiterName, new Date().toISOString());
+      sessionStorage.setItem('salon_chat_last_seen_' + currentWaiterName, new Date().toISOString());
       updateChatEnvelopeBadge(false);
 
       const modal = document.getElementById('teamChatModal');
@@ -1442,7 +1440,7 @@
       if (error || !data || data.length === 0) return;
 
       let lastMsg = data[0];
-      let lastSeenTime = localStorage.getItem('salon_chat_last_seen_' + currentWaiterName);
+      let lastSeenTime = sessionStorage.getItem('salon_chat_last_seen_' + currentWaiterName);
       
       if (lastMsg.author_name.toLowerCase() !== currentWaiterName.toLowerCase()) {
         if (!lastSeenTime || new Date(lastMsg.created_at) > new Date(lastSeenTime)) {
@@ -1726,7 +1724,7 @@
     async function handleLogout() {
       document.getElementById('settingsDropdown').classList.add('hidden');
       await _supabase.auth.signOut();
-      localStorage.removeItem('salon_waiter_name');
+      sessionStorage.removeItem('salon_waiter_name');
       currentWaiterName = "";
       currentWaiterAvatar = "";
       currentEnteredPin = "";
@@ -2008,35 +2006,43 @@
       });
     }
 
+    /* 1. Načítanie 20 posledných verzií z databázy */
     async function loadChangelogData() {
       const container = document.getElementById('changelogListContainer');
-      const { data, error } = await _supabase.from('support_tickets').select('*').eq('is_changelog', true).order('created_at', { ascending: false });
+      container.innerHTML = `<p class="text-slate-500 italic text-xs text-center py-4">Lade Neuigkeiten...</p>`;
+
+      const { data, error } = await _supabase.from('support_tickets').select('*').eq('is_changelog', true).order('created_at', { ascending: false }).limit(20);
       
-      let dynamicHtml = '';
+      let html = '';
       if (data && data.length > 0) {
-        dynamicHtml = data.map(item => {
+        html = data.map(item => {
           let dateStr = new Date(item.created_at).toLocaleDateString();
           return `
-            <div class="custom-box p-3.5 rounded-xl border text-xs">
+            <div class="custom-box p-3.5 rounded-xl border text-xs shrink-0">
               <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-                <span>Update (Tomas Kardos - Developer)</span>
+                <span>${item.author_email || 'Update (Tomas Kardos - Developer)'}</span>
                 <span class="text-slate-500">${dateStr}</span>
               </div>
-              <p>${item.message}</p>
+              <p class="leading-relaxed">${item.message}</p>
             </div>
           `;
         }).join('');
+      } else {
+        html = `<p class="text-slate-500 italic text-xs text-center py-2">Keine dynamischen Neuigkeiten vorhanden.</p>`;
       }
 
-      container.innerHTML = dynamicHtml + `
-        <div class="custom-box p-3.5 rounded-xl border text-xs">
+      /* Pridanie pevného záznamu pre v3.0.38 */
+      html += `
+        <div class="custom-box p-3.5 rounded-xl border text-xs shrink-0">
           <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-            <span>Version v3.0.37 (Tomas Kardos - Developer)</span>
+            <span>Version v3.0.38 (Tomas Kardos - Developer)</span>
             <span class="text-slate-500">Oktober 2026</span>
           </div>
-          <p>Einführung des persönlichen Profil-Dialogs (Klick auf das eigene Profilbild in der Kopfzeile oder über das Menü), womit jeder Mitarbeiter selbst seinen PIN-Code und sein Profilbild ändern kann.</p>
+          <p class="leading-relaxed">Sicherheits-Update Variant A (Session lock bei Browser-Schließen), Reorganisation des Hauptmenüs (Mein Profil & Personal unter Einstellungen) und Erweiterung der Versionshistorie im Changelog auf 20 Einträge.</p>
         </div>
       `;
+
+      container.innerHTML = html;
     }
 
     const motivationalQuotes = [
@@ -2193,7 +2199,7 @@
       const listBtn = document.getElementById('unifiedViewList');
       if (gridBtn && listBtn) {
         gridBtn.className = viewMode === 'grid' ? 'px-2.5 py-1 text-xs font-bold rounded bg-amber-500 text-slate-950' : 'px-2.5 py-1 text-xs font-bold rounded bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-300';
-        listBtn.className = viewMode === 'list' ? 'px-2.5 py-1 text-xs font-bold rounded bg-amber-500 text-slate-950' : 'px-2.5 py-1 text-xs font-bold rounded bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-300';
+        listBtn.className = viewMode === 'list' ? 'px-2.5 py-1 text-xs font-bold rounded bg-amber-500 text-slate-950' : 'px-2.5 py-1 text-xs font-bold rounded bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300';
       }
     }
 
@@ -3324,7 +3330,7 @@
               name: col0,
               category: currentCat,
               season: targetSeason,
-            ingredients_json: [],
+              ingredients_json: [],
               is_active: true
             };
             continue;
