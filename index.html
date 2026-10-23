@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.39</title>
+  <title>Salonplafond BAR v3.0.40</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import & Export -->
@@ -135,7 +135,7 @@
       <div>
         <h1 class="text-lg md:text-xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-xl md:text-2xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.0.39 • Touch-Grid PIN-Login</span>
+        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.0.40 • Touch-Grid PIN-Login</span>
       </div>
 
       <div id="pinLoginForm" class="w-full bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-2xl space-y-4 text-left mt-1">
@@ -256,15 +256,39 @@
         </div>
       </div>
 
-      <div class="flex flex-col gap-2">
+      <!-- Tlačidlo pre otvorenie Login-Historie priamo v Personal & PINs -->
+      <div class="flex justify-between items-center pt-1">
         <h4 class="text-xs font-bold uppercase tracking-wider">Aktuelles Personal in der Datenbank:</h4>
-        <div id="staffManagementListContainer" class="flex flex-col gap-2 max-h-[35vh] overflow-y-auto pr-1">
-          <p class="text-slate-500 italic text-xs text-center py-4">Lade Personal...</p>
-        </div>
+        <button onclick="openLoginHistoryModal()" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 font-bold rounded-lg text-xs transition border border-slate-300 dark:border-slate-700 flex items-center gap-1.5">
+          📜 Login-Protokoll anzeigen
+        </button>
+      </div>
+
+      <div id="staffManagementListContainer" class="flex flex-col gap-2 max-h-[35vh] overflow-y-auto pr-1">
+        <p class="text-slate-500 italic text-xs text-center py-4">Lade Personal...</p>
       </div>
 
       <div class="flex justify-end pt-3 border-t border-slate-200 dark:border-slate-800">
         <button onclick="closeStaffPinModal()" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 font-bold text-slate-800 dark:text-white rounded-xl text-xs transition">Schließen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOVÝ DIALÓG: LOGIN-HISTORIE / PROTOKOLL -->
+  <div id="loginHistoryModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[285]">
+    <div class="card max-w-2xl w-full p-6 relative flex flex-col gap-4 max-h-[85vh] overflow-y-auto border-amber-500/50 shadow-2xl">
+      <button onclick="closeLoginHistoryModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
+      <div>
+        <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400 flex items-center gap-2">📜 Login-Historie & Protokoll</h3>
+        <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Übersicht darüber, welcher Benutzer sich wann im System angemeldet hat.</p>
+      </div>
+
+      <div id="loginHistoryListContainer" class="flex flex-col gap-2 max-h-[50vh] overflow-y-auto pr-1 custom-box p-3 rounded-xl border text-xs">
+        <p class="text-slate-500 italic text-xs text-center py-4">Lade Login-Protokoll...</p>
+      </div>
+
+      <div class="flex justify-end pt-3 border-t border-slate-200 dark:border-slate-800">
+        <button onclick="closeLoginHistoryModal()" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 font-bold text-slate-800 dark:text-white rounded-xl text-xs transition">Schließen</button>
       </div>
     </div>
   </div>
@@ -279,7 +303,7 @@
       </div>
 
       <div class="custom-box p-4 rounded-xl border flex flex-col gap-4 items-center text-center">
-        <div id="profileModalAvatarContainer" class="w-20 h-20 rounded-full border-2 border-amber-500 bg-slate-800 overflow-hidden flex items-center justify-center shadow-lg">
+        <div id="profileModalAvatarContainer" onclick="openMyFullAvatar()" class="w-20 h-20 rounded-full border-2 border-amber-500 bg-slate-800 overflow-hidden flex items-center justify-center shadow-lg cursor-pointer hover:scale-105 transition" title="Klicken, um Foto in voller Größe anzuzeigen">
           <span class="text-lg font-black text-amber-400" id="profileAvatarFallback">?</span>
         </div>
         <div>
@@ -322,14 +346,16 @@
           <span class="logo-main-char" id="headerLogoChar">O</span>
           <span class="logo-dot" id="headerLogoDot">•</span>
         </div>
-        <div class="flex items-center gap-3">
-          <!-- Kliknutím na svoju fotku sa otvorí dialóg Môj profil -->
-          <div id="headerUserAvatarContainer" onclick="openUserProfileModal()" class="w-10 h-10 rounded-full border-2 border-amber-500 bg-slate-800 overflow-hidden flex items-center justify-center shrink-0 cursor-pointer hover:scale-105 transition shadow-md" title="Mein Profil öffnen">
-            <span class="text-xs font-bold text-amber-400" id="headerAvatarFallback">?</span>
-          </div>
-          <div>
-            <h1 class="text-3xl font-bold tracking-tight text-amber-500 dark:text-amber-400">Salonplafond BAR</h1>
-            <span class="text-xs text-slate-600 dark:text-slate-400 font-medium">v3.0.39 • Angemeldet als: <span id="currentUserEmail" class="text-amber-600 dark:text-amber-300 font-bold"></span></span>
+        <div>
+          <h1 class="text-3xl font-bold tracking-tight text-amber-500 dark:text-amber-400">Salonplafond BAR</h1>
+          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium block">v3.0.40</span>
+          
+          <!-- Samostatný blok pre prihláseného používateľa pod názvom aplikácie -->
+          <div onclick="handleLogout()" class="mt-1 flex items-center gap-2 cursor-pointer group inline-flex bg-slate-200/80 dark:bg-slate-800/80 hover:bg-amber-500/20 px-2.5 py-1 rounded-xl border border-slate-300 dark:border-slate-700 transition" title="Klicken, um Benutzer zu wechseln">
+            <div id="headerUserAvatarContainer" class="w-6 h-6 rounded-full border border-amber-500 bg-slate-800 overflow-hidden flex items-center justify-center shrink-0">
+              <span class="text-[10px] font-bold text-amber-400" id="headerAvatarFallback">?</span>
+            </div>
+            <span class="text-xs text-slate-800 dark:text-slate-200 group-hover:text-amber-500 font-bold">Angemeldet: <span id="currentUserEmail" class="text-amber-600 dark:text-amber-300"></span> 🔄</span>
           </div>
         </div>
       </div>
@@ -339,11 +365,6 @@
         <button onclick="openTeamChatModal()" id="headerChatEnvelopeBtn" class="relative px-3 py-1.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-amber-600 dark:text-amber-400 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm" title="Team-Chat öffnen">
           <span>✉️ Chat</span>
           <span id="headerChatBadgeDot" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white dark:border-slate-950 pulse-badge-dot"></span>
-        </button>
-
-        <!-- Zmenená ikona a premenované tlačidlo pre zmenu užívateľa -->
-        <button onclick="handleLogout()" class="px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-600 dark:text-amber-400 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm" title="Benutzer wechseln">
-          👥 Benutzer wechseln
         </button>
 
         <button onclick="toggleFullscreen()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-lg text-xs font-semibold border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-300 flex items-center gap-1 transition">
@@ -373,6 +394,11 @@
 
             <button onclick="openStaffPinModalFromMenu()" id="menuStaffPinBtn" class="hidden w-full text-left px-2.5 py-2 rounded bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-amber-600 dark:text-amber-400 items-center justify-between border border-slate-200 dark:border-slate-700">
               <span>👤 Personal & PINs (Zentrale)</span> <span>→</span>
+            </button>
+
+            <!-- POLOŽKA LOGIN-HISTORIE POD PERSONAL & PINS V MANAŽÉRSKOM REŽIME -->
+            <button onclick="openLoginHistoryModalFromMenu()" id="menuLoginHistoryBtn" class="hidden w-full text-left px-2.5 py-2 rounded bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-amber-600 dark:text-amber-400 items-center justify-between border border-slate-200 dark:border-slate-700">
+              <span>📜 Login-Historie / Protokoll</span> <span>→</span>
             </button>
 
             <!-- ODDEĽOVACIA ČIARA MEDZI ZENTRALE A CHATOM/PROFILOM -->
@@ -425,7 +451,7 @@
             <div class="border-t border-slate-200 dark:border-slate-700 my-0.5"></div>
 
             <button onclick="handleLogout()" class="w-full text-left px-2.5 py-2 rounded bg-red-50 dark:bg-red-600/20 hover:bg-red-100 dark:hover:bg-red-600/30 text-xs font-bold text-red-600 dark:text-red-400 flex items-center gap-2 border border-red-200 dark:border-red-500/30">
-              🚪 Abmelden / Wechseln
+              🚪 Benutzer wechseln
             </button>
 
           </div>
@@ -491,7 +517,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-300 dark:border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.39 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.40 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div>
@@ -897,10 +923,10 @@
   </div>
 
   <!-- Samostatný Modal pre náhľad fotky (Lightbox) -->
-  <div id="photoPreviewModal" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden items-center justify-center p-4 z-[250]">
+  <div id="photoPreviewModal" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden items-center justify-center p-4 z-[350]">
     <div class="relative max-w-4xl w-full flex flex-col items-center">
       <button onclick="closePhotoPreview()" class="absolute -top-12 right-0 text-white hover:text-amber-400 text-3xl font-bold">&times;</button>
-      <img id="previewImageSrc" src="" class="max-h-[80vh] max-w-full rounded-2xl shadow-2xl object-contain border border-slate-700" alt="Detailansicht">
+      <img id="previewImageSrc" src="" class="max-h-[85vh] max-w-full rounded-2xl shadow-2xl object-contain border border-slate-700" alt="Detailansicht">
     </div>
   </div>
 
@@ -910,12 +936,12 @@
       <button onclick="closeChangelogModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
       <div>
         <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400 flex items-center gap-2">🚀 Was ist neu? (Changelog)</h3>
-        <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Hier siehst du die Historie der letzten Aktualisierungen der App.</p>
+        <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Hier siehst du die Historie der letzten Aktualisierungen der App (letzte 20 Versionen).</p>
       </div>
 
       <div id="adminChangelogFormContainer" class="hidden custom-box p-4 rounded-xl border flex flex-col gap-2.5">
         <label class="text-xs font-bold text-amber-600 dark:text-amber-300">➕ Neue Neuigkeit hinzufügen (Tomas - Developer):</label>
-        <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.39: Menu Reorganisation..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
+        <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.40: Login History & Photo Lightbox..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
         <button onclick="submitNewChangelog()" class="py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs transition shadow">Als Neuigkeit veröffentlichen</button>
       </div>
 
@@ -1219,6 +1245,18 @@
       inputEl.value = "•".repeat(currentEnteredPin.length);
     }
 
+    async function recordLoginHistory(userName, userRole) {
+      try {
+        await _supabase.from('login_history').insert([{
+          user_name: userName,
+          role: userRole || 'staff',
+          logged_in_at: new Date().toISOString()
+        }]);
+      } catch (err) {
+        console.error("Login history insert error:", err);
+      }
+    }
+
     async function checkAutoPinLogin() {
       const errDiv = document.getElementById('pinAuthError');
       errDiv.classList.add('hidden');
@@ -1235,7 +1273,8 @@
         currentWaiterAvatar = staffRecord.avatar_url || "";
         sessionStorage.setItem('salon_waiter_name', currentWaiterName);
         
-        _supabase.from('staff_presence').update({ last_used_at: new Date().toISOString() }).eq('name', currentWaiterName).then();
+        await _supabase.from('staff_presence').update({ last_used_at: new Date().toISOString() }).eq('name', currentWaiterName);
+        await recordLoginHistory(currentWaiterName, staffRecord.role);
 
         const { data: { session } } = await _supabase.auth.getSession();
         if (session && session.user) {
@@ -1268,6 +1307,8 @@
         document.getElementById('menuAddDrinkBtn').classList.add('flex');
         document.getElementById('menuStaffPinBtn').classList.remove('hidden');
         document.getElementById('menuStaffPinBtn').classList.add('flex');
+        document.getElementById('menuLoginHistoryBtn').classList.remove('hidden');
+        document.getElementById('menuLoginHistoryBtn').classList.add('flex');
         document.getElementById('addDrinkBtnContainer').classList.remove('hidden');
         const adminChangelogCont = document.getElementById('adminChangelogFormContainer');
         if (adminChangelogCont) adminChangelogCont.classList.remove('hidden');
@@ -1280,6 +1321,8 @@
         document.getElementById('menuAddDrinkBtn').classList.remove('flex');
         document.getElementById('menuStaffPinBtn').classList.add('hidden');
         document.getElementById('menuStaffPinBtn').classList.remove('flex');
+        document.getElementById('menuLoginHistoryBtn').classList.add('hidden');
+        document.getElementById('menuLoginHistoryBtn').classList.remove('flex');
         document.getElementById('addDrinkBtnContainer').classList.add('hidden');
         const adminChangelogCont = document.getElementById('adminChangelogFormContainer');
         if (adminChangelogCont) adminChangelogCont.classList.add('hidden');
@@ -1301,7 +1344,7 @@
         }
       } else {
         let initial = currentWaiterName ? currentWaiterName.charAt(0).toUpperCase() : '?';
-        container.innerHTML = `<span class="text-xs font-bold text-amber-400">${initial}</span>`;
+        container.innerHTML = `<span class="text-[10px] font-bold text-amber-400">${initial}</span>`;
         if (menuThumbContainer) {
           menuThumbContainer.innerHTML = `<span class="text-[10px] font-bold text-amber-400">${initial}</span>`;
         }
@@ -1349,11 +1392,19 @@
       modal.classList.add('hidden');
     }
 
+    function openMyFullAvatar() {
+      let url = document.getElementById('profileInputAvatarUrl').value;
+      if (!url && currentWaiterAvatar) url = currentWaiterAvatar;
+      if (url) {
+        openPhotoPreview(url);
+      }
+    }
+
     async function uploadMyAvatarToSupabase(event) {
       const file = event.target.files[0];
       if (!file) return;
       const status = document.getElementById('profileAvatarStatus');
-      status.innerText = "Bild wird hochgeladen...";
+      status.innerText = "⏳ Fotka sa nahráva...";
 
       const fileName = `my_avatar_${Date.now()}_${file.name}`;
       let { data, error } = await _supabase.storage.from('drinks').upload(fileName, file);
@@ -1368,7 +1419,8 @@
         document.getElementById('profileInputAvatarUrl').value = publicURLData.publicUrl;
         const avatarContainer = document.getElementById('profileModalAvatarContainer');
         avatarContainer.innerHTML = `<img src="${publicURLData.publicUrl}" class="w-full h-full object-cover" alt="">`;
-        status.innerText = '✔ Neues Bild bereit zum Speichern!';
+        status.innerText = '✔ Fotka bola úspešne pridaná!';
+        alert("Fotka bola úspešne pridaná!");
       }
     }
 
@@ -1418,6 +1470,7 @@
       } else {
         if (data && data.user) {
           if (!currentWaiterName) currentWaiterName = data.user.email.split('@')[0];
+          await recordLoginHistory(currentWaiterName, data.user.email === "kdstom@outlook.com" ? "developer" : "manager");
           await handleSessionAfterLogin(data.user);
         }
       }
@@ -1432,6 +1485,57 @@
         staffRec = { name: currentWaiterName, role: (user.email === "kdstom@outlook.com" ? "developer" : "staff") };
       }
       await finalizeAppStartForStaff(staffRec);
+    }
+
+    /* --- LOGIN HISTÓRIA / PROTOKOL --- */
+    function openLoginHistoryModal() {
+      document.getElementById('settingsDropdown').classList.add('hidden');
+      checkManagerAuth(() => {
+        loadLoginHistoryRecords();
+        const modal = document.getElementById('loginHistoryModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      });
+    }
+
+    function openLoginHistoryModalFromMenu() {
+      openLoginHistoryModal();
+    }
+
+    function closeLoginHistoryModal() {
+      const modal = document.getElementById('loginHistoryModal');
+      modal.classList.remove('flex');
+      modal.classList.add('hidden');
+    }
+
+    async function loadLoginHistoryRecords() {
+      const container = document.getElementById('loginHistoryListContainer');
+      container.innerHTML = `<p class="text-slate-500 italic text-xs text-center py-4">Lade Login-Protokoll...</p>`;
+
+      const { data, error } = await _supabase.from('login_history').select('*').order('logged_in_at', { ascending: false }).limit(50);
+      if (error) {
+        container.innerHTML = `<p class="text-red-500 text-xs text-center py-4">Fehler: ${error.message}</p>`;
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        container.innerHTML = `<p class="text-slate-500 italic text-xs text-center py-4">Keine Logins in der Historie gefunden.</p>`;
+        return;
+      }
+
+      container.innerHTML = data.map(item => {
+        let dateStr = new Date(item.logged_in_at).toLocaleString();
+        let roleBadge = `<span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] uppercase font-bold">${item.role || 'staff'}</span>`;
+        return `
+          <div class="custom-box p-3 rounded-xl border flex items-center justify-between gap-2 text-xs">
+            <div class="flex items-center gap-2">
+              <span class="text-amber-500 font-bold">👤 ${item.user_name}</span>
+              ${roleBadge}
+            </div>
+            <span class="text-slate-400 text-[11px]">${dateStr}</span>
+          </div>
+        `;
+      }).join('');
     }
 
     /* --- TEAM CHAT --- */
@@ -1644,7 +1748,7 @@
       const file = event.target.files[0];
       if (!file) return;
       const status = document.getElementById('staffAvatarStatus');
-      status.innerText = "Wird hochgeladen...";
+      status.innerText = "⏳ Fotka sa nahráva...";
       
       const fileName = `avatar_${Date.now()}_${file.name}`;
       let { data, error } = await _supabase.storage.from('drinks').upload(fileName, file);
@@ -1657,7 +1761,8 @@
       let { data: publicURLData } = _supabase.storage.from('drinks').getPublicUrl(fileName);
       if (publicURLData && publicURLData.publicUrl) {
         document.getElementById('staffInputAvatar').value = publicURLData.publicUrl;
-        status.innerText = '✔ Profilbild bereit!';
+        status.innerText = '✔ Fotka bola úspešne pridaná!';
+        alert("Fotka bola úspešne pridaná!");
       }
     }
 
@@ -1815,6 +1920,8 @@
         document.getElementById('menuAddDrinkBtn').classList.add('flex');
         document.getElementById('menuStaffPinBtn').classList.remove('hidden');
         document.getElementById('menuStaffPinBtn').classList.add('flex');
+        document.getElementById('menuLoginHistoryBtn').classList.remove('hidden');
+        document.getElementById('menuLoginHistoryBtn').classList.add('flex');
         document.getElementById('addDrinkBtnContainer').classList.remove('hidden');
         const adminChangelogCont = document.getElementById('adminChangelogFormContainer');
         if (adminChangelogCont) adminChangelogCont.classList.remove('hidden');
@@ -2059,14 +2166,14 @@
         html = `<p class="text-slate-500 italic text-xs text-center py-2">Keine dynamischen Neuigkeiten vorhanden.</p>`;
       }
 
-      /* Pevný záznam pre v3.0.39 */
+      /* Pevné záznamy pre posledné verzie vrátane v3.0.40 */
       html += `
         <div class="custom-box p-3.5 rounded-xl border text-xs shrink-0">
           <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-            <span>Version v3.0.39 (Tomas Kardos - Developer)</span>
+            <span>Version v3.0.40 (Tomas Kardos - Developer)</span>
             <span class="text-slate-500">Oktober 2026</span>
           </div>
-          <p class="leading-relaxed">Menü-Reorganisation (Neues Getränk ganz oben, Team-Chat & Mein Profil mit Benutzerfoto getrennt unter dem Strich), eigenständiger Changelog-Menüpunkt und hyle-Logo mit gelegentlichem Koktail-Symbol.</p>
+          <p class="leading-relaxed">Foto-Upload Statusanzeige mit Erfolgsmeldung, Lightbox für volle Profilfoto-Ansicht, verschobener Login-Block unter dem Logo mit direktem Schnellwechsel, Changelog für 20 Versionen und neue Login-Historie Protokolltabelle.</p>
         </div>
       `;
 
@@ -2777,7 +2884,7 @@
       const file = event.target.files[0];
       if (!file) return;
       const status = document.getElementById('uploadStatus');
-      status.innerText = "Wird hochgeladen...";
+      status.innerText = "⏳ Fotka sa nahráva...";
       
       const fileName = `${Date.now()}_${file.name}`;
       let { data, error } = await _supabase.storage.from('drinks').upload(fileName, file);
@@ -2791,7 +2898,8 @@
       let { data: publicURLData } = _supabase.storage.from('drinks').getPublicUrl(fileName);
       if (publicURLData && publicURLData.publicUrl) {
         document.getElementById('dPhoto').value = publicURLData.publicUrl;
-        status.innerText = '✔ Foto erfolgreich hochgeladen!';
+        status.innerText = '✔ Fotka bola úspešne pridaná!';
+        alert("Fotka bola úspešne pridaná!");
       }
     }
 
@@ -2804,7 +2912,6 @@
       }
       updateActiveSeasonBadgeUI();
       renderSeasonFormSelect(currentSeasonFilter);
-      renderCategories();
       renderGlassFilterButtons();
       renderDrinks();
       renderBarTrayUI();
@@ -2991,6 +3098,8 @@
           document.getElementById('menuAddDrinkBtn').classList.add('flex');
           document.getElementById('menuStaffPinBtn').classList.remove('hidden');
           document.getElementById('menuStaffPinBtn').classList.add('flex');
+          document.getElementById('menuLoginHistoryBtn').classList.remove('hidden');
+          document.getElementById('menuLoginHistoryBtn').classList.add('flex');
           document.getElementById('addDrinkBtnContainer').classList.remove('hidden');
           const adminChangelogCont = document.getElementById('adminChangelogFormContainer');
           if (adminChangelogCont) adminChangelogCont.classList.remove('hidden');
@@ -3004,6 +3113,8 @@
         document.getElementById('menuAddDrinkBtn').classList.remove('flex');
         document.getElementById('menuStaffPinBtn').classList.add('hidden');
         document.getElementById('menuStaffPinBtn').classList.remove('flex');
+        document.getElementById('menuLoginHistoryBtn').classList.add('hidden');
+        document.getElementById('menuLoginHistoryBtn').classList.remove('flex');
         document.getElementById('addDrinkBtnContainer').classList.add('hidden');
         const adminChangelogCont = document.getElementById('adminChangelogFormContainer');
         if (adminChangelogCont) adminChangelogCont.classList.add('hidden');
@@ -3299,7 +3410,7 @@
 
       const targetSeason = document.getElementById('wizardSeasonSelect').value;
       const statusEl = document.getElementById('wizardStatus');
-      statusEl.innerText = "Wird importiert...";
+      statusEl.innerText = "⏳ Import prebieha...";
 
       const reader = new FileReader();
       reader.onload = async function(e) {
@@ -3372,6 +3483,7 @@
           if (error) {
             statusEl.innerText = "Fehler: " + error.message;
           } else {
+            statusEl.innerText = "✔ Import úspešne dokončený!";
             alert(`Erfolg! ${parsedDrinks.length} Drinks für die Saison (${targetSeason}) importiert.`);
             closeImportExportModal();
             loadDrinks();
