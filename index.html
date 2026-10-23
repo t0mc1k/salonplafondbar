@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.35</title>
+  <title>Salonplafond BAR v3.0.36</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import & Export -->
@@ -135,7 +135,7 @@
       <div>
         <h1 class="text-lg md:text-xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-xl md:text-2xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.0.35 • Touch-Grid PIN-Login</span>
+        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.0.36 • Touch-Grid PIN-Login</span>
       </div>
 
       <div id="pinLoginForm" class="w-full bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-2xl space-y-4 text-left mt-1">
@@ -286,12 +286,18 @@
           </div>
           <div>
             <h1 class="text-3xl font-bold tracking-tight text-amber-500 dark:text-amber-400">Salonplafond BAR</h1>
-            <span class="text-xs text-slate-600 dark:text-slate-400 font-medium">v3.0.35 • Angemeldet als: <span id="currentUserEmail" class="text-amber-600 dark:text-amber-300 font-bold"></span></span>
+            <span class="text-xs text-slate-600 dark:text-slate-400 font-medium">v3.0.36 • Angemeldet als: <span id="currentUserEmail" class="text-amber-600 dark:text-amber-300 font-bold"></span></span>
           </div>
         </div>
       </div>
 
       <div class="flex flex-wrap items-center gap-2">
+        <!-- Notifikačná obálka pre Team-Chat priamo v hlavičke -->
+        <button onclick="openTeamChatModal()" id="headerChatEnvelopeBtn" class="relative px-3 py-1.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-amber-600 dark:text-amber-400 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm" title="Team-Chat öffnen">
+          <span>✉️ Chat</span>
+          <span id="headerChatBadgeDot" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white dark:border-slate-950 pulse-badge-dot"></span>
+        </button>
+
         <button onclick="handleLogout()" class="px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-600 dark:text-amber-400 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm" title="Benutzer wechseln">
           ✏️ Ändern
         </button>
@@ -424,7 +430,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-300 dark:border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.35 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.36 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div>
@@ -451,14 +457,24 @@
       <button onclick="closeTeamChatModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
       <div>
         <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400 flex items-center gap-2">💬 Salonplafond Team-Chat</h3>
-        <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Echtzeit-Kommunikation für das Bar-Team. Jede Nachricht kann vom Autor oder von Managern/Developern gelöscht werden.</p>
+        <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Echtzeit-Kommunikation für das Bar-Team. Jede Nachricht kann zitiert oder gelöscht werden.</p>
       </div>
 
-      <div id="chatMessagesContainer" class="custom-box p-4 rounded-xl border flex flex-col gap-3 max-h-[45vh] overflow-y-auto pr-2">
+      <div id="chatMessagesContainer" class="custom-box p-4 rounded-xl border flex flex-col gap-3 max-h-[42vh] overflow-y-auto pr-2">
         <p class="text-slate-500 italic text-xs text-center py-4">Lade Chat-Nachrichten...</p>
       </div>
 
+      <!-- Indikátor pre práve odpovedanú správu -->
+      <div id="replyingIndicatorBox" class="hidden custom-box p-2.5 rounded-lg border-l-4 border-amber-500 flex items-center justify-between text-xs">
+        <div>
+          <span class="text-[10px] text-amber-500 font-bold block uppercase">Antwort auf <span id="replyingAuthorName"></span>:</span>
+          <span id="replyingSnippetText" class="text-slate-300 truncate block max-w-md"></span>
+        </div>
+        <button type="button" onclick="cancelReply()" class="text-slate-400 hover:text-white font-bold p-1">&times;</button>
+      </div>
+
       <form onsubmit="handleSendChatMessage(event)" class="flex gap-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+        <input type="hidden" id="replyingMessageId" value="">
         <input type="text" id="chatMessageInput" autocomplete="off" placeholder="Nachricht an das Team schreiben..." class="flex-1 p-3 rounded-xl border text-xs focus:outline-none focus:border-amber-500">
         <button type="submit" class="px-5 py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl text-xs transition shadow flex items-center gap-1.5 shrink-0">
           Senden ➔
@@ -980,24 +996,17 @@
 
         <div id="adminChangelogFormContainer" class="hidden custom-box p-4 rounded-xl border flex flex-col gap-2.5">
           <label class="text-xs font-bold text-amber-600 dark:text-amber-300">➕ Neue Neuigkeit hinzufügen (Tomas - Developer):</label>
-          <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.35: Fix Staff Edit..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
+          <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.36: Chat Reply & Header Envelope..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
           <button onclick="submitNewChangelog()" class="py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs transition shadow">Als Neuigkeit veröffentlichen</button>
         </div>
 
         <div class="flex flex-col gap-2.5 max-h-[45vh] overflow-y-auto pr-1" id="changelogListContainer">
           <div class="custom-box p-3.5 rounded-xl border text-xs">
             <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-              <span>Version v3.0.35 (Tomas Kardos - Developer)</span>
+              <span>Version v3.0.36 (Tomas Kardos - Developer)</span>
               <span class="text-slate-500">Oktober 2026</span>
             </div>
-            <p>Behebung des Fehlers bei der Bearbeitung von Personal (Sicherer Update-Modus per Original-Name statt Duplikat-Erstellung).</p>
-          </div>
-          <div class="custom-box p-3.5 rounded-xl border text-xs">
-            <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-              <span>Version v3.0.34</span>
-              <span class="text-slate-500">Oktober 2026</span>
-            </div>
-            <p>Einführung des Salonplafond Team-Chats und Profilbilder.</p>
+            <p>Einführung von Chat-Zitaten / Antworten auf konkrete Nachrichten sowie blinkender Notifikations-Obálka (Briefumschlag) direkt in der Kopfzeile.</p>
           </div>
         </div>
       </div>
@@ -1021,6 +1030,7 @@
     let staffDatabaseRecords = [];
     let currentEnteredPin = "";
     let selectedWaiterForPin = "";
+    let chatRealtimeSubscription = null;
 
     window.addEventListener("DOMContentLoaded", async () => {
       window.addEventListener('scroll', handleScrollPosition);
@@ -1203,6 +1213,7 @@
 
       await loadDrinks();
       await checkPendingTicketsBadge();
+      setupChatRealtimeListener();
     }
 
     function updateHeaderAvatarUI() {
@@ -1247,10 +1258,15 @@
       await finalizeAppStartForStaff(staffRec);
     }
 
-    /* --- TEAM CHAT --- */
+    /* --- TEAM CHAT S CITÁCIOU A REALTIME NOTIFIKÁCIOU --- */
     function openTeamChatModal() {
       document.getElementById('settingsDropdown').classList.add('hidden');
       loadChatMessages();
+      
+      // Označíme v lokálnej pamäti, že chat bol prečítaný (zmažeme notifikáciu)
+      localStorage.setItem('salon_chat_last_seen_' + currentWaiterName, new Date().toISOString());
+      updateChatEnvelopeBadge(false);
+
       const modal = document.getElementById('teamChatModal');
       modal.classList.remove('hidden');
       modal.classList.add('flex');
@@ -1260,6 +1276,50 @@
       const modal = document.getElementById('teamChatModal');
       modal.classList.remove('flex');
       modal.classList.add('hidden');
+    }
+
+    function setupChatRealtimeListener() {
+      if (chatRealtimeSubscription) return;
+      chatRealtimeSubscription = _supabase
+        .channel('public:team_chat')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'team_chat' }, payload => {
+          let newMsg = payload.new;
+          // Ak nie je chat modal otvorený a správa nie je od aktuálneho používateľa -> rozblikáme obálku
+          if (document.getElementById('teamChatModal').classList.contains('hidden') && newMsg.author_name.toLowerCase() !== currentWaiterName.toLowerCase()) {
+            updateChatEnvelopeBadge(true);
+          }
+          // Ak je chat modal otvorený, automaticky načítame nové správy
+          if (!document.getElementById('teamChatModal').classList.contains('hidden')) {
+            loadChatMessages();
+          }
+        })
+        .subscribe();
+      
+      // Úvodná kontrola pri štarte
+      checkForUnreadChatMessages();
+    }
+
+    async function checkForUnreadChatMessages() {
+      const { data, error } = await _supabase.from('team_chat').select('*').order('created_at', { ascending: false }).limit(1);
+      if (error || !data || data.length === 0) return;
+
+      let lastMsg = data[0];
+      let lastSeenTime = localStorage.getItem('salon_chat_last_seen_' + currentWaiterName);
+      
+      if (lastMsg.author_name.toLowerCase() !== currentWaiterName.toLowerCase()) {
+        if (!lastSeenTime || new Date(lastMsg.created_at) > new Date(lastSeenTime)) {
+          updateChatEnvelopeBadge(true);
+        }
+      }
+    }
+
+    function updateChatEnvelopeBadge(hasUnread) {
+      const badge = document.getElementById('headerChatBadgeDot');
+      if (hasUnread) {
+        if (badge) badge.classList.remove('hidden');
+      } else {
+        if (badge) badge.classList.add('hidden');
+      }
     }
 
     async function loadChatMessages() {
@@ -1277,6 +1337,10 @@
         return;
       }
 
+      // Vytvoríme mapu ID správ pre rýchle vyhľadanie citácie
+      let messagesMap = {};
+      data.forEach(m => messagesMap[m.id] = m);
+
       const isUserDevOrManager = (isAdmin || currentWaiterName.toLowerCase() === 'tomas' || currentWaiterName.toLowerCase() === 'tomas kardos');
 
       container.innerHTML = data.map(msg => {
@@ -1291,14 +1355,29 @@
 
         let timeStr = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
+        // Ak správa na niekoho reaguje (cituje)
+        let replyQuoteHtml = '';
+        if (msg.reply_to_id && messagesMap[msg.reply_to_id]) {
+          let quoted = messagesMap[msg.reply_to_id];
+          replyQuoteHtml = `
+            <div class="mb-1.5 p-2 rounded bg-slate-900/60 border-l-2 border-amber-500 text-[11px] text-slate-300">
+              <span class="font-bold text-amber-400">${quoted.author_name}:</span> ${quoted.message}
+            </div>
+          `;
+        }
+
         return `
           <div class="flex items-start gap-2.5 p-2.5 rounded-xl custom-box border text-xs relative group">
             ${avatarHtml}
             <div class="flex-1 min-w-0">
               <div class="flex items-center justify-between">
                 <span class="font-bold text-amber-600 dark:text-amber-400">${msg.author_name}</span>
-                <span class="text-[10px] text-slate-500">${timeStr}</span>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] text-slate-500">${timeStr}</span>
+                  <button onclick="setReplyTarget('${msg.id}', '${msg.author_name}', '${msg.message.replace(/'/g, "\\'")}')" class="text-[10px] text-amber-500 hover:underline font-semibold" title="Auf diese Nachricht antworten">Antworten</button>
+                </div>
               </div>
+              ${replyQuoteHtml}
               <p class="mt-1 text-slate-200 break-words">${msg.message}</p>
             </div>
             ${canDelete ? `<button onclick="deleteChatMessage('${msg.id}')" class="text-slate-500 hover:text-red-400 font-bold p-1 transition" title="Nachricht löschen">&times;</button>` : ''}
@@ -1308,21 +1387,41 @@
       container.scrollTop = container.scrollHeight;
     }
 
+    function setReplyTarget(msgId, authorName, messageText) {
+      document.getElementById('replyingMessageId').value = msgId;
+      document.getElementById('replyingAuthorName').innerText = authorName;
+      document.getElementById('replyingSnippetText').innerText = messageText;
+      document.getElementById('replyingIndicatorBox').classList.remove('hidden');
+      document.getElementById('replyingIndicatorBox').classList.add('flex');
+      document.getElementById('chatMessageInput').focus();
+    }
+
+    function cancelReply() {
+      document.getElementById('replyingMessageId').value = '';
+      document.getElementById('replyingIndicatorBox').classList.remove('flex');
+      document.getElementById('replyingIndicatorBox').classList.add('hidden');
+    }
+
     async function handleSendChatMessage(e) {
       e.preventDefault();
       const input = document.getElementById('chatMessageInput');
+      const replyIdInput = document.getElementById('replyingMessageId');
       const text = input.value.trim();
       if (!text) return;
 
+      let reply_to_id = replyIdInput.value ? replyIdInput.value : null;
+
       const { error } = await _supabase.from('team_chat').insert([{
         author_name: currentWaiterName,
-        message: text
+        message: text,
+        reply_to_id: reply_to_id
       }]);
 
       if (error) {
         alert("Fehler beim Senden: " + error.message);
       } else {
         input.value = '';
+        cancelReply();
         loadChatMessages();
       }
     }
@@ -1335,6 +1434,12 @@
       } else {
         loadChatMessages();
       }
+    }
+
+    /* --- DOKONČENIE TABUĽKY PRE CHAT (Ak by náhodou chýbal stĺpec reply_to_id) --- */
+    // Poznámka: Tabuľka team_chat už existuje, ale ak by chýbal stĺpec pre odpovede, Supabase ho v prípade potreby doplní alebo ho vytvoríme cez SQL.
+    async function ensureChatReplyColumnExists() {
+      // V Supabase SQL Editori stačí spustiť: alter table public.team_chat add column if not exists reply_to_id uuid references public.team_chat(id) on delete set null;
     }
 
     /* --- SPRÁVCOVSKÝ PANEL PRE PERSONAL & PINs --- */
@@ -1456,7 +1561,6 @@
       if (!newName) return alert("Bitte Name eingeben.");
 
       if (originalName) {
-        // Opravená logika: Aktualizujeme priamo záznam podľa pôvodného mena bez zbytočného mazania
         const { error } = await _supabase.from('staff_presence')
           .update({ name: newName, pin, role, avatar_url })
           .eq('name', originalName);
@@ -1797,10 +1901,10 @@
       container.innerHTML = dynamicHtml + `
         <div class="custom-box p-3.5 rounded-xl border text-xs">
           <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-            <span>Version v3.0.35 (Tomas Kardos - Developer)</span>
+            <span>Version v3.0.36 (Tomas Kardos - Developer)</span>
             <span class="text-slate-500">Oktober 2026</span>
           </div>
-          <p>Behebung des Fehlers bei der Bearbeitung von Personal (Sicherer Update-Modus per Original-Name statt Duplikat-Erstellung).</p>
+          <p>Einführung von Chat-Zitaten / Antworten auf konkrete Nachrichten sowie blinkender Notifikations-Obálka (Briefumschlag) direkt in der Kopfzeile.</p>
         </div>
       `;
     }
@@ -2859,7 +2963,7 @@
       });
     }
 
-    /* --- DOPLNENÉ FUNKCIE PRE A3 TLAČ --- */
+    /* --- A3 TLAČ --- */
     function openA3PrintSetupModal() {
       document.getElementById('settingsDropdown').classList.add('hidden');
       const seasons = getAllSeasons();
