@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.41</title>
+  <title>Salonplafond BAR v3.0.42</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import & Export -->
@@ -134,7 +134,7 @@
       <div>
         <h1 class="text-lg md:text-xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-xl md:text-2xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.0.41 • Touch-Grid PIN-Login</span>
+        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.0.42 • Touch-Grid PIN-Login</span>
       </div>
 
       <div id="pinLoginForm" class="w-full bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-2xl space-y-4 text-left mt-1">
@@ -255,7 +255,6 @@
         </div>
       </div>
 
-      <!-- Tlačidlo pre otvorenie Login-Historie priamo v Personal & PINs -->
       <div class="flex justify-between items-center pt-1">
         <h4 class="text-xs font-bold uppercase tracking-wider">Aktuelles Personal in der Datenbank:</h4>
         <button onclick="openLoginHistoryModal()" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 font-bold rounded-lg text-xs transition border border-slate-300 dark:border-slate-700 flex items-center gap-1.5">
@@ -273,7 +272,7 @@
     </div>
   </div>
 
-  <!-- NOVÝ DIALÓG: LOGIN-HISTORIE / PROTOKOLL -->
+  <!-- LOGIN-HISTORIE / PROTOKOLL -->
   <div id="loginHistoryModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[285]">
     <div class="card max-w-2xl w-full p-6 relative flex flex-col gap-4 max-h-[85vh] overflow-y-auto border-amber-500/50 shadow-2xl">
       <button onclick="closeLoginHistoryModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
@@ -292,7 +291,7 @@
     </div>
   </div>
 
-  <!-- MÓDNY DIALÓG: MÔJ PROFIL (USER PROFILE) -->
+  <!-- MÔJ PROFIL (USER PROFILE) -->
   <div id="userProfileModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[280]">
     <div class="card max-w-md w-full p-6 relative flex flex-col gap-4 border-amber-500/50 shadow-2xl">
       <button onclick="closeUserProfileModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
@@ -347,12 +346,17 @@
         </div>
         <div>
           <h1 class="text-3xl font-bold tracking-tight text-amber-500 dark:text-amber-400">Salonplafond BAR</h1>
-          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium block">v3.0.41</span>
+          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium block">v3.0.42</span>
         </div>
       </div>
 
       <div class="flex flex-wrap items-center gap-2">
-        <!-- Notifikačná obálka pre Team-Chat priamo v hlavičke -->
+        <!-- Tlačidlo Benutzer wechseln presunuté nahor -->
+        <button onclick="handleLogout()" class="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/30 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm" title="Benutzer wechseln">
+          🚪 Benutzer wechseln
+        </button>
+
+        <!-- Notifikačná obálka pre Team-Chat -->
         <button onclick="openTeamChatModal()" id="headerChatEnvelopeBtn" class="relative px-3 py-1.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-amber-600 dark:text-amber-400 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm" title="Team-Chat öffnen">
           <span>✉️ Chat</span>
           <span id="headerChatBadgeDot" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white dark:border-slate-950 pulse-badge-dot"></span>
@@ -370,7 +374,7 @@
           
           <div id="settingsDropdown" class="hidden absolute right-0 mt-2 w-72 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl shadow-2xl p-2 z-50 flex flex-col gap-1.5 text-slate-900 dark:text-slate-100">
             
-            <!-- MANAŽÉRSKE POLOŽKY (Na vrchole) -->
+            <!-- MANAŽÉRSKE POLOŽKY -->
             <button onclick="openAddDrinkModalFromMenu()" id="menuAddDrinkBtn" class="hidden w-full text-left px-2.5 py-2 rounded bg-amber-500 text-slate-950 hover:bg-amber-600 text-xs font-black items-center gap-2 shadow-sm">
               ➕ Neues Getränk hinzufügen
             </button>
@@ -387,15 +391,12 @@
               <span>👤 Personal & PINs (Zentrale)</span> <span>→</span>
             </button>
 
-            <!-- POLOŽKA LOGIN-HISTORIE POD PERSONAL & PINS V MANAŽÉRSKOM REŽIME -->
             <button onclick="openLoginHistoryModalFromMenu()" id="menuLoginHistoryBtn" class="hidden w-full text-left px-2.5 py-2 rounded bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-amber-600 dark:text-amber-400 items-center justify-between border border-slate-200 dark:border-slate-700">
               <span>📜 Login-Historie / Protokoll</span> <span>→</span>
             </button>
 
-            <!-- ODDEĽOVACIA ČIARA MEDZI ZENTRALE A CHATOM/PROFILOM -->
             <div class="border-t border-slate-200 dark:border-slate-700 my-1"></div>
 
-            <!-- TEAM CHAT A MEIN PROFIL S FOTKOU -->
             <button onclick="openTeamChatModal()" class="w-full text-left px-2.5 py-2 rounded bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center justify-between border border-slate-200 dark:border-slate-700">
               <span>💬 Team-Chat</span> <span>→</span>
             </button>
@@ -412,7 +413,6 @@
 
             <div class="border-t border-slate-200 dark:border-slate-700 my-1"></div>
 
-            <!-- ĎALŠIE FUNKCIE -->
             <button onclick="refreshData()" class="w-full text-left px-2.5 py-2 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
               🔄 Daten aktualisieren
             </button>
@@ -429,7 +429,6 @@
               📊 Import & Export
             </button>
 
-            <!-- SAMOSTATNÉ TLAČIDLO PRE WAS IST NEU? (CHANGELOG) -->
             <button onclick="openChangelogModal()" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-semibold text-amber-600 dark:text-amber-400 flex items-center justify-between">
               <span class="flex items-center gap-2">🚀 Was ist neu? (Changelog)</span>
             </button>
@@ -439,24 +438,18 @@
               <span id="menuDropdownTicketDot" class="hidden w-2 h-2 bg-amber-500 rounded-full pulse-badge-dot"></span>
             </button>
 
-            <div class="border-t border-slate-200 dark:border-slate-700 my-0.5"></div>
-
-            <button onclick="handleLogout()" class="w-full text-left px-2.5 py-2 rounded bg-red-50 dark:bg-red-600/20 hover:bg-red-100 dark:hover:bg-red-600/30 text-xs font-bold text-red-600 dark:text-red-400 flex items-center gap-2 border border-red-200 dark:border-red-500/30">
-              🚪 Benutzer wechseln
-            </button>
-
           </div>
         </div>
       </div>
     </header>
 
-    <!-- Samostatný blok pre prihláseného používateľa úplne pod logom a verziou -->
+    <!-- Samostatný blok pre prihláseného používateľa: fotka je klikatelná (Mein Profil), meno je čistý text vedľa -->
     <div class="mb-6">
-      <div onclick="handleLogout()" class="inline-flex items-center gap-2.5 cursor-pointer group bg-slate-200/90 dark:bg-slate-800/90 hover:bg-amber-500/20 px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 transition shadow-sm" title="Klicken, um Benutzer zu wechseln">
-        <div id="headerUserAvatarContainer" class="w-7 h-7 rounded-full border border-amber-500 bg-slate-800 overflow-hidden flex items-center justify-center shrink-0">
+      <div class="inline-flex items-center gap-3 bg-slate-200/90 dark:bg-slate-800/90 px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 shadow-sm">
+        <div id="headerUserAvatarContainer" onclick="openUserProfileModal()" class="w-8 h-8 rounded-full border-2 border-amber-500 bg-slate-800 overflow-hidden flex items-center justify-center shrink-0 cursor-pointer hover:scale-105 transition shadow" title="Klicken, um mein Profil zu öffnen">
           <span class="text-[10px] font-bold text-amber-400" id="headerAvatarFallback">?</span>
         </div>
-        <span class="text-xs text-slate-800 dark:text-slate-200 group-hover:text-amber-500 font-bold">Angemeldet: <span id="currentUserEmail" class="text-amber-600 dark:text-amber-300"></span> 🔄</span>
+        <span class="text-xs text-slate-800 dark:text-slate-200 font-bold">Angemeldet: <span id="currentUserEmail" class="text-amber-600 dark:text-amber-300"></span></span>
       </div>
     </div>
 
@@ -518,7 +511,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-300 dark:border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.41 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.42 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div>
@@ -930,7 +923,7 @@
     </div>
   </div>
 
-  <!-- Samostatný Modal pre Changelog (Was ist neu?) -->
+  <!-- Changelog (Was ist neu?) -->
   <div id="changelogModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[280]">
     <div class="card max-w-2xl w-full p-6 relative flex flex-col gap-4 max-h-[85vh] overflow-y-auto border-amber-500/50 shadow-2xl">
       <button onclick="closeChangelogModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
@@ -941,7 +934,7 @@
 
       <div id="adminChangelogFormContainer" class="hidden custom-box p-4 rounded-xl border flex flex-col gap-2.5">
         <label class="text-xs font-bold text-amber-600 dark:text-amber-300">➕ Neue Neuigkeit hinzufügen (Tomas - Developer):</label>
-        <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.41: Login History & Header Fix..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
+        <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.42: PIN-Auth & Header fix..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
         <button onclick="submitNewChangelog()" class="py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs transition shadow">Als Neuigkeit veröffentlichen</button>
       </div>
 
@@ -1296,7 +1289,8 @@
       currentWaiterAvatar = staffRecord.avatar_url || "";
       updateHeaderAvatarUI();
 
-      isAdmin = (staffRecord.role === 'manager' || staffRecord.role === 'developer' || currentWaiterName.toLowerCase() === 'amim');
+      // Oprava: Ak je to manager alebo developer alebo Tomas, nastavíme isAdmin = true okamžite aj pri PIN prihlásení!
+      isAdmin = (staffRecord.role === 'manager' || staffRecord.role === 'developer' || currentWaiterName.toLowerCase() === 'tomas' || currentWaiterName.toLowerCase() === 'amim');
       
       if (isAdmin) {
         document.getElementById('currentUserEmail').innerHTML = `<span class="text-amber-600 dark:text-amber-400 font-black">${currentWaiterName} (${staffRecord.role || 'Manager'})</span>`;
@@ -2162,10 +2156,10 @@
       html += `
         <div class="custom-box p-3.5 rounded-xl border text-xs shrink-0">
           <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-            <span>Version v3.0.41 (Tomas Kardos - Developer)</span>
+            <span>Version v3.0.42 (Tomas Kardos - Developer)</span>
             <span class="text-slate-500">Oktober 2026</span>
           </div>
-          <p class="leading-relaxed">Separater Anmelde-Block unter dem Header, wiederhergestellter Benutzerwechsel im Menü, PIN-Login korrigiert für Manager-Rechte und SQL-Unterstützung für Login-Historie.</p>
+          <p class="leading-relaxed">Getrennte Profilbild-Ansicht (Öffnet Mein Profil), Benutzer wechseln Button in den Header verschoben, und PIN-Login Rechte für Manager/Developer korrigiert.</p>
         </div>
       `;
 
