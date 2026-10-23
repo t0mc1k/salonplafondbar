@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.45</title>
+  <title>Salonplafond BAR v3.0.46</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import & Export -->
@@ -104,20 +104,23 @@
     }
 
     @media print {
-      @page { size: A3 portrait; margin: 10mm; }
+      @page { size: portrait; margin: 10mm; }
       body { background: white !important; color: black !important; padding: 0 !important; }
-      body > *:not(#a3PrintPreviewModal):not(#drinkModal) { display: none !important; }
       
-      #a3PrintPreviewModal {
+      /* Schová sa všetko okrem otvoreného modal okna s drinkom alebo A3 náhľadu */
+      body > *:not(#drinkModal):not(#a3PrintPreviewModal) { display: none !important; }
+
+      #drinkModal, #a3PrintPreviewModal {
         position: absolute !important;
         inset: 0 !important;
         background: white !important;
         padding: 0 !important;
         overflow: visible !important;
-        display: flex !important;
+        display: block !important;
         z-index: 99999 !important;
       }
-      #a3PrintPreviewModal .card {
+
+      #drinkModal .card, #a3PrintPreviewModal .card {
         border: none !important;
         box-shadow: none !important;
         background: white !important;
@@ -128,9 +131,10 @@
         max-height: none !important;
         overflow: visible !important;
       }
+
       .no-print, button, .modal-bg { display: none !important; }
-      #a3PrintContainer * { color: black !important; background: transparent !important; }
-      
+      body.print-no-images #printModalImage { display: none !important; }
+
       /* Tlačový podpis vpravo dole */
       .print-watermark-footer {
         display: block !important;
@@ -162,7 +166,7 @@
       <div>
         <h1 class="text-lg md:text-xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-xl md:text-2xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.0.45 • Touch-Grid PIN-Login</span>
+        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.0.46 • Touch-Grid PIN-Login</span>
       </div>
 
       <div id="pinLoginForm" class="w-full bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-2xl space-y-4 text-left mt-1">
@@ -411,7 +415,7 @@
             <!-- Štandardný názov -->
             <div class="h-[2.75rem] flex flex-col justify-center">
               <h1 class="text-3xl font-bold tracking-tight text-amber-500 dark:text-amber-400 leading-none">Salonplafond BAR</h1>
-              <span class="text-xs text-slate-600 dark:text-slate-400 font-medium block mt-0.5">v3.0.45</span>
+              <span class="text-xs text-slate-600 dark:text-slate-400 font-medium block mt-0.5">v3.0.46</span>
             </div>
             <!-- Oznam o prihlásení kolegu -->
             <div class="h-[2.75rem] flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-xl">
@@ -491,6 +495,10 @@
 
             <button onclick="openSeasonModal()" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
               📅 Saison wählen...
+            </button>
+
+            <button onclick="createNewSeasonPrompt()" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center gap-2">
+              ➕ Neue Saison erstellen
             </button>
 
             <button onclick="openShoppingModal()" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
@@ -587,7 +595,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-300 dark:border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.45 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.46 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div>
@@ -1030,7 +1038,7 @@
 
       <div id="adminChangelogFormContainer" class="hidden custom-box p-4 rounded-xl border flex flex-col gap-2.5">
         <label class="text-xs font-bold text-amber-600 dark:text-amber-300">➕ Neue Neuigkeit hinzufügen (Tomas - Developer):</label>
-        <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.45: Chat Sidebar & Login-Animations..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
+        <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.46: Einzelne Getränke drucken, Saison-Manager..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
         <button onclick="submitNewChangelog()" class="py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs transition shadow">Als Neuigkeit veröffentlichen</button>
       </div>
 
@@ -1146,14 +1154,23 @@
     </div>
   </div>
 
-  <!-- Season Selection Modal Dialog -->
+  <!-- Season Selection Modal Dialog (S tlačidlom vytvoriť novú sezónu) -->
   <div id="seasonModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
     <div class="card max-w-md w-full p-6 relative flex flex-col gap-4 shadow-2xl border-amber-500/50">
       <button onclick="closeSeasonModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
-      <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400">📅 Saison & Archiv wählen</h3>
+      
+      <div class="flex items-center justify-between">
+        <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400">📅 Saison & Archiv wählen</h3>
+        <button onclick="createNewSeasonPrompt()" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs transition shadow flex items-center gap-1">
+          ➕ Neue Saison
+        </button>
+      </div>
+
       <p class="text-xs text-slate-600 dark:text-slate-300">Wähle die aktive Saison oder verwalte die Einträge:</p>
-      <div id="seasonModalList" class="flex flex-col gap-2.5 mt-2 max-h-[50vh] overflow-y-auto pr-1"></div>
-      <div class="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800 flex justify-end">
+      
+      <div id="seasonModalList" class="flex flex-col gap-2.5 mt-1 max-h-[50vh] overflow-y-auto pr-1"></div>
+      
+      <div class="mt-2 pt-3 border-t border-slate-200 dark:border-slate-800 flex justify-end">
         <button onclick="closeSeasonModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 font-bold text-slate-800 dark:text-white rounded-lg text-xs transition">Schließen</button>
       </div>
     </div>
@@ -2415,10 +2432,10 @@
       html += `
         <div class="custom-box p-3.5 rounded-xl border text-xs shrink-0">
           <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-            <span>Version v3.0.45 (Tomas Kardos - Developer)</span>
+            <span>Version v3.0.46 (Tomas Kardos - Developer)</span>
             <span class="text-slate-500">Oktober 2026</span>
           </div>
-          <p class="leading-relaxed">Login-Animation bei neu angemeldetem Kollegen, Autoren-Wasserzeichen beim Drucken, Profil-Button in der Sidebar & Online-Mitgliederanzeige im Chat.</p>
+          <p class="leading-relaxed">Korrektur beim Drucken einzelner Getränke, verbesserte Saison-Erstellung und vollständiges Löschen von Saisons für Manager.</p>
         </div>
       `;
 
@@ -2609,6 +2626,39 @@
       document.getElementById('seasonModal').classList.add('hidden');
     }
 
+    /* 3. VYTVORENIE NOVEJ SEZÓNY */
+    function createNewSeasonPrompt() {
+      document.getElementById('settingsDropdown').classList.add('hidden');
+      checkManagerAuth(async () => {
+        let newSeasonName = prompt("Namen für die neue Saison eingeben (z. B. Sommer 2027 oder 01.05.2027 - 31.10.2027):");
+        if (!newSeasonName || newSeasonName.trim() === '') return;
+
+        let formatted = newSeasonName.trim();
+        
+        // Vytvoríme vzorový (placeholder) drink pre novú sezónu, aby existovala v databáze
+        const { error } = await _supabase.from('drinks').insert([{
+          name: "Willkommens-Drink (Saison-Start)",
+          category: "Cocktails",
+          season: formatted,
+          glass_type: "Coupette",
+          method: "Build",
+          ice: "Cubed",
+          garnish: "Mint",
+          ingredients_json: [{ name: "Saison-Eröffnung", amount: "1x" }],
+          recipe: "Erster Drink dieser neuen Saison.",
+          is_featured: false
+        }]);
+
+        if (error) {
+          alert("Fehler beim Erstellen der Saison: " + error.message);
+        } else {
+          alert(`Saison "${formatted}" wurde erfolgreich erstellt!`);
+          await loadDrinks();
+          selectSeason(formatted);
+        }
+      });
+    }
+
     function openShoppingModal() {
       document.getElementById('settingsDropdown').classList.add('hidden');
       document.getElementById('shoppingSeasonName').innerText = currentSeasonFilter;
@@ -2753,24 +2803,26 @@
 
         alert(`Saison erfolgreich in "${formattedNewName}" umbenannt!`);
         currentSeasonFilter = formattedNewName;
-        loadDrinks();
+        await loadDrinks();
         closeSeasonModal();
       });
     }
 
+    /* 2. OPRAVA MAZANIA SEZÓNY */
     async function deleteEntireSeason(seasonKey, event) {
       if (event) event.stopPropagation();
       checkManagerAuth(async () => {
-        if (!confirm(`Möchten Sie wirklich die gesamte Saison "${seasonKey}" und alle darin enthaltenen Getränke löschen?`)) return;
+        if (!confirm(`Möchten Sie wirklich die gesamte Saison "${seasonKey}" und alle darin enthaltenen Getränke permanent löschen?`)) return;
 
         const { error } = await _supabase.from('drinks').delete().eq('season', seasonKey);
         if (error) {
-          alert("Fehler beim Löschen: " + error.message);
+          alert("Fehler beim Löschen der Saison: " + error.message);
           return;
         }
 
         alert(`Saison "${seasonKey}" wurde erfolgreich gelöscht!`);
-        loadDrinks();
+        currentSeasonFilter = null;
+        await loadDrinks();
         closeSeasonModal();
       });
     }
@@ -3323,6 +3375,7 @@
       modal.classList.add('hidden');
     }
 
+    /* 1. OPRAVA TLAČE JEDNÉHO DRINKU */
     function executePrint(withImage) {
       closePrintOptionsModal();
       if (withImage) {
