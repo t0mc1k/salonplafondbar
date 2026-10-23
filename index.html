@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.42</title>
+  <title>Salonplafond BAR v3.0.43</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import & Export -->
@@ -134,7 +134,7 @@
       <div>
         <h1 class="text-lg md:text-xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-xl md:text-2xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.0.42 • Touch-Grid PIN-Login</span>
+        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.0.43 • Touch-Grid PIN-Login</span>
       </div>
 
       <div id="pinLoginForm" class="w-full bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-2xl space-y-4 text-left mt-1">
@@ -272,16 +272,24 @@
     </div>
   </div>
 
-  <!-- LOGIN-HISTORIE / PROTOKOLL -->
+  <!-- LOGIN-HISTORIE / PROTOKOLL (S počtom online používateľov) -->
   <div id="loginHistoryModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[285]">
     <div class="card max-w-2xl w-full p-6 relative flex flex-col gap-4 max-h-[85vh] overflow-y-auto border-amber-500/50 shadow-2xl">
       <button onclick="closeLoginHistoryModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
       <div>
         <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400 flex items-center gap-2">📜 Login-Historie & Protokoll</h3>
-        <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Übersicht darüber, welcher Benutzer sich wann im System angemeldet hat.</p>
+        <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Übersicht darüber, welcher Benutzer sich wann im System angemeldet hat und wer aktuell online ist.</p>
       </div>
 
-      <div id="loginHistoryListContainer" class="flex flex-col gap-2 max-h-[50vh] overflow-y-auto pr-1 custom-box p-3 rounded-xl border text-xs">
+      <!-- Online Status Box -->
+      <div id="onlineUsersSummaryBox" class="custom-box p-3 rounded-xl border flex flex-col gap-2 text-xs">
+        <span class="font-bold text-amber-600 dark:text-amber-400 uppercase text-[10px]">🟢 Aktiv online in den letzten 15 Minuten (<span id="onlineCountBadge">0</span>):</span>
+        <div id="onlineUsersListContainer" class="flex flex-wrap gap-1.5">
+          <span class="text-slate-500 italic">Lade Online-Status...</span>
+        </div>
+      </div>
+
+      <div id="loginHistoryListContainer" class="flex flex-col gap-2 max-h-[40vh] overflow-y-auto pr-1 custom-box p-3 rounded-xl border text-xs">
         <p class="text-slate-500 italic text-xs text-center py-4">Lade Login-Protokoll...</p>
       </div>
 
@@ -346,12 +354,12 @@
         </div>
         <div>
           <h1 class="text-3xl font-bold tracking-tight text-amber-500 dark:text-amber-400">Salonplafond BAR</h1>
-          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium block">v3.0.42</span>
+          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium block">v3.0.43</span>
         </div>
       </div>
 
       <div class="flex flex-wrap items-center gap-2">
-        <!-- Tlačidlo Benutzer wechseln presunuté nahor -->
+        <!-- Tlačidlo Benutzer wechseln v hlavičke -->
         <button onclick="handleLogout()" class="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/30 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm" title="Benutzer wechseln">
           🚪 Benutzer wechseln
         </button>
@@ -438,14 +446,21 @@
               <span id="menuDropdownTicketDot" class="hidden w-2 h-2 bg-amber-500 rounded-full pulse-badge-dot"></span>
             </button>
 
+            <div class="border-t border-slate-200 dark:border-slate-700 my-1"></div>
+
+            <!-- Tlačidlo Benutzer wechseln pridané aj do menu -->
+            <button onclick="handleLogout()" class="w-full text-left px-2.5 py-2 rounded hover:bg-red-500/20 text-xs font-bold text-red-600 dark:text-red-400 flex items-center gap-2">
+              🚪 Benutzer wechseln
+            </button>
+
           </div>
         </div>
       </div>
     </header>
 
-    <!-- Samostatný blok pre prihláseného používateľa: fotka je klikatelná (Mein Profil), meno je čistý text vedľa -->
+    <!-- Zrušený rámček: Čistý text a samostatná klikateľná fotka vedľa neho -->
     <div class="mb-6">
-      <div class="inline-flex items-center gap-3 bg-slate-200/90 dark:bg-slate-800/90 px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 shadow-sm">
+      <div class="inline-flex items-center gap-3">
         <div id="headerUserAvatarContainer" onclick="openUserProfileModal()" class="w-8 h-8 rounded-full border-2 border-amber-500 bg-slate-800 overflow-hidden flex items-center justify-center shrink-0 cursor-pointer hover:scale-105 transition shadow" title="Klicken, um mein Profil zu öffnen">
           <span class="text-[10px] font-bold text-amber-400" id="headerAvatarFallback">?</span>
         </div>
@@ -511,7 +526,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-300 dark:border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.42 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.43 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div>
@@ -614,16 +629,13 @@
     </div>
   </div>
 
-  <!-- A3 Print Preview Modal -->
+  <!-- A3 Print Preview Modal (Bez hlavičky a čiary) -->
   <div id="a3PrintPreviewModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[300]">
     <div class="card max-w-4xl w-full p-8 relative flex flex-col gap-6 max-h-[90vh] overflow-y-auto border-amber-500/50 shadow-2xl bg-white text-slate-900">
       <button onclick="closeA3PrintPreviewModal()" class="no-print absolute top-4 right-4 text-slate-500 hover:text-slate-900 text-2xl font-bold">&times;</button>
       
       <div id="a3PrintContainer" class="flex flex-col gap-8 bg-white text-slate-900 p-4">
-        <div class="text-center pb-4 border-b-2 border-slate-900">
-          <h2 class="text-2xl font-black uppercase tracking-widest text-slate-900">Salonplafond Bar • A3 Karte</h2>
-          <p class="text-xs text-slate-700 mt-1">Saison: <span id="a3PrintSeasonName" class="font-bold"></span></p>
-        </div>
+        <!-- Úplne odstránený horný text aj čiarový oddeľovač -->
         <div id="a3PrintDrinksList" class="flex flex-col gap-8"></div>
       </div>
 
@@ -934,7 +946,7 @@
 
       <div id="adminChangelogFormContainer" class="hidden custom-box p-4 rounded-xl border flex flex-col gap-2.5">
         <label class="text-xs font-bold text-amber-600 dark:text-amber-300">➕ Neue Neuigkeit hinzufügen (Tomas - Developer):</label>
-        <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.42: PIN-Auth & Header fix..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
+        <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.43: A3 print header removed & online count..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
         <button onclick="submitNewChangelog()" class="py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs transition shadow">Als Neuigkeit veröffentlichen</button>
       </div>
 
@@ -1009,8 +1021,8 @@
     </div>
   </div>
 
-  <!-- Secure Manager Auth Modal Dialog -->
-  <div id="authModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+  <!-- Secure Manager Auth Modal Dialog (Zvýšený z-index na z[320], aby bol vždy navrchu) -->
+  <div id="authModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[320]">
     <div class="card max-w-md w-full p-6 relative flex flex-col gap-4 shadow-2xl border-amber-500/50">
       <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-500 dark:text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
       <div class="w-12 h-12 bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-xl mx-auto flex items-center justify-center text-2xl border border-amber-500/30">🔒</div>
@@ -1289,7 +1301,6 @@
       currentWaiterAvatar = staffRecord.avatar_url || "";
       updateHeaderAvatarUI();
 
-      // Oprava: Ak je to manager alebo developer alebo Tomas, nastavíme isAdmin = true okamžite aj pri PIN prihlásení!
       isAdmin = (staffRecord.role === 'manager' || staffRecord.role === 'developer' || currentWaiterName.toLowerCase() === 'tomas' || currentWaiterName.toLowerCase() === 'amim');
       
       if (isAdmin) {
@@ -1479,10 +1490,11 @@
       await finalizeAppStartForStaff(staffRec);
     }
 
-    function openLoginHistoryModal() {
+    async function openLoginHistoryModal() {
       document.getElementById('settingsDropdown').classList.add('hidden');
-      checkManagerAuth(() => {
-        loadLoginHistoryRecords();
+      checkManagerAuth(async () => {
+        await loadLoginHistoryRecords();
+        await loadOnlineUsersSummary();
         const modal = document.getElementById('loginHistoryModal');
         modal.classList.remove('hidden');
         modal.classList.add('flex');
@@ -1497,6 +1509,43 @@
       const modal = document.getElementById('loginHistoryModal');
       modal.classList.remove('flex');
       modal.classList.add('hidden');
+    }
+
+    async function loadOnlineUsersSummary() {
+      const container = document.getElementById('onlineUsersListContainer');
+      const countBadge = document.getElementById('onlineCountBadge');
+      container.innerHTML = `<span class="text-slate-500 italic">Lade Online-Status...</span>`;
+
+      const { data, error } = await _supabase.from('staff_presence').select('*');
+      if (error || !data) {
+        container.innerHTML = `<span class="text-red-400">Fehler beim Laden</span>`;
+        countBadge.innerText = "0";
+        return;
+      }
+
+      const now = new Date();
+      // Aktivita za posledných 15 minút
+      let onlineUsers = data.filter(staff => {
+        if (!staff.last_used_at) return false;
+        let lastActive = new Date(staff.last_used_at);
+        let diffMinutes = (now - lastActive) / (1000 * 60);
+        return diffMinutes <= 15;
+      });
+
+      countBadge.innerText = onlineUsers.length;
+
+      if (onlineUsers.length === 0) {
+        container.innerHTML = `<span class="text-slate-400 italic">Keine Benutzer in den letzten 15 Minuten aktiv.</span>`;
+        return;
+      }
+
+      container.innerHTML = onlineUsers.map(user => {
+        return `
+          <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30 text-[11px] flex items-center gap-1">
+            🟢 ${user.name} <span class="text-[9px] opacity-75 uppercase">(${user.role || 'staff'})</span>
+          </span>
+        `;
+      }).join('');
     }
 
     async function loadLoginHistoryRecords() {
@@ -2156,10 +2205,10 @@
       html += `
         <div class="custom-box p-3.5 rounded-xl border text-xs shrink-0">
           <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-            <span>Version v3.0.42 (Tomas Kardos - Developer)</span>
+            <span>Version v3.0.43 (Tomas Kardos - Developer)</span>
             <span class="text-slate-500">Oktober 2026</span>
           </div>
-          <p class="leading-relaxed">Getrennte Profilbild-Ansicht (Öffnet Mein Profil), Benutzer wechseln Button in den Header verschoben, und PIN-Login Rechte für Manager/Developer korrigiert.</p>
+          <p class="leading-relaxed">Entfernung des A3 Druck-Titels/Linie, Benutzer wechseln ins Menü ergänzt, Login-Historie zeigt aktive Online-Benutzer, und z-index für Auth-Modal korrigiert.</p>
         </div>
       `;
 
@@ -3273,11 +3322,9 @@
       const checked = document.querySelectorAll('input[name="a3DrinkCheckbox"]:checked');
       if (checked.length === 0) return alert("Bitte wähle mindestens ein Getränk aus.");
 
-      const selectedSeason = document.getElementById('a3SeasonSelect').value;
       const showImage = document.getElementById('a3OptionImage').checked;
       const showPrice = document.getElementById('a3OptionPrice').checked;
 
-      document.getElementById('a3PrintSeasonName').innerText = selectedSeason;
       const drinksListContainer = document.getElementById('a3PrintDrinksList');
 
       let html = '';
