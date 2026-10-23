@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.43</title>
+  <title>Salonplafond BAR v3.0.44</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import & Export -->
@@ -134,7 +134,7 @@
       <div>
         <h1 class="text-lg md:text-xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-xl md:text-2xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.0.43 • Touch-Grid PIN-Login</span>
+        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.0.44 • Touch-Grid PIN-Login</span>
       </div>
 
       <div id="pinLoginForm" class="w-full bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-2xl space-y-4 text-left mt-1">
@@ -272,7 +272,7 @@
     </div>
   </div>
 
-  <!-- LOGIN-HISTORIE / PROTOKOLL (S počtom online používateľov) -->
+  <!-- LOGIN-HISTORIE / PROTOKOLL -->
   <div id="loginHistoryModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[285]">
     <div class="card max-w-2xl w-full p-6 relative flex flex-col gap-4 max-h-[85vh] overflow-y-auto border-amber-500/50 shadow-2xl">
       <button onclick="closeLoginHistoryModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
@@ -299,13 +299,13 @@
     </div>
   </div>
 
-  <!-- MÔJ PROFIL (USER PROFILE) -->
+  <!-- MÔJ PROFIL (USER PROFILE) S BIO -->
   <div id="userProfileModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[280]">
-    <div class="card max-w-md w-full p-6 relative flex flex-col gap-4 border-amber-500/50 shadow-2xl">
+    <div class="card max-w-md w-full p-6 relative flex flex-col gap-4 max-h-[90vh] overflow-y-auto border-amber-500/50 shadow-2xl">
       <button onclick="closeUserProfileModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
       <div>
         <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400 flex items-center gap-2">👤 Mein Profil</h3>
-        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Passe hier dein eigenes Profilbild und deinen PIN-Code an.</p>
+        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Passe hier dein eigenes Profilbild, deinen PIN-Code und deine Beschreibung (Bio) an.</p>
       </div>
 
       <div class="custom-box p-4 rounded-xl border flex flex-col gap-4 items-center text-center">
@@ -325,6 +325,11 @@
         </div>
 
         <div>
+          <label class="block text-[11px] font-semibold uppercase mb-1">Über mich / Bio (Status):</label>
+          <textarea id="profileInputBio" placeholder="Schreibe etwas über dich..." rows="2" class="w-full p-2.5 rounded-lg border text-xs"></textarea>
+        </div>
+
+        <div>
           <label class="block text-[11px] font-semibold uppercase mb-1">Neues Profilbild hochladen:</label>
           <input type="hidden" id="profileInputAvatarUrl" value="">
           <div class="flex gap-2 items-center">
@@ -341,6 +346,25 @@
     </div>
   </div>
 
+  <!-- USER DETAIL MODAL (Zobrazenie cudzieho profilu bez PINu) -->
+  <div id="userDetailModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[290]">
+    <div class="card max-w-sm w-full p-6 relative flex flex-col gap-4 items-center text-center border-amber-500/50 shadow-2xl">
+      <button onclick="closeUserDetailModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
+      <div id="userDetailAvatarContainer" onclick="openDetailUserFullAvatar()" class="w-24 h-24 rounded-full border-2 border-amber-500 bg-slate-800 overflow-hidden flex items-center justify-center shadow-lg cursor-pointer hover:scale-105 transition" title="Foto in Großansicht öffnen">
+        <span class="text-2xl font-black text-amber-400" id="userDetailAvatarFallback">?</span>
+      </div>
+      <div>
+        <h4 id="userDetailName" class="text-lg font-bold text-white"></h4>
+        <span id="userDetailRole" class="text-[10px] uppercase tracking-wider text-amber-400 font-semibold block mt-0.5"></span>
+      </div>
+      <div class="w-full custom-box p-3 rounded-xl border text-left">
+        <span class="text-[10px] font-bold uppercase text-slate-400 block mb-1">Über mich:</span>
+        <p id="userDetailBio" class="text-xs italic text-slate-300">Keine Beschreibung angegeben.</p>
+      </div>
+      <button onclick="closeUserDetailModal()" class="w-full py-2.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 font-bold text-slate-800 dark:text-white rounded-xl text-xs transition">Schließen</button>
+    </div>
+  </div>
+
   <!-- Celá aplikácia -->
   <div id="appContainer" class="hidden">
 
@@ -354,7 +378,7 @@
         </div>
         <div>
           <h1 class="text-3xl font-bold tracking-tight text-amber-500 dark:text-amber-400">Salonplafond BAR</h1>
-          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium block">v3.0.43</span>
+          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium block">v3.0.44</span>
         </div>
       </div>
 
@@ -448,7 +472,6 @@
 
             <div class="border-t border-slate-200 dark:border-slate-700 my-1"></div>
 
-            <!-- Tlačidlo Benutzer wechseln pridané aj do menu -->
             <button onclick="handleLogout()" class="w-full text-left px-2.5 py-2 rounded hover:bg-red-500/20 text-xs font-bold text-red-600 dark:text-red-400 flex items-center gap-2">
               🚪 Benutzer wechseln
             </button>
@@ -458,7 +481,7 @@
       </div>
     </header>
 
-    <!-- Zrušený rámček: Čistý text a samostatná klikateľná fotka vedľa neho -->
+    <!-- Čistý text a samostatná klikateľná fotka vedľa neho -->
     <div class="mb-6">
       <div class="inline-flex items-center gap-3">
         <div id="headerUserAvatarContainer" onclick="openUserProfileModal()" class="w-8 h-8 rounded-full border-2 border-amber-500 bg-slate-800 overflow-hidden flex items-center justify-center shrink-0 cursor-pointer hover:scale-105 transition shadow" title="Klicken, um mein Profil zu öffnen">
@@ -526,7 +549,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-300 dark:border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.43 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.44 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div>
@@ -547,34 +570,55 @@
     </div>
   </div>
 
-  <!-- TEAM CHAT MODAL -->
+  <!-- TEAM CHAT MODAL S BOČNÝM PANELOM (SIDEBAR) -->
   <div id="teamChatModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[280]">
-    <div class="card max-w-2xl w-full p-6 relative flex flex-col gap-4 max-h-[85vh] overflow-y-auto border-amber-500/50 shadow-2xl">
-      <button onclick="closeTeamChatModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
-      <div>
-        <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400 flex items-center gap-2">💬 Salonplafond Team-Chat</h3>
-        <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Echtzeit-Kommunikation für das Bar-Team. Jede Nachricht kann zitiert oder gelöscht werden.</p>
-      </div>
-
-      <div id="chatMessagesContainer" class="custom-box p-4 rounded-xl border flex flex-col gap-3 max-h-[42vh] overflow-y-auto pr-2">
-        <p class="text-slate-500 italic text-xs text-center py-4">Lade Chat-Nachrichten...</p>
-      </div>
-
-      <div id="replyingIndicatorBox" class="hidden custom-box p-2.5 rounded-lg border-l-4 border-amber-500 flex items-center justify-between text-xs">
+    <div class="card max-w-4xl w-full p-6 relative flex flex-col gap-4 max-h-[85vh] overflow-y-auto border-amber-500/50 shadow-2xl">
+      <button onclick="closeTeamChatModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold z-10">&times;</button>
+      
+      <div class="flex justify-between items-center pr-8">
         <div>
-          <span class="text-[10px] text-amber-500 font-bold block uppercase">Antwort auf <span id="replyingAuthorName"></span>:</span>
-          <span id="replyingSnippetText" class="text-slate-300 truncate block max-w-md"></span>
+          <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400 flex items-center gap-2">💬 Salonplafond Team-Chat</h3>
+          <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Echtzeit-Kommunikation für das Bar-Team. Klicke auf ein Teammitglied im Sidebar, um es zu markieren oder das Profil anzusehen.</p>
         </div>
-        <button type="button" onclick="cancelReply()" class="text-slate-400 hover:text-white font-bold p-1">&times;</button>
+        <button onclick="toggleChatSidebar()" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 border border-slate-300 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
+          👥 <span id="chatSidebarToggleLabel">Team-Sidebar einblenden</span>
+        </button>
       </div>
 
-      <form onsubmit="handleSendChatMessage(event)" class="flex gap-2 pt-2 border-t border-slate-200 dark:border-slate-800">
-        <input type="hidden" id="replyingMessageId" value="">
-        <input type="text" id="chatMessageInput" autocomplete="off" placeholder="Nachricht an das Team schreiben..." class="flex-1 p-3 rounded-xl border text-xs focus:outline-none focus:border-amber-500">
-        <button type="submit" class="px-5 py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl text-xs transition shadow flex items-center gap-1.5 shrink-0">
-          Senden ➔
-        </button>
-      </form>
+      <div class="flex gap-4 items-start relative overflow-hidden">
+        
+        <!-- Hlavná chatovacia časť -->
+        <div class="flex-1 flex flex-col gap-3 min-w-0">
+          <div id="chatMessagesContainer" class="custom-box p-4 rounded-xl border flex flex-col gap-3 h-[42vh] overflow-y-auto pr-2">
+            <p class="text-slate-500 italic text-xs text-center py-4">Lade Chat-Nachrichten...</p>
+          </div>
+
+          <div id="replyingIndicatorBox" class="hidden custom-box p-2.5 rounded-lg border-l-4 border-amber-500 flex items-center justify-between text-xs">
+            <div>
+              <span class="text-[10px] text-amber-500 font-bold block uppercase">Antwort auf <span id="replyingAuthorName"></span>:</span>
+              <span id="replyingSnippetText" class="text-slate-300 truncate block max-w-md"></span>
+            </div>
+            <button type="button" onclick="cancelReply()" class="text-slate-400 hover:text-white font-bold p-1">&times;</button>
+          </div>
+
+          <form onsubmit="handleSendChatMessage(event)" class="flex gap-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+            <input type="hidden" id="replyingMessageId" value="">
+            <input type="text" id="chatMessageInput" autocomplete="off" placeholder="Nachricht an das Team schreiben (nutze @Name zum Markieren)..." class="flex-1 p-3 rounded-xl border text-xs focus:outline-none focus:border-amber-500">
+            <button type="submit" class="px-5 py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl text-xs transition shadow flex items-center gap-1.5 shrink-0">
+              Senden ➔
+            </button>
+          </form>
+        </div>
+
+        <!-- Bočný panel (Sidebar) pre používateľov v chate -->
+        <div id="chatSidebar" class="hidden w-72 custom-box p-3 rounded-xl border flex flex-col gap-2.5 h-[42vh] overflow-y-auto shrink-0 transition-all">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Team-Mitglieder</span>
+          <div id="chatSidebarUsersList" class="flex flex-col gap-2">
+            <span class="text-xs text-slate-500 italic">Lade Mitglieder...</span>
+          </div>
+        </div>
+
+      </div>
 
       <div class="flex justify-end pt-1">
         <button onclick="closeTeamChatModal()" class="px-5 py-2 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 font-bold text-slate-800 dark:text-white rounded-xl text-xs transition">Schließen</button>
@@ -946,7 +990,7 @@
 
       <div id="adminChangelogFormContainer" class="hidden custom-box p-4 rounded-xl border flex flex-col gap-2.5">
         <label class="text-xs font-bold text-amber-600 dark:text-amber-300">➕ Neue Neuigkeit hinzufügen (Tomas - Developer):</label>
-        <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.43: A3 print header removed & online count..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
+        <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.44: Chat Sidebar & Bio Profile..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
         <button onclick="submitNewChangelog()" class="py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs transition shadow">Als Neuigkeit veröffentlichen</button>
       </div>
 
@@ -1021,7 +1065,7 @@
     </div>
   </div>
 
-  <!-- Secure Manager Auth Modal Dialog (Zvýšený z-index na z[320], aby bol vždy navrchu) -->
+  <!-- Secure Manager Auth Modal Dialog -->
   <div id="authModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[320]">
     <div class="card max-w-md w-full p-6 relative flex flex-col gap-4 shadow-2xl border-amber-500/50">
       <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-500 dark:text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
@@ -1065,7 +1109,7 @@
   <!-- Season Selection Modal Dialog -->
   <div id="seasonModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
     <div class="card max-w-md w-full p-6 relative flex flex-col gap-4 shadow-2xl border-amber-500/50">
-      <button onclick="closeSeasonModal()" class="absolute top-4 right-4 text-slate-500 dark:text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
+      <button onclick="closeSeasonModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
       <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400">📅 Saison & Archiv wählen</h3>
       <p class="text-xs text-slate-600 dark:text-slate-300">Wähle die aktive Saison oder verwalte die Einträge:</p>
       <div id="seasonModalList" class="flex flex-col gap-2.5 mt-2 max-h-[50vh] overflow-y-auto pr-1"></div>
@@ -1121,6 +1165,7 @@
     let currentEnteredPin = "";
     let selectedWaiterForPin = "";
     let chatRealtimeSubscription = null;
+    let chatSidebarOpen = false;
 
     window.addEventListener("DOMContentLoaded", async () => {
       window.addEventListener('scroll', handleScrollPosition);
@@ -1368,6 +1413,7 @@
       document.getElementById('profileModalName').innerText = data.name;
       document.getElementById('profileModalRole').innerText = `Rolle: ${data.role || 'staff'}`;
       document.getElementById('profileInputNewPin').value = '';
+      document.getElementById('profileInputBio').value = data.bio || '';
       document.getElementById('profileInputAvatarUrl').value = data.avatar_url || '';
       document.getElementById('profileAvatarFile').value = '';
       document.getElementById('profileAvatarStatus').innerText = '';
@@ -1429,20 +1475,17 @@
 
     async function saveMyUserProfile() {
       const newPin = document.getElementById('profileInputNewPin').value.trim();
+      const newBio = document.getElementById('profileInputBio').value.trim();
       const newAvatarUrl = document.getElementById('profileInputAvatarUrl').value.trim();
 
       let updatePayload = {};
       if (newPin !== '') {
         updatePayload.pin = newPin;
       }
+      updatePayload.bio = newBio;
       if (newAvatarUrl !== '') {
         updatePayload.avatar_url = newAvatarUrl;
         currentWaiterAvatar = newAvatarUrl;
-      }
-
-      if (Object.keys(updatePayload).length === 0) {
-        alert("Keine Änderungen vorgenommen.");
-        return;
       }
 
       const { error } = await _supabase.from('staff_presence').update(updatePayload).eq('name', currentWaiterName);
@@ -1454,6 +1497,42 @@
         await loadStaffPresenceRecordsForLogin();
         closeUserProfileModal();
       }
+    }
+
+    // Funkcie pre zobrazenie cudzieho detailu používateľa v chate
+    async function openUserDetailModal(userName) {
+      const { data, error } = await _supabase.from('staff_presence').select('*').eq('name', userName).single();
+      if (error || !data) {
+        alert("Benutzerdetails konnten nicht geladen werden.");
+        return;
+      }
+
+      document.getElementById('userDetailName').innerText = data.name;
+      document.getElementById('userDetailRole').innerText = `Rolle: ${data.role || 'staff'}`;
+      document.getElementById('userDetailBio').innerText = data.bio ? data.bio : "Keine Beschreibung angegeben.";
+
+      const avatarContainer = document.getElementById('userDetailAvatarContainer');
+      if (data.avatar_url) {
+        avatarContainer.innerHTML = `<img src="${data.avatar_url}" class="w-full h-full object-cover" alt="${data.name}">`;
+        avatarContainer.setAttribute('onclick', `openPhotoPreview('${data.avatar_url}')`);
+      } else {
+        avatarContainer.innerHTML = `<span class="text-2xl font-black text-amber-400">${data.name.charAt(0).toUpperCase()}</span>`;
+        avatarContainer.removeAttribute('onclick');
+      }
+
+      const modal = document.getElementById('userDetailModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeUserDetailModal() {
+      const modal = document.getElementById('userDetailModal');
+      modal.classList.remove('flex');
+      modal.classList.add('hidden');
+    }
+
+    function openDetailUserFullAvatar() {
+      // Ak má nastavený onclick cez foto, otvorí sa cez lightbox
     }
 
     async function handleEmailLogin(e) {
@@ -1524,7 +1603,6 @@
       }
 
       const now = new Date();
-      // Aktivita za posledných 15 minút
       let onlineUsers = data.filter(staff => {
         if (!staff.last_used_at) return false;
         let lastActive = new Date(staff.last_used_at);
@@ -1581,6 +1659,7 @@
     function openTeamChatModal() {
       document.getElementById('settingsDropdown').classList.add('hidden');
       loadChatMessages();
+      loadChatSidebarUsers();
       
       sessionStorage.setItem('salon_chat_last_seen_' + currentWaiterName, new Date().toISOString());
       updateChatEnvelopeBadge(false);
@@ -1594,6 +1673,52 @@
       const modal = document.getElementById('teamChatModal');
       modal.classList.remove('flex');
       modal.classList.add('hidden');
+    }
+
+    function toggleChatSidebar() {
+      const sidebar = document.getElementById('chatSidebar');
+      const label = document.getElementById('chatSidebarToggleLabel');
+      chatSidebarOpen = !chatSidebarOpen;
+      if (chatSidebarOpen) {
+        sidebar.classList.remove('hidden');
+        sidebar.classList.add('flex');
+        label.innerText = 'Team-Sidebar ausblenden';
+      } else {
+        sidebar.classList.remove('flex');
+        sidebar.classList.add('hidden');
+        label.innerText = 'Team-Sidebar einblenden';
+      }
+    }
+
+    async function loadChatSidebarUsers() {
+      const container = document.getElementById('chatSidebarUsersList');
+      const { data, error } = await _supabase.from('staff_presence').select('*').order('name', { ascending: true });
+      if (error || !data) {
+        container.innerHTML = `<span class="text-xs text-red-400">Fehler beim Laden</span>`;
+        return;
+      }
+
+      container.innerHTML = data.map(staff => {
+        let avatarHtml = staff.avatar_url 
+          ? `<img src="${staff.avatar_url}" class="w-8 h-8 rounded-full object-cover border border-amber-500/50 shrink-0 cursor-pointer" onclick="event.stopPropagation(); openUserDetailModal('${staff.name}')" alt="${staff.name}">` 
+          : `<div class="w-8 h-8 rounded-full bg-slate-800 text-amber-400 font-bold flex items-center justify-center border border-slate-700 text-xs shrink-0 cursor-pointer" onclick="event.stopPropagation(); openUserDetailModal('${staff.name}')">${staff.name.charAt(0).toUpperCase()}</div>`;
+
+        return `
+          <div onclick="appendChatMention('${staff.name}')" class="p-2 rounded-lg custom-box border hover:border-amber-500 cursor-pointer flex items-center gap-2.5 transition group" title="Klicken, um @${staff.name} zu markieren">
+            ${avatarHtml}
+            <div class="min-w-0 flex-1">
+              <span class="text-xs font-bold text-white group-hover:text-amber-400 truncate block">${staff.name}</span>
+              <span class="text-[9px] text-slate-400 uppercase tracking-wider block">${staff.role || 'staff'}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function appendChatMention(name) {
+      const input = document.getElementById('chatMessageInput');
+      input.value += `@${name} `;
+      input.focus();
     }
 
     function setupChatRealtimeListener() {
@@ -1664,8 +1789,8 @@
         let staffRecord = staffDatabaseRecords.find(s => s.name.toLowerCase() === msg.author_name.toLowerCase());
         let avatarUrl = (staffRecord && staffRecord.avatar_url) ? staffRecord.avatar_url : "";
         let avatarHtml = avatarUrl 
-          ? `<img src="${avatarUrl}" class="w-8 h-8 rounded-full object-cover border border-amber-500/50 shrink-0" alt="${msg.author_name}">` 
-          : `<div class="w-8 h-8 rounded-full bg-slate-800 text-amber-400 font-bold flex items-center justify-center border border-slate-700 text-xs shrink-0">${msg.author_name.charAt(0).toUpperCase()}</div>`;
+          ? `<img src="${avatarUrl}" class="w-8 h-8 rounded-full object-cover border border-amber-500/50 shrink-0 cursor-pointer hover:scale-105 transition" onclick="openUserDetailModal('${msg.author_name}')" alt="${msg.author_name}">` 
+          : `<div class="w-8 h-8 rounded-full bg-slate-800 text-amber-400 font-bold flex items-center justify-center border border-slate-700 text-xs shrink-0 cursor-pointer hover:scale-105 transition" onclick="openUserDetailModal('${msg.author_name}')">${msg.author_name.charAt(0).toUpperCase()}</div>`;
 
         let timeStr = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
@@ -1684,7 +1809,7 @@
             ${avatarHtml}
             <div class="flex-1 min-w-0">
               <div class="flex items-center justify-between">
-                <span class="font-bold text-amber-600 dark:text-amber-400">${msg.author_name}</span>
+                <span class="font-bold text-amber-600 dark:text-amber-400 cursor-pointer hover:underline" onclick="openUserDetailModal('${msg.author_name}')">${msg.author_name}</span>
                 <div class="flex items-center gap-2">
                   <span class="text-[10px] text-slate-500">${timeStr}</span>
                   <button onclick="setReplyTarget('${msg.id}', '${msg.author_name}', '${msg.message.replace(/'/g, "\\'")}')" class="text-[10px] text-amber-500 hover:underline font-semibold" title="Auf diese Nachricht antworten">Antworten</button>
@@ -2205,10 +2330,10 @@
       html += `
         <div class="custom-box p-3.5 rounded-xl border text-xs shrink-0">
           <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-            <span>Version v3.0.43 (Tomas Kardos - Developer)</span>
+            <span>Version v3.0.44 (Tomas Kardos - Developer)</span>
             <span class="text-slate-500">Oktober 2026</span>
           </div>
-          <p class="leading-relaxed">Entfernung des A3 Druck-Titels/Linie, Benutzer wechseln ins Menü ergänzt, Login-Historie zeigt aktive Online-Benutzer, und z-index für Auth-Modal korrigiert.</p>
+          <p class="leading-relaxed">Team-Chat Sidebar für Mitglieder mit @Mention und Profil-Anzeige integriert, sowie Bio-Feld in Mein Profil hinzugefügt.</p>
         </div>
       `;
 
