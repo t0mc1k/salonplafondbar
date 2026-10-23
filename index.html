@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.40</title>
+  <title>Salonplafond BAR v3.0.41</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import & Export -->
@@ -35,7 +35,6 @@
     .card:hover { transform: translateY(-4px); border-color: #f59e0b; }
     .list-item { border-radius: 0.75rem; transition: background 0.2s; }
     
-    /* Logo animácia s občasným prechodom na koktail */
     .login-logo-advanced {
       animation: advancedSpinRotateAnim 5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
     }
@@ -135,7 +134,7 @@
       <div>
         <h1 class="text-lg md:text-xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-xl md:text-2xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.0.40 • Touch-Grid PIN-Login</span>
+        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.0.41 • Touch-Grid PIN-Login</span>
       </div>
 
       <div id="pinLoginForm" class="w-full bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-2xl space-y-4 text-left mt-1">
@@ -348,15 +347,7 @@
         </div>
         <div>
           <h1 class="text-3xl font-bold tracking-tight text-amber-500 dark:text-amber-400">Salonplafond BAR</h1>
-          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium block">v3.0.40</span>
-          
-          <!-- Samostatný blok pre prihláseného používateľa pod názvom aplikácie -->
-          <div onclick="handleLogout()" class="mt-1 flex items-center gap-2 cursor-pointer group inline-flex bg-slate-200/80 dark:bg-slate-800/80 hover:bg-amber-500/20 px-2.5 py-1 rounded-xl border border-slate-300 dark:border-slate-700 transition" title="Klicken, um Benutzer zu wechseln">
-            <div id="headerUserAvatarContainer" class="w-6 h-6 rounded-full border border-amber-500 bg-slate-800 overflow-hidden flex items-center justify-center shrink-0">
-              <span class="text-[10px] font-bold text-amber-400" id="headerAvatarFallback">?</span>
-            </div>
-            <span class="text-xs text-slate-800 dark:text-slate-200 group-hover:text-amber-500 font-bold">Angemeldet: <span id="currentUserEmail" class="text-amber-600 dark:text-amber-300"></span> 🔄</span>
-          </div>
+          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium block">v3.0.41</span>
         </div>
       </div>
 
@@ -459,6 +450,16 @@
       </div>
     </header>
 
+    <!-- Samostatný blok pre prihláseného používateľa úplne pod logom a verziou -->
+    <div class="mb-6">
+      <div onclick="handleLogout()" class="inline-flex items-center gap-2.5 cursor-pointer group bg-slate-200/90 dark:bg-slate-800/90 hover:bg-amber-500/20 px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 transition shadow-sm" title="Klicken, um Benutzer zu wechseln">
+        <div id="headerUserAvatarContainer" class="w-7 h-7 rounded-full border border-amber-500 bg-slate-800 overflow-hidden flex items-center justify-center shrink-0">
+          <span class="text-[10px] font-bold text-amber-400" id="headerAvatarFallback">?</span>
+        </div>
+        <span class="text-xs text-slate-800 dark:text-slate-200 group-hover:text-amber-500 font-bold">Angemeldet: <span id="currentUserEmail" class="text-amber-600 dark:text-amber-300"></span> 🔄</span>
+      </div>
+    </div>
+
     <!-- Vyhľadávacie pole -->
     <div class="mb-6 flex flex-col md:flex-row justify-between items-center gap-3">
       <div class="relative w-full">
@@ -517,7 +518,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-300 dark:border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.40 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.41 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div>
@@ -551,7 +552,6 @@
         <p class="text-slate-500 italic text-xs text-center py-4">Lade Chat-Nachrichten...</p>
       </div>
 
-      <!-- Indikátor pre práve odpovedanú správu -->
       <div id="replyingIndicatorBox" class="hidden custom-box p-2.5 rounded-lg border-l-4 border-amber-500 flex items-center justify-between text-xs">
         <div>
           <span class="text-[10px] text-amber-500 font-bold block uppercase">Antwort auf <span id="replyingAuthorName"></span>:</span>
@@ -941,7 +941,7 @@
 
       <div id="adminChangelogFormContainer" class="hidden custom-box p-4 rounded-xl border flex flex-col gap-2.5">
         <label class="text-xs font-bold text-amber-600 dark:text-amber-300">➕ Neue Neuigkeit hinzufügen (Tomas - Developer):</label>
-        <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.40: Login History & Photo Lightbox..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
+        <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.41: Login History & Header Fix..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
         <button onclick="submitNewChangelog()" class="py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs transition shadow">Als Neuigkeit veröffentlichen</button>
       </div>
 
@@ -1134,7 +1134,6 @@
       }
     });
 
-    /* Cyklovanie ikony v logu na hlavnej stránke (občas koktail 🍸) */
     function startLogoIconCycler() {
       setInterval(() => {
         const charEl = document.getElementById('headerLogoChar');
@@ -1351,7 +1350,6 @@
       }
     }
 
-    /* --- MÔJ PROFIL (USER PROFILE MODAL) --- */
     async function openUserProfileModal() {
       document.getElementById('settingsDropdown').classList.add('hidden');
       if (!currentWaiterName) return alert("Du bist nicht angemeldet!");
@@ -1482,12 +1480,11 @@
       
       let staffRec = staffDatabaseRecords.find(s => s.name.toLowerCase() === currentWaiterName.toLowerCase());
       if (!staffRec) {
-        staffRec = { name: currentWaiterName, role: (user.email === "kdstom@outlook.com" ? "developer" : "staff") };
+        staffRec = { name: currentWaiterName, role: (user.email === "kdstom@outlook.com" ? "developer" : "manager") };
       }
       await finalizeAppStartForStaff(staffRec);
     }
 
-    /* --- LOGIN HISTÓRIA / PROTOKOL --- */
     function openLoginHistoryModal() {
       document.getElementById('settingsDropdown').classList.add('hidden');
       checkManagerAuth(() => {
@@ -1538,7 +1535,6 @@
       }).join('');
     }
 
-    /* --- TEAM CHAT --- */
     function openTeamChatModal() {
       document.getElementById('settingsDropdown').classList.add('hidden');
       loadChatMessages();
@@ -1710,7 +1706,6 @@
       }
     }
 
-    /* --- SPRÁVCOVSKÝ PANEL PRE PERSONAL & PINs --- */
     function openStaffPinModal() {
       document.getElementById('settingsDropdown').classList.add('hidden');
       checkManagerAuth(() => {
@@ -1969,7 +1964,6 @@
       checkPendingTicketsBadge();
     }
 
-    /* Samostatné otváranie Changelogu („Was ist neu?“) */
     function openChangelogModal() {
       document.getElementById('settingsDropdown').classList.add('hidden');
       loadChangelogData();
@@ -2141,7 +2135,6 @@
       });
     }
 
-    /* Načítanie 20 posledných verzií do Changelog modalu */
     async function loadChangelogData() {
       const container = document.getElementById('changelogModalListContainer');
       container.innerHTML = `<p class="text-slate-500 italic text-xs text-center py-4">Lade Neuigkeiten...</p>`;
@@ -2166,14 +2159,13 @@
         html = `<p class="text-slate-500 italic text-xs text-center py-2">Keine dynamischen Neuigkeiten vorhanden.</p>`;
       }
 
-      /* Pevné záznamy pre posledné verzie vrátane v3.0.40 */
       html += `
         <div class="custom-box p-3.5 rounded-xl border text-xs shrink-0">
           <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-            <span>Version v3.0.40 (Tomas Kardos - Developer)</span>
+            <span>Version v3.0.41 (Tomas Kardos - Developer)</span>
             <span class="text-slate-500">Oktober 2026</span>
           </div>
-          <p class="leading-relaxed">Foto-Upload Statusanzeige mit Erfolgsmeldung, Lightbox für volle Profilfoto-Ansicht, verschobener Login-Block unter dem Logo mit direktem Schnellwechsel, Changelog für 20 Versionen und neue Login-Historie Protokolltabelle.</p>
+          <p class="leading-relaxed">Separater Anmelde-Block unter dem Header, wiederhergestellter Benutzerwechsel im Menü, PIN-Login korrigiert für Manager-Rechte und SQL-Unterstützung für Login-Historie.</p>
         </div>
       `;
 
@@ -3236,7 +3228,6 @@
       });
     }
 
-    /* --- A3 TLAČ --- */
     function openA3PrintSetupModal() {
       document.getElementById('settingsDropdown').classList.add('hidden');
       const seasons = getAllSeasons();
