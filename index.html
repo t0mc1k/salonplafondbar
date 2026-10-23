@@ -210,7 +210,7 @@
     </div>
   </div>
 
-  <!-- SPRÁVCOVSKÝ PANEL PRE PERSONAL & PINs (S podporou profilových fotiek) -->
+  <!-- SPRÁVCOVSKÝ PANEL PRE PERSONAL & PINs -->
   <div id="staffPinManagementModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[260]">
     <div class="card max-w-2xl w-full p-6 relative flex flex-col gap-5 max-h-[85vh] overflow-y-auto border-amber-500/50 shadow-2xl">
       <button onclick="closeStaffPinModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
@@ -272,7 +272,7 @@
   <!-- Celá aplikácia -->
   <div id="appContainer" class="hidden">
 
-    <!-- Header (S profilovou fotkou aktuálne prihláseného používateľa) -->
+    <!-- Header -->
     <header class="flex flex-col md:flex-row justify-between items-center gap-4 mb-4 pb-4 border-b border-slate-300 dark:border-slate-700">
       <div class="flex items-center gap-3">
         <div class="header-logo-container" onclick="showRandomMotivation(event)" title="Klick mich für Osterei-Motivation! 🍸">
@@ -445,7 +445,7 @@
     </div>
   </div>
 
-  <!-- TEAM CHAT MODAL (Nová funkcia) -->
+  <!-- TEAM CHAT MODAL -->
   <div id="teamChatModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[280]">
     <div class="card max-w-2xl w-full p-6 relative flex flex-col gap-4 max-h-[85vh] overflow-y-auto border-amber-500/50 shadow-2xl">
       <button onclick="closeTeamChatModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
@@ -605,7 +605,7 @@
     </div>
   </div>
 
-  <!-- Modal Multi-View s možnosťou nahradenia drinku -->
+  <!-- Modal Multi-View -->
   <div id="multiViewModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
     <div class="card max-w-7xl w-full max-h-[90vh] overflow-y-auto p-6 relative flex flex-col gap-4 border-amber-500/50 shadow-2xl">
       <button onclick="closeMultiViewModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 dark:hover:text-white text-2xl font-bold">&times;</button>
@@ -1247,7 +1247,7 @@
       await finalizeAppStartForStaff(staffRec);
     }
 
-    /* --- TEAM CHAT (Nová funkcia) --- */
+    /* --- TEAM CHAT --- */
     function openTeamChatModal() {
       document.getElementById('settingsDropdown').classList.add('hidden');
       loadChatMessages();
@@ -1337,7 +1337,7 @@
       }
     }
 
-    /* --- SPRÁVCOVSKÝ PANEL PRE PERSONAL & PINs (S podporou avatarov) --- */
+    /* --- SPRÁVCOVSKÝ PANEL PRE PERSONAL & PINs --- */
     function openStaffPinModal() {
       document.getElementById('settingsDropdown').classList.add('hidden');
       checkManagerAuth(() => {
@@ -2856,6 +2856,114 @@
         closeAdminModal();
         loadDrinks();
       });
+    }
+
+    /* --- DOPLNENÉ FUNKCIE PRE A3 TLAČ --- */
+    function openA3PrintSetupModal() {
+      document.getElementById('settingsDropdown').classList.add('hidden');
+      const seasons = getAllSeasons();
+      const select = document.getElementById('a3SeasonSelect');
+      select.innerHTML = seasons.map(s => `<option value="${s}">${s}</option>`).join('');
+      if (currentSeasonFilter) select.value = currentSeasonFilter;
+      renderA3DrinkSelectionList();
+      const modal = document.getElementById('a3PrintSetupModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeA3PrintSetupModal() {
+      document.getElementById('a3PrintSetupModal').classList.remove('flex');
+      document.getElementById('a3PrintSetupModal').classList.add('hidden');
+    }
+
+    function renderA3DrinkSelectionList() {
+      const selectedSeason = document.getElementById('a3SeasonSelect').value;
+      const seasonDrinks = allDrinks.filter(d => (d.season || '') === selectedSeason);
+      const container = document.getElementById('a3DrinkCheckboxList');
+
+      if (seasonDrinks.length === 0) {
+        container.innerHTML = `<p class="text-slate-500 italic text-xs text-center py-4">Keine Getränke in dieser Saison gefunden.</p>`;
+        return;
+      }
+
+      container.innerHTML = seasonDrinks.map(d => `
+        <label class="flex items-center gap-2.5 p-2 rounded hover:bg-slate-800/50 cursor-pointer text-xs">
+          <input type="checkbox" name="a3DrinkCheckbox" value="${d.id}" onchange="updateA3SelectionCount()" class="accent-amber-500 w-4 h-4">
+          <span class="font-bold">${d.name}</span> <span class="text-slate-400">(${d.category || ''})</span>
+        </label>
+      `).join('');
+      updateA3SelectionCount();
+    }
+
+    function updateA3SelectionCount() {
+      const checked = document.querySelectorAll('input[name="a3DrinkCheckbox"]:checked');
+      const badge = document.getElementById('a3SelectedCountBadge');
+      badge.innerText = `${checked.length} / 3 gewählt`;
+      if (checked.length > 3) {
+        alert("Du kannst maximal 3 Getränke für die A3 Karte auswählen.");
+        event.target.checked = false;
+        updateA3SelectionCount();
+      }
+    }
+
+    function generateA3PrintPreview() {
+      const checked = document.querySelectorAll('input[name="a3DrinkCheckbox"]:checked');
+      if (checked.length === 0) return alert("Bitte wähle mindestens ein Getränk aus.");
+
+      const selectedSeason = document.getElementById('a3SeasonSelect').value;
+      const showImage = document.getElementById('a3OptionImage').checked;
+      const showPrice = document.getElementById('a3OptionPrice').checked;
+
+      document.getElementById('a3PrintSeasonName').innerText = selectedSeason;
+      const drinksListContainer = document.getElementById('a3PrintDrinksList');
+
+      let html = '';
+      checked.forEach(chk => {
+        let d = allDrinks.find(item => item.id === chk.value);
+        if (!d) return;
+
+        let priceText = (showPrice && d.selling_price) ? ` — € ${parseFloat(d.selling_price).toFixed(2)}` : '';
+        let photoHtml = (showImage && d.photo_url) ? `<img src="${d.photo_url}" class="w-full h-48 object-cover rounded-xl mb-4 border border-slate-300" alt="">` : '';
+
+        let ingredientsHtml = '';
+        if (Array.isArray(d.ingredients_json) && d.ingredients_json.length > 0) {
+          ingredientsHtml = d.ingredients_json.map(i => `<div class="flex justify-between py-1 border-b border-slate-200 text-sm"><span>${i.name}</span><span class="font-bold">${i.amount || '-'}</span></div>`).join('');
+        }
+
+        html += `
+          <div class="p-6 border-2 border-slate-900 rounded-2xl flex flex-col gap-3 page-break bg-white">
+            ${photoHtml}
+            <div class="flex justify-between items-baseline">
+              <h3 class="text-2xl font-black uppercase tracking-wide text-slate-900">${d.name}${priceText}</h3>
+              <span class="text-xs font-bold uppercase text-slate-600">${d.category || ''}</span>
+            </div>
+            <div class="text-xs text-slate-700 grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200">
+              <div><b>Glas:</b> ${d.glass_type || '-'}</div>
+              <div><b>Method:</b> ${d.method || '-'}</div>
+              <div><b>Ice:</b> ${d.ice || '-'}</div>
+              <div><b>Garnish:</b> ${d.garnish || '-'}</div>
+            </div>
+            <div class="flex flex-col gap-1 mt-1">
+              <span class="text-xs font-bold uppercase text-slate-900 border-b border-slate-300 pb-1">Zutaten:</span>
+              ${ingredientsHtml}
+            </div>
+            ${d.recipe ? `<div class="text-xs text-slate-700 mt-2"><b>Zubereitung:</b> ${d.recipe}</div>` : ''}
+          </div>
+        `;
+      });
+
+      drinksListContainer.innerHTML = html;
+      closeA3PrintSetupModal();
+
+      const previewModal = document.getElementById('a3PrintPreviewModal');
+      previewModal.classList.remove('hidden');
+      previewModal.classList.add('flex');
+    }
+
+    function closeA3PrintPreviewModal() {
+      const previewModal = document.getElementById('a3PrintPreviewModal');
+      previewModal.classList.remove('flex');
+      previewModal.classList.add('hidden');
     }
 
     function openImportExportModal() {
