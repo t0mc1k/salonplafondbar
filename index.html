@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.46</title>
+  <title>Salonplafond BAR v3.0.47</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import & Export -->
@@ -90,24 +90,10 @@
       100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
     }
 
-    /* Animácia pre hlavičku pri prihlásení kolegu */
-    .header-title-container {
-      position: relative;
-      height: 2.75rem;
-      overflow: hidden;
-    }
-    .header-title-inner {
-      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .header-title-container.login-animating .header-title-inner {
-      transform: translateY(-2.75rem);
-    }
-
     @media print {
       @page { size: portrait; margin: 10mm; }
       body { background: white !important; color: black !important; padding: 0 !important; }
       
-      /* Schová sa všetko okrem otvoreného modal okna s drinkom alebo A3 náhľadu */
       body > *:not(#drinkModal):not(#a3PrintPreviewModal) { display: none !important; }
 
       #drinkModal, #a3PrintPreviewModal {
@@ -135,7 +121,6 @@
       .no-print, button, .modal-bg { display: none !important; }
       body.print-no-images #printModalImage { display: none !important; }
 
-      /* Tlačový podpis vpravo dole */
       .print-watermark-footer {
         display: block !important;
         position: fixed !important;
@@ -166,7 +151,7 @@
       <div>
         <h1 class="text-lg md:text-xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-xl md:text-2xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.0.46 • Touch-Grid PIN-Login</span>
+        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.0.47 • Touch-Grid PIN-Login</span>
       </div>
 
       <div id="pinLoginForm" class="w-full bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-2xl space-y-4 text-left mt-1">
@@ -409,23 +394,9 @@
           <span class="logo-dot" id="headerLogoDot">•</span>
         </div>
 
-        <!-- Animovaný kontajner pre názov / prihlásenie kolegu -->
-        <div class="header-title-container" id="headerTitleContainer">
-          <div class="header-title-inner flex flex-col justify-start">
-            <!-- Štandardný názov -->
-            <div class="h-[2.75rem] flex flex-col justify-center">
-              <h1 class="text-3xl font-bold tracking-tight text-amber-500 dark:text-amber-400 leading-none">Salonplafond BAR</h1>
-              <span class="text-xs text-slate-600 dark:text-slate-400 font-medium block mt-0.5">v3.0.46</span>
-            </div>
-            <!-- Oznam o prihlásení kolegu -->
-            <div class="h-[2.75rem] flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-xl">
-              <div id="loginNoticeAvatar" class="w-7 h-7 rounded-full border border-amber-400 overflow-hidden bg-slate-800 flex items-center justify-center text-[10px] font-bold text-amber-400 shrink-0">?</div>
-              <div class="min-w-0">
-                <span class="text-[10px] uppercase font-bold text-amber-500 block leading-none">🟢 Gerade angemeldet:</span>
-                <span id="loginNoticeName" class="text-xs font-black text-white truncate block"></span>
-              </div>
-            </div>
-          </div>
+        <div class="flex flex-col justify-center">
+          <h1 class="text-3xl font-bold tracking-tight text-amber-500 dark:text-amber-400 leading-none">Salonplafond BAR</h1>
+          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium block mt-0.5">v3.0.47</span>
         </div>
       </div>
 
@@ -595,7 +566,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-300 dark:border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.46 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.47 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div>
@@ -1038,7 +1009,7 @@
 
       <div id="adminChangelogFormContainer" class="hidden custom-box p-4 rounded-xl border flex flex-col gap-2.5">
         <label class="text-xs font-bold text-amber-600 dark:text-amber-300">➕ Neue Neuigkeit hinzufügen (Tomas - Developer):</label>
-        <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.46: Einzelne Getränke drucken, Saison-Manager..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
+        <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.47: Saison-Kaskadenlöschung..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
         <button onclick="submitNewChangelog()" class="py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs transition shadow">Als Neuigkeit veröffentlichen</button>
       </div>
 
@@ -1222,7 +1193,6 @@
     let currentEnteredPin = "";
     let selectedWaiterForPin = "";
     let chatRealtimeSubscription = null;
-    let loginHistoryRealtimeSub = null;
     let chatSidebarOpen = false;
 
     window.addEventListener("DOMContentLoaded", async () => {
@@ -1438,41 +1408,6 @@
       await loadDrinks();
       await checkPendingTicketsBadge();
       setupChatRealtimeListener();
-      setupLoginRealtimeListener();
-    }
-
-    /* 1. ANIMÁCIA PRI PRIHLÁSENÍ NOVÉHO KOLEGU */
-    function setupLoginRealtimeListener() {
-      if (loginHistoryRealtimeSub) return;
-      loginHistoryRealtimeSub = _supabase
-        .channel('public:login_history')
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'login_history' }, payload => {
-          let newLogin = payload.new;
-          if (newLogin && newLogin.user_name && newLogin.user_name.toLowerCase() !== currentWaiterName.toLowerCase()) {
-            triggerLoginNoticeAnimation(newLogin.user_name);
-          }
-        })
-        .subscribe();
-    }
-
-    function triggerLoginNoticeAnimation(userName) {
-      const container = document.getElementById('headerTitleContainer');
-      const nameEl = document.getElementById('loginNoticeName');
-      const avatarEl = document.getElementById('loginNoticeAvatar');
-
-      let staffRec = staffDatabaseRecords.find(s => s.name.toLowerCase() === userName.toLowerCase());
-      if (staffRec && staffRec.avatar_url) {
-        avatarEl.innerHTML = `<img src="${staffRec.avatar_url}" class="w-full h-full object-cover" alt="">`;
-      } else {
-        avatarEl.innerHTML = `<span class="text-[10px] font-bold text-amber-400">${userName.charAt(0).toUpperCase()}</span>`;
-      }
-
-      nameEl.innerText = userName;
-
-      container.classList.add('login-animating');
-      setTimeout(() => {
-        container.classList.remove('login-animating');
-      }, 2500);
     }
 
     function updateHeaderAvatarUI() {
@@ -1592,7 +1527,6 @@
       }
     }
 
-    // Detail cudzieho používateľa bez PINu
     async function openUserDetailModal(userName) {
       const { data, error } = await _supabase.from('staff_presence').select('*').eq('name', userName).single();
       if (error || !data) {
@@ -1679,7 +1613,6 @@
       modal.classList.add('hidden');
     }
 
-    /* 4. VYLEPŠENÉ ONLINE POČÍTADLO */
     async function loadOnlineUsersSummary() {
       const container = document.getElementById('onlineUsersListContainer');
       const countBadge = document.getElementById('onlineCountBadge');
@@ -1786,7 +1719,6 @@
       }
     }
 
-    /* 3. TLAČÍTKO "PROFIL ANSEHEN" V BOČNOM PANELI */
     async function loadChatSidebarUsers() {
       const container = document.getElementById('chatSidebarUsersList');
       const { data, error } = await _supabase.from('staff_presence').select('*').order('name', { ascending: true });
@@ -2432,10 +2364,10 @@
       html += `
         <div class="custom-box p-3.5 rounded-xl border text-xs shrink-0">
           <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-            <span>Version v3.0.46 (Tomas Kardos - Developer)</span>
+            <span>Version v3.0.47 (Tomas Kardos - Developer)</span>
             <span class="text-slate-500">Oktober 2026</span>
           </div>
-          <p class="leading-relaxed">Korrektur beim Drucken einzelner Getränke, verbesserte Saison-Erstellung und vollständiges Löschen von Saisons für Manager.</p>
+          <p class="leading-relaxed">Entfernung der Anmelde-Animatonsleiste. Kaskadenlöschung für Saisons implementiert, wodurch auch Summer 2026 restlos entfernt werden kann.</p>
         </div>
       `;
 
@@ -2626,7 +2558,6 @@
       document.getElementById('seasonModal').classList.add('hidden');
     }
 
-    /* 3. VYTVORENIE NOVEJ SEZÓNY */
     function createNewSeasonPrompt() {
       document.getElementById('settingsDropdown').classList.add('hidden');
       checkManagerAuth(async () => {
@@ -2635,7 +2566,6 @@
 
         let formatted = newSeasonName.trim();
         
-        // Vytvoríme vzorový (placeholder) drink pre novú sezónu, aby existovala v databáze
         const { error } = await _supabase.from('drinks').insert([{
           name: "Willkommens-Drink (Saison-Start)",
           category: "Cocktails",
@@ -2808,15 +2738,16 @@
       });
     }
 
-    /* 2. OPRAVA MAZANIA SEZÓNY */
+    /* 2. OPRAVA MAZANIA SEZÓNY S KASKÁDOU (VYMAŽE AJ VŠETKY DRINKY V ŇOM) */
     async function deleteEntireSeason(seasonKey, event) {
       if (event) event.stopPropagation();
       checkManagerAuth(async () => {
         if (!confirm(`Möchten Sie wirklich die gesamte Saison "${seasonKey}" und alle darin enthaltenen Getränke permanent löschen?`)) return;
 
-        const { error } = await _supabase.from('drinks').delete().eq('season', seasonKey);
-        if (error) {
-          alert("Fehler beim Löschen der Saison: " + error.message);
+        // Najprv vymažeme všetky drinky patriace do tejto sezóny (kaskáda)
+        const { error: drinksErr } = await _supabase.from('drinks').delete().eq('season', seasonKey);
+        if (drinksErr) {
+          alert("Fehler beim Löschen der Getränke der Saison: " + drinksErr.message);
           return;
         }
 
@@ -3375,7 +3306,6 @@
       modal.classList.add('hidden');
     }
 
-    /* 1. OPRAVA TLAČE JEDNÉHO DRINKU */
     function executePrint(withImage) {
       closePrintOptionsModal();
       if (withImage) {
@@ -3547,248 +3477,4 @@
     }
 
     function closeA3PrintSetupModal() {
-      document.getElementById('a3PrintSetupModal').classList.remove('flex');
-      document.getElementById('a3PrintSetupModal').classList.add('hidden');
-    }
-
-    function renderA3DrinkSelectionList() {
-      const selectedSeason = document.getElementById('a3SeasonSelect').value;
-      const seasonDrinks = allDrinks.filter(d => (d.season || '') === selectedSeason);
-      const container = document.getElementById('a3DrinkCheckboxList');
-
-      if (seasonDrinks.length === 0) {
-        container.innerHTML = `<p class="text-slate-500 italic text-xs text-center py-4">Keine Getränke in dieser Saison gefunden.</p>`;
-        return;
-      }
-
-      container.innerHTML = seasonDrinks.map(d => `
-        <label class="flex items-center gap-2.5 p-2 rounded hover:bg-slate-800/50 cursor-pointer text-xs">
-          <input type="checkbox" name="a3DrinkCheckbox" value="${d.id}" onchange="updateA3SelectionCount()" class="accent-amber-500 w-4 h-4">
-          <span class="font-bold">${d.name}</span> <span class="text-slate-400">(${d.category || ''})</span>
-        </label>
-      `).join('');
-      updateA3SelectionCount();
-    }
-
-    function updateA3SelectionCount() {
-      const checked = document.querySelectorAll('input[name="a3DrinkCheckbox"]:checked');
-      const badge = document.getElementById('a3SelectedCountBadge');
-      badge.innerText = `${checked.length} / 3 gewählt`;
-      if (checked.length > 3) {
-        alert("Du kannst maximal 3 Getränke für die A3 Karte auswählen.");
-        event.target.checked = false;
-        updateA3SelectionCount();
-      }
-    }
-
-    function generateA3PrintPreview() {
-      const checked = document.querySelectorAll('input[name="a3DrinkCheckbox"]:checked');
-      if (checked.length === 0) return alert("Bitte wähle mindestens ein Getränk aus.");
-
-      const showImage = document.getElementById('a3OptionImage').checked;
-      const showPrice = document.getElementById('a3OptionPrice').checked;
-
-      const drinksListContainer = document.getElementById('a3PrintDrinksList');
-
-      let html = '';
-      checked.forEach(chk => {
-        let d = allDrinks.find(item => item.id === chk.value);
-        if (!d) return;
-
-        let priceText = (showPrice && d.selling_price) ? ` — € ${parseFloat(d.selling_price).toFixed(2)}` : '';
-        let photoHtml = (showImage && d.photo_url) ? `<img src="${d.photo_url}" class="w-full h-48 object-cover rounded-xl mb-4 border border-slate-300" alt="">` : '';
-
-        let ingredientsHtml = '';
-        if (Array.isArray(d.ingredients_json) && d.ingredients_json.length > 0) {
-          ingredientsHtml = d.ingredients_json.map(i => `<div class="flex justify-between py-1 border-b border-slate-200 text-sm"><span>${i.name}</span><span class="font-bold">${i.amount || '-'}</span></div>`).join('');
-        }
-
-        html += `
-          <div class="p-6 border-2 border-slate-900 rounded-2xl flex flex-col gap-3 page-break bg-white">
-            ${photoHtml}
-            <div class="flex justify-between items-baseline">
-              <h3 class="text-2xl font-black uppercase tracking-wide text-slate-900">${d.name}${priceText}</h3>
-              <span class="text-xs font-bold uppercase text-slate-600">${d.category || ''}</span>
-            </div>
-            <div class="text-xs text-slate-700 grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200">
-              <div><b>Glas:</b> ${d.glass_type || '-'}</div>
-              <div><b>Method:</b> ${d.method || '-'}</div>
-              <div><b>Ice:</b> ${d.ice || '-'}</div>
-              <div><b>Garnish:</b> ${d.garnish || '-'}</div>
-            </div>
-            <div class="flex flex-col gap-1 mt-1">
-              <span class="text-xs font-bold uppercase text-slate-900 border-b border-slate-300 pb-1">Zutaten:</span>
-              ${ingredientsHtml}
-            </div>
-            ${d.recipe ? `<div class="text-xs text-slate-700 mt-2"><b>Zubereitung:</b> ${d.recipe}</div>` : ''}
-          </div>
-        `;
-      });
-
-      drinksListContainer.innerHTML = html;
-      closeA3PrintSetupModal();
-
-      const previewModal = document.getElementById('a3PrintPreviewModal');
-      previewModal.classList.remove('hidden');
-      previewModal.classList.add('flex');
-    }
-
-    function closeA3PrintPreviewModal() {
-      const previewModal = document.getElementById('a3PrintPreviewModal');
-      previewModal.classList.remove('flex');
-      previewModal.classList.add('hidden');
-    }
-
-    function openImportExportModal() {
-      document.getElementById('settingsDropdown').classList.add('hidden');
-      checkManagerAuth(() => {
-        renderWizardSeasonSelect();
-        renderExportSeasonSelect();
-        document.getElementById('wizardExcelFile').value = '';
-        document.getElementById('wizardStatus').innerText = '';
-        document.getElementById('importExportModal').classList.remove('hidden');
-        document.getElementById('importExportModal').classList.add('flex');
-      });
-    }
-
-    function closeImportExportModal() {
-      document.getElementById('importExportModal').classList.remove('flex');
-      document.getElementById('importExportModal').classList.add('hidden');
-    }
-
-    function renderWizardSeasonSelect() {
-      const seasons = getAllSeasons();
-      const select = document.getElementById('wizardSeasonSelect');
-      let html = '';
-      seasons.forEach(s => {
-        html += `<option value="${s}">📅 ${s}</option>`;
-      });
-      html += `<option value="addNew">➕ Neue Saison erstellen...</option>`;
-      select.innerHTML = html;
-      if (currentSeasonFilter) select.value = currentSeasonFilter;
-    }
-
-    function renderExportSeasonSelect() {
-      const seasons = getAllSeasons();
-      const select = document.getElementById('exportSeasonSelect');
-      let html = `<option value="ALL">🌐 Alle Saisons (Gesamte Datenbank)</option>`;
-      seasons.forEach(s => {
-        html += `<option value="${s}">📅 ${s}</option>`;
-      });
-      select.innerHTML = html;
-      if (currentSeasonFilter) select.value = currentSeasonFilter;
-    }
-
-    function handleWizardSeasonChange(selectEl) {
-      if (selectEl.value === 'addNew') {
-        let newName = prompt('Zeitraum eingeben (z. B. 01.04.2027 – 30.09.2027):');
-        if (newName && newName.trim() !== '') {
-          let formatted = newName.trim();
-          let opt = document.createElement('option');
-          opt.value = formatted;
-          opt.text = `📅 ${formatted}`;
-          selectEl.insertBefore(opt, selectEl.lastElementChild);
-          selectEl.value = formatted;
-        } else {
-          selectEl.value = getAllSeasons()[0];
-        }
-      }
-    }
-
-    function executeWizardImport() {
-      const fileInput = document.getElementById('wizardExcelFile');
-      const file = fileInput.files[0];
-      if (!file) {
-        alert("Bitte wählen Sie zuerst eine Excel-Datei aus.");
-        return;
-      }
-
-      const targetSeason = document.getElementById('wizardSeasonSelect').value;
-      const statusEl = document.getElementById('wizardStatus');
-      statusEl.innerText = "⏳ Import prebieha...";
-
-      const reader = new FileReader();
-      reader.onload = async function(e) {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
-        let parsedDrinks = [];
-        let currentDrink = null;
-        let currentCat = "Cocktails";
-
-        for (let i = 0; i < rows.length; i++) {
-          const row = rows[i];
-          if (!row || row.length === 0) continue;
-
-          const col0 = row[0] ? String(row[0]).trim() : "";
-          const col1 = row[1] ? String(row[1]).trim() : "";
-
-          if (["APERITTIF", "MOCKTAILS", "Cocktails", "After Dinner Drinks", "Salonplafond Classic"].includes(col1)) {
-            currentCat = col1;
-            continue;
-          }
-
-          if (col0.startsWith("Glass:")) {
-            if (currentDrink) {
-              currentDrink.glass_type = col0.replace("Glass:", "").trim();
-              if (col1.startsWith("Method:")) currentDrink.method = col1.replace("Method:", "").trim();
-            }
-            continue;
-          }
-
-          if (col0.startsWith("Ice:")) {
-            if (currentDrink) currentDrink.ice = col0.replace("Ice:", "").trim();
-            continue;
-          }
-
-          if (col0 === "Garnish:") continue;
-
-          if (col1.startsWith("Preis") || col1.startsWith("Price")) {
-            if (currentDrink) {
-              currentDrink.garnish = col0;
-              let rawPrice = col1.replace("Preis", "").replace("Price", "").replace(",", ".").trim();
-              let parsedPrice = parseFloat(rawPrice);
-              currentDrink.selling_price = !isNaN(parsedPrice) ? parsedPrice : null;
-              parsedDrinks.push(currentDrink);
-              currentDrink = null;
-            }
-            continue;
-          }
-
-          if (col0 && !col0.startsWith("Ingredients:") && !currentDrink) {
-            currentDrink = {
-              name: col0,
-              category: currentCat,
-              season: targetSeason,
-              ingredients_json: [],
-              is_active: true
-            };
-            continue;
-          }
-
-          if (currentDrink && col0 && col0 !== "Ingredients:") {
-            currentDrink.ingredients_json.push({ name: col0, amount: col1 });
-          }
-        }
-
-        if (parsedDrinks.length > 0) {
-          const { error } = await _supabase.from("drinks").insert(parsedDrinks);
-          if (error) {
-            statusEl.innerText = "Fehler: " + error.message;
-          } else {
-            statusEl.innerText = "✔ Import úspešne dokončený!";
-            alert(`Erfolg! ${parsedDrinks.length} Drinks für die Saison (${targetSeason}) importiert.`);
-            closeImportExportModal();
-            loadDrinks();
-          }
-        } else {
-          statusEl.innerText = "Keine Drinks in der Datei gefunden.";
-        }
-      };
-      reader.readAsArrayBuffer(file);
-    }
-  </script>
-</body>
-</html>
+      document.getElementById('a3PrintSetupModal').classList.remove
