@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.44</title>
+  <title>Salonplafond BAR v3.0.45</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import & Export -->
@@ -90,10 +90,24 @@
       100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
     }
 
+    /* Animácia pre hlavičku pri prihlásení kolegu */
+    .header-title-container {
+      position: relative;
+      height: 2.75rem;
+      overflow: hidden;
+    }
+    .header-title-inner {
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .header-title-container.login-animating .header-title-inner {
+      transform: translateY(-2.75rem);
+    }
+
     @media print {
       @page { size: A3 portrait; margin: 10mm; }
       body { background: white !important; color: black !important; padding: 0 !important; }
-      body > *:not(#a3PrintPreviewModal) { display: none !important; }
+      body > *:not(#a3PrintPreviewModal):not(#drinkModal) { display: none !important; }
+      
       #a3PrintPreviewModal {
         position: absolute !important;
         inset: 0 !important;
@@ -116,7 +130,21 @@
       }
       .no-print, button, .modal-bg { display: none !important; }
       #a3PrintContainer * { color: black !important; background: transparent !important; }
+      
+      /* Tlačový podpis vpravo dole */
+      .print-watermark-footer {
+        display: block !important;
+        position: fixed !important;
+        bottom: 5mm !important;
+        right: 5mm !important;
+        font-size: 8pt !important;
+        font-weight: bold !important;
+        color: #64748b !important;
+        text-align: right !important;
+      }
     }
+
+    .print-watermark-footer { display: none; }
   </style>
 </head>
 <body class="dark-mode p-4 md:p-8 max-w-6xl mx-auto pb-32" onclick="closeDropdowns(event)">
@@ -134,7 +162,7 @@
       <div>
         <h1 class="text-lg md:text-xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-xl md:text-2xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.0.44 • Touch-Grid PIN-Login</span>
+        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.0.45 • Touch-Grid PIN-Login</span>
       </div>
 
       <div id="pinLoginForm" class="w-full bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-2xl space-y-4 text-left mt-1">
@@ -350,7 +378,7 @@
   <div id="userDetailModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[290]">
     <div class="card max-w-sm w-full p-6 relative flex flex-col gap-4 items-center text-center border-amber-500/50 shadow-2xl">
       <button onclick="closeUserDetailModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
-      <div id="userDetailAvatarContainer" onclick="openDetailUserFullAvatar()" class="w-24 h-24 rounded-full border-2 border-amber-500 bg-slate-800 overflow-hidden flex items-center justify-center shadow-lg cursor-pointer hover:scale-105 transition" title="Foto in Großansicht öffnen">
+      <div id="userDetailAvatarContainer" class="w-24 h-24 rounded-full border-2 border-amber-500 bg-slate-800 overflow-hidden flex items-center justify-center shadow-lg cursor-pointer hover:scale-105 transition" title="Foto in Großansicht öffnen">
         <span class="text-2xl font-black text-amber-400" id="userDetailAvatarFallback">?</span>
       </div>
       <div>
@@ -376,19 +404,32 @@
           <span class="logo-main-char" id="headerLogoChar">O</span>
           <span class="logo-dot" id="headerLogoDot">•</span>
         </div>
-        <div>
-          <h1 class="text-3xl font-bold tracking-tight text-amber-500 dark:text-amber-400">Salonplafond BAR</h1>
-          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium block">v3.0.44</span>
+
+        <!-- Animovaný kontajner pre názov / prihlásenie kolegu -->
+        <div class="header-title-container" id="headerTitleContainer">
+          <div class="header-title-inner flex flex-col justify-start">
+            <!-- Štandardný názov -->
+            <div class="h-[2.75rem] flex flex-col justify-center">
+              <h1 class="text-3xl font-bold tracking-tight text-amber-500 dark:text-amber-400 leading-none">Salonplafond BAR</h1>
+              <span class="text-xs text-slate-600 dark:text-slate-400 font-medium block mt-0.5">v3.0.45</span>
+            </div>
+            <!-- Oznam o prihlásení kolegu -->
+            <div class="h-[2.75rem] flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-xl">
+              <div id="loginNoticeAvatar" class="w-7 h-7 rounded-full border border-amber-400 overflow-hidden bg-slate-800 flex items-center justify-center text-[10px] font-bold text-amber-400 shrink-0">?</div>
+              <div class="min-w-0">
+                <span class="text-[10px] uppercase font-bold text-amber-500 block leading-none">🟢 Gerade angemeldet:</span>
+                <span id="loginNoticeName" class="text-xs font-black text-white truncate block"></span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       <div class="flex flex-wrap items-center gap-2">
-        <!-- Tlačidlo Benutzer wechseln v hlavičke -->
         <button onclick="handleLogout()" class="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/30 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm" title="Benutzer wechseln">
           🚪 Benutzer wechseln
         </button>
 
-        <!-- Notifikačná obálka pre Team-Chat -->
         <button onclick="openTeamChatModal()" id="headerChatEnvelopeBtn" class="relative px-3 py-1.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-amber-600 dark:text-amber-400 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm" title="Team-Chat öffnen">
           <span>✉️ Chat</span>
           <span id="headerChatBadgeDot" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white dark:border-slate-950 pulse-badge-dot"></span>
@@ -406,7 +447,6 @@
           
           <div id="settingsDropdown" class="hidden absolute right-0 mt-2 w-72 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl shadow-2xl p-2 z-50 flex flex-col gap-1.5 text-slate-900 dark:text-slate-100">
             
-            <!-- MANAŽÉRSKE POLOŽKY -->
             <button onclick="openAddDrinkModalFromMenu()" id="menuAddDrinkBtn" class="hidden w-full text-left px-2.5 py-2 rounded bg-amber-500 text-slate-950 hover:bg-amber-600 text-xs font-black items-center gap-2 shadow-sm">
               ➕ Neues Getränk hinzufügen
             </button>
@@ -481,7 +521,6 @@
       </div>
     </header>
 
-    <!-- Čistý text a samostatná klikateľná fotka vedľa neho -->
     <div class="mb-6">
       <div class="inline-flex items-center gap-3">
         <div id="headerUserAvatarContainer" onclick="openUserProfileModal()" class="w-8 h-8 rounded-full border-2 border-amber-500 bg-slate-800 overflow-hidden flex items-center justify-center shrink-0 cursor-pointer hover:scale-105 transition shadow" title="Klicken, um mein Profil zu öffnen">
@@ -502,7 +541,6 @@
       </div>
     </div>
 
-    <!-- Tlačidlo pre pridanie nového drinku -->
     <div id="addDrinkBtnContainer" class="hidden mb-4">
       <button onclick="openAddDrinkModal()" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl text-xs transition shadow-md flex items-center gap-2">
         ➕ Neues Getränk hinzufügen
@@ -549,7 +587,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-300 dark:border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.44 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.45 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div>
@@ -570,7 +608,7 @@
     </div>
   </div>
 
-  <!-- TEAM CHAT MODAL S BOČNÝM PANELOM (SIDEBAR) -->
+  <!-- TEAM CHAT MODAL S BOČNÝM PANELOM (SIDEBAR) & ONLINE POČÍ TADLOM -->
   <div id="teamChatModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[280]">
     <div class="card max-w-4xl w-full p-6 relative flex flex-col gap-4 max-h-[85vh] overflow-y-auto border-amber-500/50 shadow-2xl">
       <button onclick="closeTeamChatModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold z-10">&times;</button>
@@ -578,7 +616,7 @@
       <div class="flex justify-between items-center pr-8">
         <div>
           <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400 flex items-center gap-2">💬 Salonplafond Team-Chat</h3>
-          <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Echtzeit-Kommunikation für das Bar-Team. Klicke auf ein Teammitglied im Sidebar, um es zu markieren oder das Profil anzusehen.</p>
+          <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Echtzeit-Kommunikation für das Bar-Team. Nutze die Sidebar für Profil-Details oder @Mentions.</p>
         </div>
         <button onclick="toggleChatSidebar()" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 border border-slate-300 dark:border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
           👥 <span id="chatSidebarToggleLabel">Team-Sidebar einblenden</span>
@@ -587,7 +625,6 @@
 
       <div class="flex gap-4 items-start relative overflow-hidden">
         
-        <!-- Hlavná chatovacia časť -->
         <div class="flex-1 flex flex-col gap-3 min-w-0">
           <div id="chatMessagesContainer" class="custom-box p-4 rounded-xl border flex flex-col gap-3 h-[42vh] overflow-y-auto pr-2">
             <p class="text-slate-500 italic text-xs text-center py-4">Lade Chat-Nachrichten...</p>
@@ -610,8 +647,7 @@
           </form>
         </div>
 
-        <!-- Bočný panel (Sidebar) pre používateľov v chate -->
-        <div id="chatSidebar" class="hidden w-72 custom-box p-3 rounded-xl border flex flex-col gap-2.5 h-[42vh] overflow-y-auto shrink-0 transition-all">
+        <div id="chatSidebar" class="hidden w-80 custom-box p-3 rounded-xl border flex flex-col gap-2.5 h-[42vh] overflow-y-auto shrink-0 transition-all">
           <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Team-Mitglieder</span>
           <div id="chatSidebarUsersList" class="flex flex-col gap-2">
             <span class="text-xs text-slate-500 italic">Lade Mitglieder...</span>
@@ -620,7 +656,10 @@
 
       </div>
 
-      <div class="flex justify-end pt-1">
+      <div class="flex justify-between items-center pt-1 border-t border-slate-200 dark:border-slate-800">
+        <span class="text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+          🟢 Aktuell online: <span id="chatOnlineCountLabel" class="text-white font-extrabold">0 Mitglieder</span>
+        </span>
         <button onclick="closeTeamChatModal()" class="px-5 py-2 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 font-bold text-slate-800 dark:text-white rounded-xl text-xs transition">Schließen</button>
       </div>
     </div>
@@ -673,14 +712,14 @@
     </div>
   </div>
 
-  <!-- A3 Print Preview Modal (Bez hlavičky a čiary) -->
+  <!-- A3 Print Preview Modal (S podpisom pri tlači) -->
   <div id="a3PrintPreviewModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[300]">
     <div class="card max-w-4xl w-full p-8 relative flex flex-col gap-6 max-h-[90vh] overflow-y-auto border-amber-500/50 shadow-2xl bg-white text-slate-900">
       <button onclick="closeA3PrintPreviewModal()" class="no-print absolute top-4 right-4 text-slate-500 hover:text-slate-900 text-2xl font-bold">&times;</button>
       
-      <div id="a3PrintContainer" class="flex flex-col gap-8 bg-white text-slate-900 p-4">
-        <!-- Úplne odstránený horný text aj čiarový oddeľovač -->
+      <div id="a3PrintContainer" class="flex flex-col gap-8 bg-white text-slate-900 p-4 relative">
         <div id="a3PrintDrinksList" class="flex flex-col gap-8"></div>
+        <div class="print-watermark-footer">Salonplafond BAR App create Tomas Kardos</div>
       </div>
 
       <div class="no-print flex justify-end gap-2 pt-4 border-t border-slate-200 bg-white">
@@ -923,12 +962,13 @@
     </div>
   </div>
 
-  <!-- Modal Detail View -->
+  <!-- Modal Detail View (S podpisom pri tlači) -->
   <div id="drinkModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
     <div class="card max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 relative flex flex-col justify-between shadow-2xl">
       <div>
         <button onclick="closeModal()" class="no-print absolute top-4 right-4 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-2xl font-bold">&times;</button>
         <div id="modalContent"></div>
+        <div class="print-watermark-footer">Salonplafond BAR App create Tomas Kardos</div>
       </div>
       <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 flex gap-2 no-print items-center flex-wrap">
         <button id="modalPhotoBtn" onclick="openPhotoPreviewFromModal()" class="hidden px-4 py-3 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-amber-700 dark:text-amber-400 font-bold rounded-xl transition text-sm flex items-center justify-center gap-2 border border-slate-300 dark:border-slate-700">
@@ -990,7 +1030,7 @@
 
       <div id="adminChangelogFormContainer" class="hidden custom-box p-4 rounded-xl border flex flex-col gap-2.5">
         <label class="text-xs font-bold text-amber-600 dark:text-amber-300">➕ Neue Neuigkeit hinzufügen (Tomas - Developer):</label>
-        <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.44: Chat Sidebar & Bio Profile..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
+        <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.45: Chat Sidebar & Login-Animations..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
         <button onclick="submitNewChangelog()" class="py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs transition shadow">Als Neuigkeit veröffentlichen</button>
       </div>
 
@@ -1165,6 +1205,7 @@
     let currentEnteredPin = "";
     let selectedWaiterForPin = "";
     let chatRealtimeSubscription = null;
+    let loginHistoryRealtimeSub = null;
     let chatSidebarOpen = false;
 
     window.addEventListener("DOMContentLoaded", async () => {
@@ -1380,6 +1421,41 @@
       await loadDrinks();
       await checkPendingTicketsBadge();
       setupChatRealtimeListener();
+      setupLoginRealtimeListener();
+    }
+
+    /* 1. ANIMÁCIA PRI PRIHLÁSENÍ NOVÉHO KOLEGU */
+    function setupLoginRealtimeListener() {
+      if (loginHistoryRealtimeSub) return;
+      loginHistoryRealtimeSub = _supabase
+        .channel('public:login_history')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'login_history' }, payload => {
+          let newLogin = payload.new;
+          if (newLogin && newLogin.user_name && newLogin.user_name.toLowerCase() !== currentWaiterName.toLowerCase()) {
+            triggerLoginNoticeAnimation(newLogin.user_name);
+          }
+        })
+        .subscribe();
+    }
+
+    function triggerLoginNoticeAnimation(userName) {
+      const container = document.getElementById('headerTitleContainer');
+      const nameEl = document.getElementById('loginNoticeName');
+      const avatarEl = document.getElementById('loginNoticeAvatar');
+
+      let staffRec = staffDatabaseRecords.find(s => s.name.toLowerCase() === userName.toLowerCase());
+      if (staffRec && staffRec.avatar_url) {
+        avatarEl.innerHTML = `<img src="${staffRec.avatar_url}" class="w-full h-full object-cover" alt="">`;
+      } else {
+        avatarEl.innerHTML = `<span class="text-[10px] font-bold text-amber-400">${userName.charAt(0).toUpperCase()}</span>`;
+      }
+
+      nameEl.innerText = userName;
+
+      container.classList.add('login-animating');
+      setTimeout(() => {
+        container.classList.remove('login-animating');
+      }, 2500);
     }
 
     function updateHeaderAvatarUI() {
@@ -1499,7 +1575,7 @@
       }
     }
 
-    // Funkcie pre zobrazenie cudzieho detailu používateľa v chate
+    // Detail cudzieho používateľa bez PINu
     async function openUserDetailModal(userName) {
       const { data, error } = await _supabase.from('staff_presence').select('*').eq('name', userName).single();
       if (error || !data) {
@@ -1529,10 +1605,6 @@
       const modal = document.getElementById('userDetailModal');
       modal.classList.remove('flex');
       modal.classList.add('hidden');
-    }
-
-    function openDetailUserFullAvatar() {
-      // Ak má nastavený onclick cez foto, otvorí sa cez lightbox
     }
 
     async function handleEmailLogin(e) {
@@ -1590,6 +1662,7 @@
       modal.classList.add('hidden');
     }
 
+    /* 4. VYLEPŠENÉ ONLINE POČÍTADLO */
     async function loadOnlineUsersSummary() {
       const container = document.getElementById('onlineUsersListContainer');
       const countBadge = document.getElementById('onlineCountBadge');
@@ -1599,7 +1672,7 @@
       if (error || !data) {
         container.innerHTML = `<span class="text-red-400">Fehler beim Laden</span>`;
         countBadge.innerText = "0";
-        return;
+        return 0;
       }
 
       const now = new Date();
@@ -1612,9 +1685,12 @@
 
       countBadge.innerText = onlineUsers.length;
 
+      const chatCountLabel = document.getElementById('chatOnlineCountLabel');
+      if (chatCountLabel) chatCountLabel.innerText = `${onlineUsers.length} ${onlineUsers.length === 1 ? 'Mitglied' : 'Mitglieder'}`;
+
       if (onlineUsers.length === 0) {
         container.innerHTML = `<span class="text-slate-400 italic">Keine Benutzer in den letzten 15 Minuten aktiv.</span>`;
-        return;
+        return 0;
       }
 
       container.innerHTML = onlineUsers.map(user => {
@@ -1624,6 +1700,8 @@
           </span>
         `;
       }).join('');
+
+      return onlineUsers.length;
     }
 
     async function loadLoginHistoryRecords() {
@@ -1660,6 +1738,7 @@
       document.getElementById('settingsDropdown').classList.add('hidden');
       loadChatMessages();
       loadChatSidebarUsers();
+      loadOnlineUsersSummary();
       
       sessionStorage.setItem('salon_chat_last_seen_' + currentWaiterName, new Date().toISOString());
       updateChatEnvelopeBadge(false);
@@ -1690,6 +1769,7 @@
       }
     }
 
+    /* 3. TLAČÍTKO "PROFIL ANSEHEN" V BOČNOM PANELI */
     async function loadChatSidebarUsers() {
       const container = document.getElementById('chatSidebarUsersList');
       const { data, error } = await _supabase.from('staff_presence').select('*').order('name', { ascending: true });
@@ -1700,16 +1780,21 @@
 
       container.innerHTML = data.map(staff => {
         let avatarHtml = staff.avatar_url 
-          ? `<img src="${staff.avatar_url}" class="w-8 h-8 rounded-full object-cover border border-amber-500/50 shrink-0 cursor-pointer" onclick="event.stopPropagation(); openUserDetailModal('${staff.name}')" alt="${staff.name}">` 
-          : `<div class="w-8 h-8 rounded-full bg-slate-800 text-amber-400 font-bold flex items-center justify-center border border-slate-700 text-xs shrink-0 cursor-pointer" onclick="event.stopPropagation(); openUserDetailModal('${staff.name}')">${staff.name.charAt(0).toUpperCase()}</div>`;
+          ? `<img src="${staff.avatar_url}" class="w-9 h-9 rounded-full object-cover border border-amber-500/50 shrink-0 cursor-pointer" onclick="event.stopPropagation(); openUserDetailModal('${staff.name}')" alt="${staff.name}">` 
+          : `<div class="w-9 h-9 rounded-full bg-slate-800 text-amber-400 font-bold flex items-center justify-center border border-slate-700 text-xs shrink-0 cursor-pointer" onclick="event.stopPropagation(); openUserDetailModal('${staff.name}')">${staff.name.charAt(0).toUpperCase()}</div>`;
 
         return `
-          <div onclick="appendChatMention('${staff.name}')" class="p-2 rounded-lg custom-box border hover:border-amber-500 cursor-pointer flex items-center gap-2.5 transition group" title="Klicken, um @${staff.name} zu markieren">
-            ${avatarHtml}
-            <div class="min-w-0 flex-1">
-              <span class="text-xs font-bold text-white group-hover:text-amber-400 truncate block">${staff.name}</span>
-              <span class="text-[9px] text-slate-400 uppercase tracking-wider block">${staff.role || 'staff'}</span>
+          <div onclick="appendChatMention('${staff.name}')" class="p-2 rounded-lg custom-box border hover:border-amber-500 cursor-pointer flex items-center justify-between gap-2 transition group" title="Klicken, um @${staff.name} zu markieren">
+            <div class="flex items-center gap-2 min-w-0">
+              ${avatarHtml}
+              <div class="min-w-0">
+                <span class="text-xs font-bold text-white group-hover:text-amber-400 truncate block">${staff.name}</span>
+                <span class="text-[9px] text-slate-400 uppercase tracking-wider block">${staff.role || 'staff'}</span>
+              </div>
             </div>
+            <button onclick="event.stopPropagation(); openUserDetailModal('${staff.name}')" class="px-2 py-1 bg-slate-800 hover:bg-amber-500/20 hover:border-amber-500/50 text-amber-400 font-bold rounded text-[10px] border border-slate-700 transition shrink-0">
+              Profil
+            </button>
           </div>
         `;
       }).join('');
@@ -2330,10 +2415,10 @@
       html += `
         <div class="custom-box p-3.5 rounded-xl border text-xs shrink-0">
           <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-            <span>Version v3.0.44 (Tomas Kardos - Developer)</span>
+            <span>Version v3.0.45 (Tomas Kardos - Developer)</span>
             <span class="text-slate-500">Oktober 2026</span>
           </div>
-          <p class="leading-relaxed">Team-Chat Sidebar für Mitglieder mit @Mention und Profil-Anzeige integriert, sowie Bio-Feld in Mein Profil hinzugefügt.</p>
+          <p class="leading-relaxed">Login-Animation bei neu angemeldetem Kollegen, Autoren-Wasserzeichen beim Drucken, Profil-Button in der Sidebar & Online-Mitgliederanzeige im Chat.</p>
         </div>
       `;
 
@@ -2345,7 +2430,7 @@
       "„Keine Zeit!“ ⏱️",
       "„Shaken, einschenken, lächeln! Ihr macht das großartig!“ 🍸✨",
       "„Kein Stress hinter der Bar – die Drinks schmecken besser mit Gelassenheit!“ 🧊",
-      "„Ein perfekter Drink ist wie Kunst. Und ihr seid die Künstler heute Abend! “ 🎨🍾",
+      "„Ein perfekter Drink ist wie Kunst. Und ihr seid die Künstler heute Abend!“ 🎨🍾",
       "„Fokus, Teamwork und ein guter Cocktail – das Erfolgsrezept für jeden Abend!“ 🔥",
       "„Egal wie lang die Schlange ist: Einen Drink nach dem anderen. Du schaffst das!“ 💪",
       "„Weißt du, wer der beste Spüler im Salonplafond ist? Natürlich Tomas Kardos, der auch diese App für euch programmiert hat! Er grüßt euch und freut sich, dass ihr diese App nutzt!“ 🧽✨"
