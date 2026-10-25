@@ -134,6 +134,30 @@
     }
 
     .print-watermark-footer { display: none; }
+
+    /* Mobilné menu: vždy v obraze, posúvateľné, nie mimo obrazovky */
+    @media (max-width: 767px) {
+      #settingsDropdown {
+        position: fixed !important;
+        left: 1rem !important;
+        right: 1rem !important;
+        top: auto !important;
+        bottom: max(1rem, env(safe-area-inset-bottom, 0px)) !important;
+        width: auto !important;
+        max-height: min(80dvh, calc(100dvh - 2rem));
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+        z-index: 250 !important;
+        margin-top: 0 !important;
+      }
+    }
+    @media (min-width: 768px) {
+      #settingsDropdown {
+        max-height: min(70vh, 36rem);
+        overflow-y: auto;
+      }
+    }
   </style>
 </head>
 <body class="dark-mode p-4 md:p-8 max-w-6xl mx-auto pb-32" onclick="closeDropdowns(event)">
@@ -399,6 +423,8 @@
             ⚙️ Menü
             <span id="menuNotificationDot" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-amber-500 dark:bg-amber-400 rounded-full border-2 border-white dark:border-slate-950 pulse-badge-dot"></span>
           </button>
+
+          <div id="settingsMenuBackdrop" class="hidden fixed inset-0 z-[240] bg-black/60 md:bg-transparent" onclick="closeSettingsMenu()"></div>
           
           <div id="settingsDropdown" class="hidden absolute right-0 mt-2 w-72 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl shadow-2xl p-2 z-50 flex flex-col gap-1.5 text-slate-900 dark:text-slate-100">
             
@@ -1464,7 +1490,7 @@
     }
 
     async function openUserProfileModal() {
-      document.getElementById('settingsDropdown').classList.add('hidden');
+      closeSettingsMenu();
       if (!currentWaiterName) return alert("Du bist nicht angemeldet!");
 
       const { data, error } = await fetchStaffByName(currentWaiterName);
@@ -1494,7 +1520,7 @@
     }
 
     function openUserProfileModalFromMenu() {
-      document.getElementById('settingsDropdown').classList.add('hidden');
+      closeSettingsMenu();
       openUserProfileModal();
     }
 
@@ -1598,7 +1624,7 @@
     }
 
     async function openLoginHistoryModal() {
-      document.getElementById('settingsDropdown').classList.add('hidden');
+      closeSettingsMenu();
       checkManagerAuth(async () => {
         await loadLoginHistoryRecords();
         await loadOnlineUsersSummary();
@@ -1690,7 +1716,7 @@
     }
 
     function openTeamChatModal() {
-      document.getElementById('settingsDropdown').classList.add('hidden');
+      closeSettingsMenu();
       loadChatMessages();
       loadChatSidebarUsers();
       loadOnlineUsersSummary();
@@ -1914,7 +1940,7 @@
     }
 
     function openStaffPinModal() {
-      document.getElementById('settingsDropdown').classList.add('hidden');
+      closeSettingsMenu();
       checkManagerAuth(() => {
         resetStaffForm();
         loadStaffManagementList();
@@ -2068,7 +2094,7 @@
     }
 
     async function handleLogout() {
-      document.getElementById('settingsDropdown').classList.add('hidden');
+      closeSettingsMenu();
       try { await _supabase.rpc('logout_staff'); } catch (e) {}
       clearStaffSession();
       sessionStorage.removeItem('salon_waiter_name');
@@ -2122,7 +2148,7 @@
     }
 
     function openSupportModal() {
-      document.getElementById('settingsDropdown').classList.add('hidden');
+      closeSettingsMenu();
       document.getElementById('ticketAuthorDisplay').innerText = currentWaiterName;
       loadTicketsData();
       const modal = document.getElementById('supportModal');
@@ -2138,7 +2164,7 @@
     }
 
     function openChangelogModal() {
-      document.getElementById('settingsDropdown').classList.add('hidden');
+      closeSettingsMenu();
       loadChangelogData();
       const modal = document.getElementById('changelogModal');
       modal.classList.remove('hidden');
@@ -2394,7 +2420,7 @@
     }
 
     async function openWorkScheduleModal() {
-      document.getElementById('settingsDropdown').classList.add('hidden');
+      closeSettingsMenu();
       const container = document.getElementById('workScheduleContentContainer');
       container.innerHTML = `<p class="text-slate-500 italic text-xs text-center py-4">Lade Arbeitsplan für ${currentWaiterName}...</p>`;
 
@@ -2506,7 +2532,7 @@
     let barTraySelection = JSON.parse(localStorage.getItem('salon_bar_tray') || '[]');
 
     function refreshData() {
-      document.getElementById('settingsDropdown').classList.add('hidden');
+      closeSettingsMenu();
       loadDrinks();
       checkPendingTicketsBadge();
     }
@@ -2589,18 +2615,35 @@
       }
     }
 
+    function closeSettingsMenu() {
+      const dropdown = document.getElementById('settingsDropdown');
+      const backdrop = document.getElementById('settingsMenuBackdrop');
+      if (dropdown) dropdown.classList.add('hidden');
+      if (backdrop) backdrop.classList.add('hidden');
+    }
+
     function toggleSettingsMenu(event) {
       event.stopPropagation();
-      document.getElementById('settingsDropdown').classList.toggle('hidden');
+      const dropdown = document.getElementById('settingsDropdown');
+      const backdrop = document.getElementById('settingsMenuBackdrop');
+      const willOpen = dropdown.classList.contains('hidden');
+      dropdown.classList.toggle('hidden');
+      if (backdrop) {
+        if (willOpen) backdrop.classList.remove('hidden');
+        else backdrop.classList.add('hidden');
+      }
     }
 
     function closeDropdowns(event) {
       const dropdown = document.getElementById('settingsDropdown');
-      if (dropdown && !dropdown.contains(event.target)) dropdown.classList.add('hidden');
+      if (!dropdown || dropdown.classList.contains('hidden')) return;
+      if (dropdown.contains(event.target)) return;
+      if (event.target.closest && event.target.closest('button[onclick*="toggleSettingsMenu"]')) return;
+      closeSettingsMenu();
     }
 
     function openUnifiedSettingsModal() {
-      document.getElementById('settingsDropdown').classList.add('hidden');
+      closeSettingsMenu();
       renderUnifiedSeasonSelect();
       updateUnifiedSettingsUI();
       const modal = document.getElementById('unifiedSettingsModal');
@@ -2641,7 +2684,7 @@
     }
 
     function openSeasonModal() {
-      document.getElementById('settingsDropdown').classList.add('hidden');
+      closeSettingsMenu();
       renderSeasonModalList();
       document.getElementById('seasonModal').classList.remove('hidden');
       document.getElementById('seasonModal').classList.add('flex');
@@ -2653,7 +2696,7 @@
     }
 
     function createNewSeasonPrompt() {
-      document.getElementById('settingsDropdown').classList.add('hidden');
+      closeSettingsMenu();
       checkDrinkEditAuth(async () => {
         let newSeasonName = prompt("Namen für die neue Saison eingeben (z. B. Sommer 2027 oder 01.05.2027 - 31.10.2027):");
         if (!newSeasonName || newSeasonName.trim() === '') return;
@@ -2684,7 +2727,7 @@
     }
 
     function openShoppingModal() {
-      document.getElementById('settingsDropdown').classList.add('hidden');
+      closeSettingsMenu();
       document.getElementById('shoppingSeasonName').innerText = currentSeasonFilter;
       
       let activeDrinks = allDrinks.filter(d => (d.season || '') === currentSeasonFilter);
@@ -3425,7 +3468,7 @@
     }
 
     function openAddDrinkModalFromMenu() {
-      document.getElementById('settingsDropdown').classList.add('hidden');
+      closeSettingsMenu();
       openAddDrinkModal();
     }
 
@@ -3537,7 +3580,7 @@
     }
 
     function openA3PrintSetupModal() {
-      document.getElementById('settingsDropdown').classList.add('hidden');
+      closeSettingsMenu();
       const seasons = getAllSeasons();
       const select = document.getElementById('a3SeasonSelect');
       select.innerHTML = seasons.map(s => `<option value="${s}">${s}</option>`).join('');
@@ -3642,7 +3685,7 @@
     }
 
     function openImportExportModal() {
-      document.getElementById('settingsDropdown').classList.add('hidden');
+      closeSettingsMenu();
       checkDrinkEditAuth(() => {
         renderWizardSeasonSelect();
         renderExportSeasonSelect();
