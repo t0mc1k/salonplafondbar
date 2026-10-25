@@ -226,9 +226,9 @@
           <div>
             <label class="block text-[10px] font-semibold uppercase mb-1">Rolle</label>
             <select id="staffInputRole" class="w-full p-2.5 rounded-lg border text-xs">
-              <option value="staff">staff (Čašník)</option>
-              <option value="manager">manager (Manažér)</option>
-              <option value="developer">developer (Vývojár)</option>
+              <option value="staff">staff (Kellner)</option>
+              <option value="manager">manager (Manager)</option>
+              <option value="developer">developer (Entwickler)</option>
             </select>
           </div>
         </div>
@@ -587,7 +587,7 @@
       <!-- Testovacie upozornenie -->
       <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-700 dark:text-amber-300 flex items-center gap-2.5">
         <span class="text-base">⚠️</span>
-        <span><b>Testovacia verzia:</b> Tento pracovný plán je zatiaľ v testovacom režime a netreba sa naň stopercentne spoliehať.</span>
+        <span><b>Testversion:</b> Dieser Arbeitsplan befindet sich noch im Testmodus und ist noch nicht vollständig verbindlich.</span>
       </div>
 
       <div id="workScheduleContentContainer" class="flex flex-col gap-2.5 custom-box p-4 rounded-xl border text-xs max-h-[50vh] overflow-y-auto">
@@ -1026,7 +1026,7 @@
           <span>Version v3.0.50 (Tomas Kardos - Developer)</span>
           <span class="text-slate-500">Oktober 2026</span>
         </div>
-        <p class="leading-relaxed font-semibold">Aktualizácia verzie na v3.0.50.</p>
+        <p class="leading-relaxed font-semibold">Versionsupdate auf v3.0.50.</p>
       </div>
 
       <div id="adminChangelogFormContainer" class="hidden custom-box p-4 rounded-xl border flex flex-col gap-2.5">
@@ -1037,7 +1037,7 @@
 
       <!-- Tlačidlo pre archív/históriu -->
       <button onclick="toggleChangelogHistory()" id="toggleHistoryBtn" class="w-full py-2.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 font-bold rounded-xl text-xs transition border border-slate-300 dark:border-slate-700 flex items-center justify-center gap-1.5">
-        📜 Historie zmien / Archiv verzií (v1.0 – v3.0.49) anzeigen
+        📜 Versionshistorie / Archiv (v1.0 – v3.0.49) anzeigen
       </button>
 
       <!-- Skrytý archív verzií -->
@@ -1516,7 +1516,7 @@
       const file = event.target.files[0];
       if (!file) return;
       const status = document.getElementById('profileAvatarStatus');
-      status.innerText = "⏳ Fotka sa nahráva...";
+      status.innerText = "⏳ Foto wird hochgeladen...";
 
       const fileName = `my_avatar_${Date.now()}_${file.name}`;
       let { data, error } = await _supabase.storage.from('drinks').upload(fileName, file);
@@ -1531,8 +1531,8 @@
         document.getElementById('profileInputAvatarUrl').value = publicURLData.publicUrl;
         const avatarContainer = document.getElementById('profileModalAvatarContainer');
         avatarContainer.innerHTML = `<img src="${publicURLData.publicUrl}" class="w-full h-full object-cover" alt="">`;
-        status.innerText = '✔ Fotka bola úspešne pridaná!';
-        alert("Fotka bola úspešne pridaná!");
+        status.innerText = '✔ Foto wurde erfolgreich hinzugefügt!';
+        alert("Foto wurde erfolgreich hinzugefügt!");
       }
     }
 
@@ -1952,7 +1952,7 @@
       const file = event.target.files[0];
       if (!file) return;
       const status = document.getElementById('staffAvatarStatus');
-      status.innerText = "⏳ Fotka sa nahráva...";
+      status.innerText = "⏳ Foto wird hochgeladen...";
       
       const fileName = `avatar_${Date.now()}_${file.name}`;
       let { data, error } = await _supabase.storage.from('drinks').upload(fileName, file);
@@ -1965,8 +1965,8 @@
       let { data: publicURLData } = _supabase.storage.from('drinks').getPublicUrl(fileName);
       if (publicURLData && publicURLData.publicUrl) {
         document.getElementById('staffInputAvatar').value = publicURLData.publicUrl;
-        status.innerText = '✔ Fotka bola úspešne pridaná!';
-        alert("Fotka bola úspešne pridaná!");
+        status.innerText = '✔ Foto wurde erfolgreich hinzugefügt!';
+        alert("Foto wurde erfolgreich hinzugefügt!");
       }
     }
 
@@ -2157,11 +2157,11 @@
       if (container.classList.contains('hidden')) {
         container.classList.remove('hidden');
         container.classList.add('flex');
-        btn.innerText = '📜 Historie zmien / Archiv verzií schovať';
+        btn.innerText = '📜 Versionshistorie / Archiv ausblenden';
       } else {
         container.classList.remove('flex');
         container.classList.add('hidden');
-        btn.innerText = '📜 Historie zmien / Archiv verzií (v1.0 – v3.0.49) anzeigen';
+        btn.innerText = '📜 Versionshistorie / Archiv (v1.0 – v3.0.49) anzeigen';
       }
     }
 
@@ -2351,42 +2351,42 @@
             <span>Version v3.0.49 (Tomas Kardos - Developer)</span>
             <span class="text-slate-500">Oktober 2026</span>
           </div>
-          <p class="leading-relaxed">Pridanie osobného pracovného plánu čašníkov s testovacím upozornením a kompletná rozdelená história všetkých verzií od v1.0 po v3.0.49.</p>
+          <p class="leading-relaxed">Persönlicher Arbeitsplan für das Servicepersonal mit Testhinweis sowie vollständige, gegliederte Versionshistorie von v1.0 bis v3.0.49.</p>
         </div>
         <div class="custom-box p-3.5 rounded-xl border text-xs shrink-0">
           <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
             <span>Version v3.0.47 (Tomas Kardos - Developer)</span>
             <span class="text-slate-500">Oktober 2026</span>
           </div>
-          <p class="leading-relaxed">Odstránenie notifikačnej animácie prihlásenia kolegu; zavedenie kaskádového mazania pre sezóny (umožňuje kompletne vymazať napr. Summer 2026 vrátane naviazaných drinków).</p>
+          <p class="leading-relaxed">Entfernen der Login-Benachrichtigungsanimation für Kollegen; kaskadierendes Löschen von Saisons (z. B. Summer 2026 inklusive aller zugehörigen Drinks).</p>
         </div>
         <div class="custom-box p-3.5 rounded-xl border text-xs shrink-0">
           <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
             <span>Version v3.0.40 – v3.0.46 (Tomas Kardos - Developer)</span>
             <span class="text-slate-500">September - Oktober 2026</span>
           </div>
-          <p class="leading-relaxed">Zavedenie PIN-login gridu pre personál, ukladanie histórie prihlásení (login_history), online status detekcia, vylepšený real-time Team-Chat s podporou @mentions a profilov s Bio a fotkami.</p>
+          <p class="leading-relaxed">Einführung des PIN-Login-Grids für das Personal, Speichern der Login-Historie (login_history), Online-Status-Erkennung, verbesserter Echtzeit-Team-Chat mit @Mentions sowie Profilen mit Bio und Fotos.</p>
         </div>
         <div class="custom-box p-3.5 rounded-xl border text-xs shrink-0">
           <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
             <span>Version v3.0.30 – v3.0.39 (Tomas Kardos - Developer)</span>
             <span class="text-slate-500">August - September 2026</span>
           </div>
-          <p class="leading-relaxed">Podpora pre viaceré sezóny, dynamický výpočet marží a wareneinsatzu, A3 tlačový náhľad pre 3 drinky, vylepšený Excel/CSV import/export sprievodca.</p>
+          <p class="leading-relaxed">Unterstützung mehrerer Saisons, dynamische Berechnung von Margen und Wareneinsatz, A3-Druckvorschau für 3 Drinks, verbesserter Excel/CSV-Import/Export-Assistent.</p>
         </div>
         <div class="custom-box p-3.5 rounded-xl border text-xs shrink-0">
           <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
             <span>Version v3.0.20 – v3.0.29 (Tomas Kardos - Developer)</span>
-            <span class="text-slate-500">Júl - August 2026</span>
+            <span class="text-slate-500">Juli - August 2026</span>
           </div>
-          <p class="leading-relaxed">Zavedenie Bar Tray (podnosu) a Multi-View porovnávača receptov, filtrovanie podľa alergií, vegan, glutenfree, laktosefree a typu pohára.</p>
+          <p class="leading-relaxed">Einführung des Bar Trays und des Multi-View-Rezeptvergleichs, Filter nach Allergien, vegan, glutenfrei, laktosefrei und Glastyp.</p>
         </div>
         <div class="custom-box p-3.5 rounded-xl border text-xs shrink-0">
           <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
             <span>Version v1.0 – v3.0.19 (Tomas Kardos - Developer)</span>
             <span class="text-slate-500">2026</span>
           </div>
-          <p class="leading-relaxed">Základný zoznam drinkov, kategórie (Cocktails, Mocktails, Salonplafond Classic, After Dinner Drinks, APERITTIF), tmavý/svetlý režim a Supabase Storage fotky.</p>
+          <p class="leading-relaxed">Grundlegende Getränkeliste, Kategorien (Cocktails, Mocktails, Salonplafond Classic, After Dinner Drinks, APERITIF), dunkler/heller Modus und Fotos über Supabase Storage.</p>
         </div>
       `;
 
@@ -3204,7 +3204,7 @@
       const file = event.target.files[0];
       if (!file) return;
       const status = document.getElementById('uploadStatus');
-      status.innerText = "⏳ Fotka sa nahráva...";
+      status.innerText = "⏳ Foto wird hochgeladen...";
       
       const fileName = `${Date.now()}_${file.name}`;
       let { data, error } = await _supabase.storage.from('drinks').upload(fileName, file);
@@ -3218,8 +3218,8 @@
       let { data: publicURLData } = _supabase.storage.from('drinks').getPublicUrl(fileName);
       if (publicURLData && publicURLData.publicUrl) {
         document.getElementById('dPhoto').value = publicURLData.publicUrl;
-        status.innerText = '✔ Fotka bola úspešne pridaná!';
-        alert("Fotka bola úspešne pridaná!");
+        status.innerText = '✔ Foto wurde erfolgreich hinzugefügt!';
+        alert("Foto wurde erfolgreich hinzugefügt!");
       }
     }
 
@@ -3786,7 +3786,7 @@
           if (error) {
             statusEl.innerText = "Fehler: " + error.message;
           } else {
-            statusEl.innerText = "✔ Import úspešne dokončený!";
+            statusEl.innerText = "✔ Import erfolgreich abgeschlossen!";
             alert(`Erfolg! ${parsedDrinks.length} Drinks für die Saison (${targetSeason}) importiert.`);
             closeImportExportModal();
             loadDrinks();
