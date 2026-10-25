@@ -509,12 +509,22 @@
             <button type="button" onclick="cancelReply()" class="text-slate-400 hover:text-white font-bold p-1">&times;</button>
           </div>
 
-          <form onsubmit="handleSendChatMessage(event)" class="flex gap-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+          <form onsubmit="handleSendChatMessage(event)" class="flex flex-col gap-2 pt-2 border-t border-slate-200 dark:border-slate-800">
             <input type="hidden" id="replyingMessageId" value="">
-            <input type="text" id="chatMessageInput" autocomplete="off" placeholder="Nachricht an das Team schreiben (nutze @Name zum Markieren)..." class="flex-1 p-3 rounded-xl border text-xs focus:outline-none focus:border-amber-500">
-            <button type="submit" class="px-5 py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl text-xs transition shadow flex items-center gap-1.5 shrink-0">
-              Senden ➔
-            </button>
+            
+            <div class="flex items-center justify-between gap-2">
+              <input type="text" id="chatMessageInput" autocomplete="off" placeholder="Nachricht an das Team schreiben (nutze @Name zum Markieren)..." class="flex-1 p-3 rounded-xl border text-xs focus:outline-none focus:border-amber-500">
+              <button type="submit" class="px-5 py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl text-xs transition shadow flex items-center gap-1.5 shrink-0">
+                Senden ➔
+              </button>
+            </div>
+
+            <!-- Panel pre rýchle formátovanie textu -->
+            <div class="flex items-center gap-1.5 px-1">
+              <span class="text-[10px] text-slate-400 font-semibold uppercase mr-1">Formatierung:</span>
+              <button type="button" onclick="applyTextStyling('**')" class="px-2 py-1 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 font-bold rounded text-xs border border-slate-300 dark:border-slate-700 transition" title="Fett (Tučné)"><b>B</b></button>
+              <button type="button" onclick="applyTextStyling('*')" class="px-2 py-1 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 italic rounded text-xs border border-slate-300 dark:border-slate-700 transition" title="Kursiv (Kurzíva)"><i>I</i></button>
+            </div>
           </form>
         </div>
 
