@@ -23,6 +23,27 @@
       modal.classList.add('hidden');
     }
 
+    async function clearLoginHistoryLogs() {
+      checkManagerAuth(async () => {
+        if (!confirm("Möchten Sie wirklich das gesamte Login-Protokoll unwiderruflich löschen?")) return;
+        
+        // Zmazanie všetkých záznamov z tabuľky login_history
+        const { error } = await _supabase.from('login_history').delete().neq('id', 0); // zmaže všetko, kde id != 0 (všetky riadky)
+        
+        if (error) {
+          // Fallback ak tabuľka nemá stĺpec id, skúsime vymazať cez inú podmienku
+          const { error: err2 } = await _supabase.from('login_history').delete().not('user_name', 'is', null);
+          if (err2) {
+            alert("Fehler beim Löschen des Protokolls: " + (error.message || err2.message));
+            return;
+          }
+        }
+
+        alert("Login-Protokoll wurde erfolgreich geleert!");
+        await loadLoginHistoryRecords();
+      });
+    }
+
     async function loadOnlineUsersSummary() {
       const container = document.getElementById('onlineUsersListContainer');
       const countBadge = document.getElementById('onlineCountBadge');
