@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.49</title>
+  <title>Salonplafond BAR v3.0.50</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import & Export -->
@@ -151,7 +151,7 @@
       <div>
         <h1 class="text-lg md:text-xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-xl md:text-2xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.0.49 • Touch-Grid PIN-Login</span>
+        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.0.50 • Touch-Grid PIN-Login</span>
       </div>
 
       <div id="pinLoginForm" class="w-full bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-2xl space-y-4 text-left mt-1">
@@ -376,7 +376,7 @@
 
         <div class="flex flex-col justify-center">
           <h1 class="text-3xl font-bold tracking-tight text-amber-500 dark:text-amber-400 leading-none">Salonplafond BAR</h1>
-          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium block mt-0.5">v3.0.49</span>
+          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium block mt-0.5">v3.0.50</span>
         </div>
       </div>
 
@@ -554,7 +554,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-300 dark:border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.49 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.50 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div>
@@ -1023,21 +1023,21 @@
       <!-- Aktuálna novinka -->
       <div class="custom-box p-4 rounded-xl border border-amber-500/40 text-xs shrink-0">
         <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-          <span>Version v3.0.49 (Tomas Kardos - Developer)</span>
+          <span>Version v3.0.50 (Tomas Kardos - Developer)</span>
           <span class="text-slate-500">Oktober 2026</span>
         </div>
-        <p class="leading-relaxed font-semibold">Pridanie osobného pracovného plánu čašníkov s testovacím upozornením a kompletná rozdelená história všetkých verzií od v1.0 po v3.0.49.</p>
+        <p class="leading-relaxed font-semibold">Aktualizácia verzie na v3.0.50.</p>
       </div>
 
       <div id="adminChangelogFormContainer" class="hidden custom-box p-4 rounded-xl border flex flex-col gap-2.5">
         <label class="text-xs font-bold text-amber-600 dark:text-amber-300">➕ Neue Neuigkeit hinzufügen (Tomas - Developer):</label>
-        <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.49: Neue Features..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
+        <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.50: Neue Features..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
         <button onclick="submitNewChangelog()" class="py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs transition shadow">Als Neuigkeit veröffentlichen</button>
       </div>
 
       <!-- Tlačidlo pre archív/históriu -->
       <button onclick="toggleChangelogHistory()" id="toggleHistoryBtn" class="w-full py-2.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 font-bold rounded-xl text-xs transition border border-slate-300 dark:border-slate-700 flex items-center justify-center gap-1.5">
-        📜 Historie zmien / Archiv verzií (v1.0 – v3.0.47) anzeigen
+        📜 Historie zmien / Archiv verzií (v1.0 – v3.0.49) anzeigen
       </button>
 
       <!-- Skrytý archív verzií -->
@@ -2161,7 +2161,7 @@
       } else {
         container.classList.remove('flex');
         container.classList.add('hidden');
-        btn.innerText = '📜 Historie zmien / Archiv verzií (v1.0 – v3.0.47) anzeigen';
+        btn.innerText = '📜 Historie zmien / Archiv verzií (v1.0 – v3.0.49) anzeigen';
       }
     }
 
@@ -2344,8 +2344,15 @@
         }).join('');
       }
 
-      // Kompletná história od v1.0 po v3.0.47
+      // Kompletná história od v1.0 po v3.0.49
       html += `
+        <div class="custom-box p-3.5 rounded-xl border text-xs shrink-0">
+          <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
+            <span>Version v3.0.49 (Tomas Kardos - Developer)</span>
+            <span class="text-slate-500">Oktober 2026</span>
+          </div>
+          <p class="leading-relaxed">Pridanie osobného pracovného plánu čašníkov s testovacím upozornením a kompletná rozdelená história všetkých verzií od v1.0 po v3.0.49.</p>
+        </div>
         <div class="custom-box p-3.5 rounded-xl border text-xs shrink-0">
           <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
             <span>Version v3.0.47 (Tomas Kardos - Developer)</span>
