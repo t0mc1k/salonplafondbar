@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.52</title>
+  <title>Salonplafond BAR v3.1.00</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import & Export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="css/style.css?v=3.0.52">
+  <link rel="stylesheet" href="css/style.css?v=3.1.00">
 </head>
 <body class="dark-mode p-4 md:p-8 max-w-6xl mx-auto pb-32" onclick="closeDropdowns(event)">
 
@@ -27,7 +27,7 @@
       <div>
         <h1 class="text-lg md:text-xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-xl md:text-2xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.0.52 • Touch-Grid PIN-Login</span>
+        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.1.00 • Touch-Grid PIN-Login</span>
       </div>
 
       <div id="pinLoginForm" class="w-full bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-2xl space-y-4 text-left mt-1">
@@ -145,7 +145,7 @@
     </div>
   </div>
 
-<!-- LOGIN-HISTORIE / PROTOKOLL -->
+  <!-- LOGIN-HISTORIE / PROTOKOLL -->
   <div id="loginHistoryModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[285]">
     <div class="card max-w-2xl w-full p-6 relative flex flex-col gap-4 max-h-[85vh] overflow-y-auto border-amber-500/50 shadow-2xl">
       <button onclick="closeLoginHistoryModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
@@ -258,7 +258,7 @@
 
         <div class="flex flex-col justify-center">
           <h1 class="text-3xl font-bold tracking-tight text-amber-500 dark:text-amber-400 leading-none">Salonplafond BAR</h1>
-          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium block mt-0.5">v3.0.52</span>
+          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium block mt-0.5">v3.1.00</span>
         </div>
       </div>
 
@@ -304,10 +304,6 @@
 
             <button onclick="openStaffPinModalFromMenu()" id="menuStaffPinBtn" class="hidden w-full text-left px-2.5 py-2 rounded bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-amber-600 dark:text-amber-400 items-center justify-between border border-slate-200 dark:border-slate-700">
               <span>👤 Personal & PINs (Zentrale)</span> <span>→</span>
-            </button>
-
-            <button onclick="openLoginHistoryModalFromMenu()" id="menuLoginHistoryBtn" class="hidden w-full text-left px-2.5 py-2 rounded bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-amber-600 dark:text-amber-400 items-center justify-between border border-slate-200 dark:border-slate-700">
-              <span>📜 Login-Historie / Protokoll</span> <span>→</span>
             </button>
 
             <div class="border-t border-slate-200 dark:border-slate-700 my-1"></div>
@@ -438,7 +434,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-300 dark:border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.52 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.1.00 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div>
@@ -459,7 +455,7 @@
     </div>
   </div>
 
-  <!-- WORK SCHEDULE MODAL (ARBEITSPLAN S TESTOVACÍM UPOZORNENÍM) -->
+  <!-- WORK SCHEDULE MODAL -->
   <div id="workScheduleModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[295]">
     <div class="card max-w-2xl w-full p-6 relative flex flex-col gap-4 max-h-[85vh] overflow-y-auto border-amber-500/50 shadow-2xl">
       <button onclick="closeWorkScheduleModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
@@ -468,7 +464,6 @@
         <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Übersicht deiner Schichten und Arbeitszeiten für die aktuelle Woche.</p>
       </div>
 
-      <!-- Testovacie upozornenie -->
       <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-700 dark:text-amber-300 flex items-center gap-2.5">
         <span class="text-base">⚠️</span>
         <span><b>Testversion:</b> Dieser Arbeitsplan befindet sich noch im Testmodus und ist noch nicht vollständig verbindlich.</span>
@@ -484,7 +479,7 @@
     </div>
   </div>
 
-  <!-- TEAM CHAT MODAL S BOČNÝM PANELOM (SIDEBAR) & ONLINE POČÍ TADLOM -->
+  <!-- TEAM CHAT MODAL -->
   <div id="teamChatModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[280]">
     <div class="card max-w-4xl w-full p-6 relative flex flex-col gap-4 max-h-[85vh] overflow-y-auto border-amber-500/50 shadow-2xl">
       <button onclick="closeTeamChatModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold z-10">&times;</button>
@@ -588,7 +583,7 @@
     </div>
   </div>
 
-  <!-- A3 Print Preview Modal (S podpisom pri tlači) -->
+  <!-- A3 Print Preview Modal -->
   <div id="a3PrintPreviewModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[300]">
     <div class="card max-w-4xl w-full p-8 relative flex flex-col gap-6 max-h-[90vh] overflow-y-auto border-amber-500/50 shadow-2xl bg-white text-slate-900">
       <button onclick="closeA3PrintPreviewModal()" class="no-print absolute top-4 right-4 text-slate-500 hover:text-slate-900 text-2xl font-bold">&times;</button>
@@ -838,7 +833,7 @@
     </div>
   </div>
 
-  <!-- Modal Detail View (S podpisom pri tlači) -->
+  <!-- Modal Detail View -->
   <div id="drinkModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
     <div class="card max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 relative flex flex-col justify-between shadow-2xl">
       <div>
@@ -907,24 +902,22 @@
       <!-- Aktuálna novinka -->
       <div class="custom-box p-4 rounded-xl border border-amber-500/40 text-xs shrink-0">
         <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-          <span>Version v3.0.52 (Tomas Kardos - Developer)</span>
+          <span>Version v3.1.00 (Tomas Kardos - Developer)</span>
           <span class="text-slate-500">Oktober 2026</span>
         </div>
-        <p class="leading-relaxed font-semibold">Deutsche Oberfläche, Saisons nur aus der Datenbank (kein festes Sommer 2026) und fixes Mobilmenü, das im Bildschirm bleibt und scrollbar ist.</p>
+        <p class="leading-relaxed font-semibold">Modularisierung der App, verbesserte Menüstrukturen, Login-Protokoll-Bereinigung und UI-Optimierungen.</p>
       </div>
 
       <div id="adminChangelogFormContainer" class="hidden custom-box p-4 rounded-xl border flex flex-col gap-2.5">
         <label class="text-xs font-bold text-amber-600 dark:text-amber-300">➕ Neue Neuigkeit hinzufügen (Tomas - Developer):</label>
-        <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.0.52: Neue Features..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
+        <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.1.00: Neue Features..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
         <button onclick="submitNewChangelog()" class="py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs transition shadow">Als Neuigkeit veröffentlichen</button>
       </div>
 
-      <!-- Tlačidlo pre archív/históriu -->
       <button onclick="toggleChangelogHistory()" id="toggleHistoryBtn" class="w-full py-2.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 font-bold rounded-xl text-xs transition border border-slate-300 dark:border-slate-700 flex items-center justify-center gap-1.5">
         📜 Versionshistorie / Archiv (v1.0 – v3.0.50) anzeigen
       </button>
 
-      <!-- Skrytý archív verzií -->
       <div id="changelogHistoryContainer" class="hidden flex-col gap-2.5 max-h-[40vh] overflow-y-auto pr-2 pt-1 border-t border-slate-200 dark:border-slate-800">
         <p class="text-slate-500 italic text-xs text-center py-2">Lade Historie...</p>
       </div>
@@ -996,8 +989,7 @@
     </div>
   </div>
 
-  <!-- Secure Manager Auth Modal Dialog -->
-  <!-- Motivation Modal (Osterei) -->
+  <!-- Motivation Modal -->
   <div id="motivationModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
     <div class="card max-w-md w-full border-amber-500/50 p-6 relative flex flex-col gap-4 text-center shadow-2xl">
       <button onclick="closeMotivationModal()" class="absolute top-4 right-4 text-slate-500 dark:text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
@@ -1011,7 +1003,7 @@
     </div>
   </div>
 
-<!-- Season Selection Modal Dialog (S tlačidlom vytvoriť novú sezónu) -->
+  <!-- Season Selection Modal Dialog -->
   <div id="seasonModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
     <div class="card max-w-md w-full p-6 relative flex flex-col gap-4 shadow-2xl border-amber-500/50">
       <button onclick="closeSeasonModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold z-10">&times;</button>
@@ -1066,21 +1058,21 @@
     </div>
   </div>
 
-  <script src="js/config.js?v=3.0.52"></script>
-  <script src="js/ui.js?v=3.0.52"></script>
-  <script src="js/auth.js?v=3.0.52"></script>
-  <script src="js/profile.js?v=3.0.52"></script>
-  <script src="js/staff-admin.js?v=3.0.52"></script>
-  <script src="js/chat.js?v=3.0.52"></script>
-  <script src="js/tickets.js?v=3.0.52"></script>
-  <script src="js/schedule.js?v=3.0.52"></script>
-  <script src="js/seasons.js?v=3.0.52"></script>
-  <script src="js/drinks.js?v=3.0.52"></script>
-  <script src="js/drink-admin.js?v=3.0.52"></script>
-  <script src="js/tray.js?v=3.0.52"></script>
-  <script src="js/shopping.js?v=3.0.52"></script>
-  <script src="js/import-export.js?v=3.0.52"></script>
-  <script src="js/print-a3.js?v=3.0.52"></script>
-  <script src="js/app.js?v=3.0.52"></script>
+  <script src="js/config.js?v=3.1.00"></script>
+  <script src="js/ui.js?v=3.1.00"></script>
+  <script src="js/auth.js?v=3.1.00"></script>
+  <script src="js/profile.js?v=3.1.00"></script>
+  <script src="js/staff-admin.js?v=3.1.00"></script>
+  <script src="js/chat.js?v=3.1.00"></script>
+  <script src="js/tickets.js?v=3.1.00"></script>
+  <script src="js/schedule.js?v=3.1.00"></script>
+  <script src="js/seasons.js?v=3.1.00"></script>
+  <script src="js/drinks.js?v=3.1.00"></script>
+  <script src="js/drink-admin.js?v=3.1.00"></script>
+  <script src="js/tray.js?v=3.1.00"></script>
+  <script src="js/shopping.js?v=3.1.00"></script>
+  <script src="js/import-export.js?v=3.1.00"></script>
+  <script src="js/print-a3.js?v=3.1.00"></script>
+  <script src="js/app.js?v=3.1.00"></script>
 </body>
 </html>
