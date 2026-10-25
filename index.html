@@ -2780,22 +2780,12 @@
       allDrinks.forEach(d => {
         if (d.season && d.season !== 'current' && !seasons.includes(d.season)) seasons.push(d.season);
       });
-      if (!seasons.includes('16.11.2026 - 16.03.2027')) seasons.push('16.11.2026 - 16.03.2027');
-      if (!seasons.includes('Sommer 2026')) seasons.push('Sommer 2026');
       return seasons;
     }
 
     function determineActiveSeasonAutomatically() {
-      let seasons = getAllSeasons();
-      const now = new Date();
-      const winterStart = new Date('2026-11-16');
-      if (now < winterStart && seasons.includes('Sommer 2026')) {
-        return 'Sommer 2026';
-      }
-      if (seasons.includes('16.11.2026 - 16.03.2027') && now >= winterStart) {
-        return '16.11.2026 - 16.03.2027';
-      }
-      return seasons[0];
+      const seasons = getAllSeasons();
+      return seasons[0] || null;
     }
 
     function updateActiveSeasonBadgeUI() {
@@ -2853,6 +2843,10 @@
     function renderSeasonModalList() {
       const seasons = getAllSeasons();
       const listContainer = document.getElementById('seasonModalList');
+      if (seasons.length === 0) {
+        listContainer.innerHTML = `<p class="text-slate-500 italic text-xs text-center py-4">Keine Saisons in der Datenbank gefunden.</p>`;
+        return;
+      }
       listContainer.innerHTML = seasons.map(s => {
         let activeClass = currentSeasonFilter === s ? 'border-amber-500 bg-amber-500/10' : 'custom-box border';
         
