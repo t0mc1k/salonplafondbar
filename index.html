@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.0.48</title>
+  <title>Salonplafond BAR v3.0.49</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import & Export -->
@@ -151,7 +151,7 @@
       <div>
         <h1 class="text-lg md:text-xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-xl md:text-2xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.0.48 • Touch-Grid PIN-Login</span>
+        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.0.49 • Touch-Grid PIN-Login</span>
       </div>
 
       <div id="pinLoginForm" class="w-full bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-2xl space-y-4 text-left mt-1">
@@ -188,37 +188,12 @@
             <button type="button" onclick="appendPinNum('0')" class="p-2.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-white text-sm font-bold rounded-xl transition">0</button>
             <button type="button" onclick="backspacePinInput()" class="p-2.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-amber-400 text-xs font-bold rounded-xl transition">⌫</button>
           </div>
+          <button type="button" id="pinSubmitBtn" onclick="submitPinLogin()" class="w-full mt-2 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold rounded-xl text-sm transition shadow-lg">🔓 Anmelden</button>
         </div>
 
         <div id="pinAuthError" class="text-xs text-red-400 hidden font-medium text-center"></div>
 
-        <div class="pt-2 border-t border-slate-800 text-center">
-          <button type="button" onclick="toggleEmailLoginMode()" class="text-[11px] text-slate-400 hover:text-amber-400 underline transition font-medium">
-            Möchtest du dich per E-Mail & Passwort anmelden? (Legacy)
-          </button>
-        </div>
       </div>
-
-      <form id="emailLoginForm" onsubmit="handleEmailLogin(event)" autocomplete="off" class="hidden w-full bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl space-y-4 text-left mt-2">
-        <div>
-          <label class="block text-xs font-semibold uppercase mb-1 text-slate-300">E-Mail</label>
-          <input type="email" id="loginEmail" autocomplete="off" placeholder="name@salonplafond.wien" class="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold uppercase mb-1 text-slate-300">Passwort</label>
-          <input type="password" id="loginPassword" autocomplete="new-password" class="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400">
-        </div>
-        <div id="emailAuthError" class="text-xs text-red-400 hidden font-medium"></div>
-        <button type="submit" id="emailLoginSubmitBtn" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold rounded-xl text-xs transition shadow-lg flex items-center justify-center gap-2">
-          <span>Mit E-Mail einloggen</span>
-        </button>
-
-        <div class="pt-3 border-t border-slate-800 text-center">
-          <button type="button" onclick="toggleEmailLoginMode()" class="text-[11px] text-slate-400 hover:text-amber-400 underline transition font-medium">
-            ← Zurück zum schnellen PIN-Login
-          </button>
-        </div>
-      </form>
 
       <div class="mt-2 flex flex-col items-center gap-1">
         <span class="text-xs text-slate-300 font-extrabold block">Erstellt von © T0mc1k (Tomas Kardos)</span>
@@ -257,6 +232,11 @@
             </select>
           </div>
         </div>
+
+        <label class="flex items-center gap-2 text-xs font-semibold cursor-pointer">
+          <input type="checkbox" id="staffInputCanEdit" class="w-4 h-4 accent-amber-500">
+          <span>🍸 Darf Getränke bearbeiten (Manager &amp; Developer immer)</span>
+        </label>
 
         <div>
           <label class="block text-[10px] font-semibold uppercase mb-1">Profilbild hochladen:</label>
@@ -396,7 +376,7 @@
 
         <div class="flex flex-col justify-center">
           <h1 class="text-3xl font-bold tracking-tight text-amber-500 dark:text-amber-400 leading-none">Salonplafond BAR</h1>
-          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium block mt-0.5">v3.0.48</span>
+          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium block mt-0.5">v3.0.49</span>
         </div>
       </div>
 
@@ -574,7 +554,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-300 dark:border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.0.48 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App v3.0.49 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div>
@@ -1043,10 +1023,10 @@
       <!-- Aktuálna novinka -->
       <div class="custom-box p-4 rounded-xl border border-amber-500/40 text-xs shrink-0">
         <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-          <span>Version v3.0.48 (Tomas Kardos - Developer)</span>
+          <span>Version v3.0.49 (Tomas Kardos - Developer)</span>
           <span class="text-slate-500">Oktober 2026</span>
         </div>
-        <p class="leading-relaxed font-semibold">Pridanie osobného pracovného plánu čašníkov s testovacím upozornením a kompletná rozdelená história všetkých verzií od v1.0 po v3.0.48.</p>
+        <p class="leading-relaxed font-semibold">Pridanie osobného pracovného plánu čašníkov s testovacím upozornením a kompletná rozdelená história všetkých verzií od v1.0 po v3.0.49.</p>
       </div>
 
       <div id="adminChangelogFormContainer" class="hidden custom-box p-4 rounded-xl border flex flex-col gap-2.5">
@@ -1133,32 +1113,6 @@
   </div>
 
   <!-- Secure Manager Auth Modal Dialog -->
-  <div id="authModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[320]">
-    <div class="card max-w-md w-full p-6 relative flex flex-col gap-4 shadow-2xl border-amber-500/50">
-      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-500 dark:text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
-      <div class="w-12 h-12 bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-xl mx-auto flex items-center justify-center text-2xl border border-amber-500/30">🔒</div>
-      <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400 text-center">Manager-Authentifizierung</h3>
-      <p class="text-xs text-slate-600 dark:text-slate-300 text-center">Diese Aktion erfordert Administratorrechte. Bitte geben Sie Ihre Manager E-Mail und Passwort ein:</p>
-      
-      <div class="space-y-3 mt-2">
-        <div>
-          <label class="block text-[11px] font-semibold uppercase mb-1">Manager E-Mail</label>
-          <input type="email" id="modalAuthEmail" autocomplete="off" placeholder="kdstom@outlook.com" class="w-full p-3 rounded-xl border text-xs focus:outline-none focus:border-amber-500">
-        </div>
-        <div>
-          <label class="block text-[11px] font-semibold uppercase mb-1">Passwort</label>
-          <input type="password" id="modalAuthPassword" autocomplete="new-password" placeholder="••••••••" class="w-full p-3 rounded-xl border text-xs focus:outline-none focus:border-amber-500">
-        </div>
-        <div id="modalAuthError" class="text-xs text-red-500 dark:text-red-400 hidden font-medium"></div>
-      </div>
-
-      <div class="flex gap-2 mt-4">
-        <button onclick="verifyManagerAuthModal()" class="flex-1 py-3 bg-amber-500 hover:bg-amber-600 font-extrabold text-slate-950 rounded-xl text-xs transition shadow-lg">Autorisieren</button>
-        <button onclick="closeAuthModal()" class="px-4 py-3 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 font-bold text-slate-800 dark:text-white rounded-xl text-xs transition">Abbrechen</button>
-      </div>
-    </div>
-  </div>
-
   <!-- Motivation Modal (Osterei) -->
   <div id="motivationModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
     <div class="card max-w-md w-full border-amber-500/50 p-6 relative flex flex-col gap-4 text-center shadow-2xl">
@@ -1229,7 +1183,41 @@
   <script>
     const SUPABASE_URL = "https://asrrkjcxqqvxzlikdkaq.supabase.co";
     const SUPABASE_KEY = "sb_publishable_2tw50zmlzxDClPx7zwnT3g_k2WiaUuL";
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const STAFF_TOKEN_KEY = 'salon_staff_token';
+    const STAFF_TOKEN_EXP_KEY = 'salon_staff_token_exp';
+    function getStaffToken() {
+      try {
+        const t = sessionStorage.getItem(STAFF_TOKEN_KEY);
+        const exp = Number(sessionStorage.getItem(STAFF_TOKEN_EXP_KEY) || 0);
+        if (t && exp > Date.now()) return t;
+      } catch (e) {}
+      return '';
+    }
+    function setStaffSession(token) {
+      sessionStorage.setItem(STAFF_TOKEN_KEY, token);
+      sessionStorage.setItem(STAFF_TOKEN_EXP_KEY, String(Date.now() + 15 * 60 * 60 * 1000));
+    }
+    function clearStaffSession() {
+      sessionStorage.removeItem(STAFF_TOKEN_KEY);
+      sessionStorage.removeItem(STAFF_TOKEN_EXP_KEY);
+    }
+    function escapeHtml(v) {
+      return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+      global: {
+        fetch: (input, init = {}) => {
+          const url = typeof input === 'string' ? input : (input && input.url) || '';
+          const token = getStaffToken();
+          if (token && url.indexOf('/rest/v1/') !== -1) {
+            const headers = new Headers(init.headers || {});
+            headers.set('x-staff-token', token);
+            return fetch(input, { ...init, headers });
+          }
+          return fetch(input, init);
+        }
+      }
+    });
 
     let pendingAuthCallback = null;
     let currentPhotoPreviewUrl = null;
@@ -1237,6 +1225,9 @@
     
     let currentWaiterName = sessionStorage.getItem('salon_waiter_name') || "";
     let currentWaiterAvatar = "";
+    let currentStaffRole = "";
+    let userIsAdmin = false;   // manager / developer (vom Server)
+    let userCanEdit = false;   // darf Getränke bearbeiten (vom Server)
     let staffDatabaseRecords = [];
     let currentEnteredPin = "";
     let selectedWaiterForPin = "";
@@ -1248,16 +1239,17 @@
       startLogoIconCycler();
       await loadStaffPresenceRecordsForLogin();
 
-      const { data: { session } } = await _supabase.auth.getSession();
-      if (session && session.user && currentWaiterName) {
-        let staffRec = staffDatabaseRecords.find(s => s.name.toLowerCase() === currentWaiterName.toLowerCase()) || { name: currentWaiterName, role: 'staff' };
-        await finalizeAppStartForStaff(staffRec);
-      } else if (currentWaiterName) {
-        let staffRec = staffDatabaseRecords.find(s => s.name.toLowerCase() === currentWaiterName.toLowerCase()) || { name: currentWaiterName, role: 'staff' };
-        await finalizeAppStartForStaff(staffRec);
-      } else {
-        document.getElementById('authContainer').classList.remove('hidden');
+      if (currentWaiterName && getStaffToken()) {
+        const staffRec = staffDatabaseRecords.find(s => s.name.toLowerCase() === currentWaiterName.toLowerCase());
+        if (staffRec) {
+          await finalizeAppStartForStaff(staffRec);
+          return;
+        }
       }
+      clearStaffSession();
+      sessionStorage.removeItem('salon_waiter_name');
+      currentWaiterName = "";
+      document.getElementById('authContainer').classList.remove('hidden');
     });
 
     function startLogoIconCycler() {
@@ -1288,20 +1280,15 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function toggleEmailLoginMode() {
-      const pinForm = document.getElementById('pinLoginForm');
-      const emailForm = document.getElementById('emailLoginForm');
-      if (pinForm.classList.contains('hidden')) {
-        pinForm.classList.remove('hidden');
-        emailForm.classList.add('hidden');
-      } else {
-        pinForm.classList.add('hidden');
-        emailForm.classList.remove('hidden');
-      }
+    async function fetchStaffByName(name) {
+      const { data, error } = await _supabase.rpc('list_staff');
+      if (error) return { data: null, error };
+      const rec = (data || []).find(x => x.name === name);
+      return { data: rec || null, error: rec ? null : { message: 'nicht gefunden' } };
     }
 
     async function loadStaffPresenceRecordsForLogin() {
-      const { data, error } = await _supabase.from('staff_presence').select('*').order('name', { ascending: true });
+      const { data, error } = await _supabase.rpc('list_staff');
       const gridContainer = document.getElementById('waiterGridContainer');
       if (error || !data || data.length === 0) {
         gridContainer.innerHTML = `<p class="col-span-full text-slate-500 italic text-xs text-center py-4">Kein Personal in Datenbank gefunden</p>`;
@@ -1349,7 +1336,6 @@
       if (currentEnteredPin.length < 6) {
         currentEnteredPin += num;
         updatePinDisplay();
-        checkAutoPinLogin();
       }
     }
 
@@ -1370,49 +1356,52 @@
       inputEl.value = "•".repeat(currentEnteredPin.length);
     }
 
-    async function recordLoginHistory(userName, userRole) {
-      try {
-        await _supabase.from('login_history').insert([{
-          user_name: userName,
-          role: userRole || 'staff',
-          logged_in_at: new Date().toISOString()
-        }]);
-      } catch (err) {
-        console.error("Login history insert error:", err);
-      }
-    }
-
-    async function checkAutoPinLogin() {
+    let pinLoginBusy = false;
+    async function submitPinLogin() {
       const errDiv = document.getElementById('pinAuthError');
       errDiv.classList.add('hidden');
+      if (!selectedWaiterForPin || pinLoginBusy) return;
 
-      if (!selectedWaiterForPin) return;
+      if (currentEnteredPin.length < 4) {
+        errDiv.innerText = "Bitte mindestens 4 Ziffern eingeben.";
+        errDiv.classList.remove('hidden');
+        return;
+      }
 
-      const staffRecord = staffDatabaseRecords.find(s => s.name === selectedWaiterForPin);
-      if (!staffRecord) return;
+      pinLoginBusy = true;
+      const { data, error } = await _supabase.rpc('login_with_pin', { p_name: selectedWaiterForPin, p_pin: currentEnteredPin });
+      pinLoginBusy = false;
 
-      let requiredPin = staffRecord.pin ? String(staffRecord.pin).trim() : "";
-      
-      if (currentEnteredPin === requiredPin || (requiredPin === "" && currentEnteredPin.length >= 4)) {
-        currentWaiterName = staffRecord.name;
-        currentWaiterAvatar = staffRecord.avatar_url || "";
-        sessionStorage.setItem('salon_waiter_name', currentWaiterName);
-        
-        await _supabase.from('staff_presence').update({ last_used_at: new Date().toISOString() }).eq('name', currentWaiterName);
-        await recordLoginHistory(currentWaiterName, staffRecord.role);
+      if (error) {
+        errDiv.innerText = (error.message || '').indexOf('Zu viele') !== -1
+          ? "Zu viele Versuche. Bitte in 10 Minuten erneut versuchen."
+          : "Fehler: " + error.message;
+        errDiv.classList.remove('hidden');
+        currentEnteredPin = "";
+        updatePinDisplay();
+        return;
+      }
 
-        const { data: { session } } = await _supabase.auth.getSession();
-        if (session && session.user) {
-          await handleSessionAfterLogin(session.user);
-        } else {
-          await finalizeAppStartForStaff(staffRecord);
-        }
-      } else if (staffRecord.pin && currentEnteredPin.length >= staffRecord.pin.length) {
+      const row = Array.isArray(data) ? data[0] : data;
+      if (!row) {
         errDiv.innerText = "Falscher PIN-Code!";
         errDiv.classList.remove('hidden');
         currentEnteredPin = "";
         updatePinDisplay();
+        return;
       }
+
+      setStaffSession(row.out_token);
+      currentWaiterName = row.out_name;
+      sessionStorage.setItem('salon_waiter_name', currentWaiterName);
+      currentEnteredPin = "";
+      updatePinDisplay();
+      await finalizeAppStartForStaff({
+        name: row.out_name,
+        role: row.out_role,
+        avatar_url: row.out_avatar,
+        can_edit_drinks: row.out_can_edit_drinks
+      });
     }
 
     async function finalizeAppStartForStaff(staffRecord) {
@@ -1422,40 +1411,38 @@
       currentWaiterAvatar = staffRecord.avatar_url || "";
       updateHeaderAvatarUI();
 
-      isAdmin = (staffRecord.role === 'manager' || staffRecord.role === 'developer' || currentWaiterName.toLowerCase() === 'tomas' || currentWaiterName.toLowerCase() === 'amim');
-      
-      if (isAdmin) {
-        document.getElementById('currentUserEmail').innerHTML = `<span class="text-amber-600 dark:text-amber-400 font-black">${currentWaiterName} (${staffRecord.role || 'Manager'})</span>`;
-        document.getElementById('btnMenuImportExport').classList.remove('hidden');
-        document.getElementById('btnMenuImportExport').classList.add('flex');
-        document.getElementById('menuAddDrinkBtn').classList.remove('hidden');
-        document.getElementById('menuAddDrinkBtn').classList.add('flex');
-        document.getElementById('menuStaffPinBtn').classList.remove('hidden');
-        document.getElementById('menuStaffPinBtn').classList.add('flex');
-        document.getElementById('menuLoginHistoryBtn').classList.remove('hidden');
-        document.getElementById('menuLoginHistoryBtn').classList.add('flex');
-        document.getElementById('addDrinkBtnContainer').classList.remove('hidden');
-        const adminChangelogCont = document.getElementById('adminChangelogFormContainer');
-        if (adminChangelogCont) adminChangelogCont.classList.remove('hidden');
-      } else {
-        isAdmin = false;
-        document.getElementById('currentUserEmail').innerHTML = `<span class="text-amber-600 dark:text-amber-400 font-black">${currentWaiterName}</span>`;
-        document.getElementById('btnMenuImportExport').classList.add('hidden');
-        document.getElementById('btnMenuImportExport').classList.remove('flex');
-        document.getElementById('menuAddDrinkBtn').classList.add('hidden');
-        document.getElementById('menuAddDrinkBtn').classList.remove('flex');
-        document.getElementById('menuStaffPinBtn').classList.add('hidden');
-        document.getElementById('menuStaffPinBtn').classList.remove('flex');
-        document.getElementById('menuLoginHistoryBtn').classList.add('hidden');
-        document.getElementById('menuLoginHistoryBtn').classList.remove('flex');
-        document.getElementById('addDrinkBtnContainer').classList.add('hidden');
-        const adminChangelogCont = document.getElementById('adminChangelogFormContainer');
-        if (adminChangelogCont) adminChangelogCont.classList.add('hidden');
-      }
+      currentStaffRole = staffRecord.role || 'staff';
+      userIsAdmin = (currentStaffRole === 'manager' || currentStaffRole === 'developer');
+      userCanEdit = userIsAdmin || staffRecord.can_edit_drinks === true;
+      isAdmin = userIsAdmin || userCanEdit;   // Verwaltungsansicht standardmäßig an
+      applyRoleUI();
 
       await loadDrinks();
       await checkPendingTicketsBadge();
       setupChatRealtimeListener();
+    }
+
+    function setVisible(id, on, useFlex) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.toggle('hidden', !on);
+      if (useFlex) el.classList.toggle('flex', on);
+    }
+
+    function applyRoleUI() {
+      const showEdit = isAdmin && userCanEdit;
+      const showAdmin = isAdmin && userIsAdmin;
+      setVisible('btnMenuImportExport', showEdit, true);
+      setVisible('menuAddDrinkBtn', showEdit, true);
+      setVisible('addDrinkBtnContainer', showEdit, false);
+      setVisible('menuStaffPinBtn', showAdmin, true);
+      setVisible('menuLoginHistoryBtn', showAdmin, true);
+      setVisible('adminChangelogFormContainer', showAdmin, false);
+      const label = document.getElementById('currentUserEmail');
+      if (label) {
+        const roleTxt = (userIsAdmin || userCanEdit) && currentStaffRole && currentStaffRole !== 'staff' ? ` (${escapeHtml(currentStaffRole)})` : '';
+        label.innerHTML = `<span class="text-amber-600 dark:text-amber-400 font-black">${escapeHtml(currentWaiterName)}${roleTxt}</span>`;
+      }
     }
 
     function updateHeaderAvatarUI() {
@@ -1480,7 +1467,7 @@
       document.getElementById('settingsDropdown').classList.add('hidden');
       if (!currentWaiterName) return alert("Du bist nicht angemeldet!");
 
-      const { data, error } = await _supabase.from('staff_presence').select('*').eq('name', currentWaiterName).single();
+      const { data, error } = await fetchStaffByName(currentWaiterName);
       if (error || !data) {
         alert("Fehler beim Laden des Profils.");
         return;
@@ -1554,6 +1541,10 @@
       const newBio = document.getElementById('profileInputBio').value.trim();
       const newAvatarUrl = document.getElementById('profileInputAvatarUrl').value.trim();
 
+      if (newPin !== '' && !/^\d{4,6}$/.test(newPin)) {
+        alert("Der PIN muss aus 4 bis 6 Ziffern bestehen.");
+        return;
+      }
       let updatePayload = {};
       if (newPin !== '') {
         updatePayload.pin = newPin;
@@ -1564,7 +1555,7 @@
         currentWaiterAvatar = newAvatarUrl;
       }
 
-      const { error } = await _supabase.from('staff_presence').update(updatePayload).eq('name', currentWaiterName);
+      const { error } = await _supabase.rpc('update_my_profile', { p_pin: newPin, p_bio: newBio, p_avatar: newAvatarUrl });
       if (error) {
         alert("Fehler beim Speichern: " + error.message);
       } else {
@@ -1576,7 +1567,7 @@
     }
 
     async function openUserDetailModal(userName) {
-      const { data, error } = await _supabase.from('staff_presence').select('*').eq('name', userName).single();
+      const { data, error } = await fetchStaffByName(userName);
       if (error || !data) {
         alert("Benutzerdetails konnten nicht geladen werden.");
         return;
@@ -1606,40 +1597,6 @@
       modal.classList.add('hidden');
     }
 
-    async function handleEmailLogin(e) {
-      e.preventDefault();
-      const email = document.getElementById("loginEmail").value;
-      const password = document.getElementById("loginPassword").value;
-      const errDiv = document.getElementById("emailAuthError");
-      const btnText = document.getElementById("emailLoginSubmitBtn").querySelector('span');
-      errDiv.classList.add("hidden");
-      btnText.innerText = "Wird eingeloggt...";
-
-      const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        errDiv.innerText = "Fehler: " + error.message;
-        errDiv.classList.remove("hidden");
-        btnText.innerText = "Mit E-Mail einloggen";
-      } else {
-        if (data && data.user) {
-          if (!currentWaiterName) currentWaiterName = data.user.email.split('@')[0];
-          await recordLoginHistory(currentWaiterName, data.user.email === "kdstom@outlook.com" ? "developer" : "manager");
-          await handleSessionAfterLogin(data.user);
-        }
-      }
-    }
-
-    async function handleSessionAfterLogin(user) {
-      currentLoggedInUserEmail = user.email;
-      document.getElementById('authContainer').classList.add('hidden');
-      
-      let staffRec = staffDatabaseRecords.find(s => s.name.toLowerCase() === currentWaiterName.toLowerCase());
-      if (!staffRec) {
-        staffRec = { name: currentWaiterName, role: (user.email === "kdstom@outlook.com" ? "developer" : "manager") };
-      }
-      await finalizeAppStartForStaff(staffRec);
-    }
-
     async function openLoginHistoryModal() {
       document.getElementById('settingsDropdown').classList.add('hidden');
       checkManagerAuth(async () => {
@@ -1666,7 +1623,7 @@
       const countBadge = document.getElementById('onlineCountBadge');
       container.innerHTML = `<span class="text-slate-500 italic">Lade Online-Status...</span>`;
 
-      const { data, error } = await _supabase.from('staff_presence').select('*');
+      const { data, error } = await _supabase.rpc('list_staff');
       if (error || !data) {
         container.innerHTML = `<span class="text-red-400">Fehler beim Laden</span>`;
         countBadge.innerText = "0";
@@ -1769,7 +1726,7 @@
 
     async function loadChatSidebarUsers() {
       const container = document.getElementById('chatSidebarUsersList');
-      const { data, error } = await _supabase.from('staff_presence').select('*').order('name', { ascending: true });
+      const { data, error } = await _supabase.rpc('list_staff');
       if (error || !data) {
         container.innerHTML = `<span class="text-xs text-red-400">Fehler beim Laden</span>`;
         return;
@@ -1862,7 +1819,7 @@
       let messagesMap = {};
       data.forEach(m => messagesMap[m.id] = m);
 
-      const isUserDevOrManager = (isAdmin || currentWaiterName.toLowerCase() === 'tomas' || currentWaiterName.toLowerCase() === 'tomas kardos');
+      const isUserDevOrManager = userIsAdmin;
 
       container.innerHTML = data.map(msg => {
         let isOwner = (msg.author_name.toLowerCase() === currentWaiterName.toLowerCase());
@@ -1982,6 +1939,8 @@
       document.getElementById('editingStaffOriginalName').value = '';
       document.getElementById('staffInputName').value = '';
       document.getElementById('staffInputPin').value = '';
+      document.getElementById('staffInputPin').placeholder = 'z. B. 1234';
+      document.getElementById('staffInputCanEdit').checked = false;
       document.getElementById('staffInputRole').value = 'staff';
       document.getElementById('staffInputAvatar').value = '';
       document.getElementById('staffAvatarFile').value = '';
@@ -2015,7 +1974,7 @@
       const container = document.getElementById('staffManagementListContainer');
       container.innerHTML = `<p class="text-slate-500 italic text-xs text-center py-4">Lade Personal...</p>`;
 
-      const { data, error } = await _supabase.from('staff_presence').select('*').order('name', { ascending: true });
+      const { data, error } = await _supabase.rpc('list_staff');
       if (error) {
         container.innerHTML = `<p class="text-red-500 text-xs text-center py-4">Fehler: ${error.message}</p>`;
         return;
@@ -2027,7 +1986,7 @@
       }
 
       container.innerHTML = data.map(staff => {
-        let isDev = (staff.role === 'developer' || staff.name.toLowerCase() === 'tomas' || staff.name.toLowerCase() === 'tomas kardos');
+        let isDev = (staff.role === 'developer');
         let deleteBtnHtml = isDev 
           ? `<span class="text-[10px] text-amber-500 font-bold px-2 py-1 bg-amber-500/10 rounded border border-amber-500/30" title="Developer-Account ist geschützt">🔒 Geschützt</span>`
           : `<button onclick='deleteStaffMember("${staff.name}")' class="px-2.5 py-1 bg-red-600/20 hover:bg-red-600/40 text-red-400 font-bold rounded text-[11px]">🗑️ Löschen</button>`;
@@ -2042,12 +2001,13 @@
               ${avatarImg}
               <div>
                 <span class="font-bold text-amber-600 dark:text-amber-400">${staff.name}</span>
-                <span class="ml-2 px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px]">PIN: ${staff.pin || 'Nicht gesetzt'}</span>
+                <span class="ml-2 px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px]">PIN: ${staff.has_pin ? 'gesetzt' : 'Nicht gesetzt'}</span>
                 <span class="ml-1 px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px]">Rolle: ${staff.role || 'staff'}</span>
+                ${staff.can_edit_drinks ? '<span class="ml-1 px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px]">🍸 Drinks</span>' : ''}
               </div>
             </div>
             <div class="flex gap-1.5 items-center">
-              <button onclick='editStaffMember("${staff.name}", "${staff.pin || ''}", "${staff.role || 'staff'}", "${staff.avatar_url || ''}")' class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 font-bold rounded text-[11px]">✏️ Bearbeiten</button>
+              <button onclick='editStaffMember("${staff.name}", "", "${staff.role || 'staff'}", "${staff.avatar_url || ''}", ${staff.can_edit_drinks ? 'true' : 'false'})' class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 font-bold rounded text-[11px]">✏️ Bearbeiten</button>
               ${deleteBtnHtml}
             </div>
           </div>
@@ -2055,10 +2015,12 @@
       }).join('');
     }
 
-    function editStaffMember(name, pin, role, avatarUrl) {
+    function editStaffMember(name, pin, role, avatarUrl, canEdit) {
       document.getElementById('editingStaffOriginalName').value = name;
       document.getElementById('staffInputName').value = name;
-      document.getElementById('staffInputPin').value = pin;
+      document.getElementById('staffInputPin').value = '';
+      document.getElementById('staffInputPin').placeholder = 'leer = unverändert';
+      document.getElementById('staffInputCanEdit').checked = !!canEdit;
       document.getElementById('staffInputRole').value = role;
       document.getElementById('staffInputAvatar').value = avatarUrl || '';
       document.getElementById('staffAvatarStatus').innerText = avatarUrl ? '✔ Bild vorhanden' : '';
@@ -2071,19 +2033,21 @@
       const pin = document.getElementById('staffInputPin').value.trim();
       const role = document.getElementById('staffInputRole').value;
       const avatar_url = document.getElementById('staffInputAvatar').value.trim();
+      const canEdit = document.getElementById('staffInputCanEdit').checked;
 
       if (!newName) return alert("Bitte Name eingeben.");
+      if (pin && !/^\d{4,6}$/.test(pin)) return alert("Der PIN muss aus 4 bis 6 Ziffern bestehen.");
+      if (!originalName && !pin) return alert("Bitte einen PIN für den neuen Mitarbeiter festlegen.");
 
-      if (originalName) {
-        const { error } = await _supabase.from('staff_presence')
-          .update({ name: newName, pin, role, avatar_url })
-          .eq('name', originalName);
-
-        if (error) return alert("Fehler beim Speichern: " + error.message);
-      } else {
-        const { error } = await _supabase.from('staff_presence').insert([{ name: newName, pin, role, avatar_url }]);
-        if (error) return alert("Fehler beim Hinzufügen: " + error.message);
-      }
+      const { error } = await _supabase.rpc('admin_save_staff', {
+        p_original: originalName,
+        p_name: newName,
+        p_pin: pin,
+        p_role: role,
+        p_avatar: avatar_url,
+        p_can_edit: canEdit
+      });
+      if (error) return alert("Fehler beim Speichern: " + error.message);
 
       alert("Erfolgreich gespeichert!");
       resetStaffForm();
@@ -2092,12 +2056,8 @@
     }
 
     async function deleteStaffMember(name) {
-      if (name.toLowerCase() === 'tomas' || name.toLowerCase() === 'tomas kardos') {
-        alert("Der Entwickler-Account kann nicht gelöscht werden!");
-        return;
-      }
       if (!confirm(`Möchten Sie ${name} wirklich aus der Datenbank löschen?`)) return;
-      const { error } = await _supabase.from('staff_presence').delete().eq('name', name);
+      const { error } = await _supabase.rpc('admin_delete_staff', { p_name: name });
       if (error) {
         alert("Fehler beim Löschen: " + error.message);
       } else {
@@ -2109,10 +2069,15 @@
 
     async function handleLogout() {
       document.getElementById('settingsDropdown').classList.add('hidden');
-      await _supabase.auth.signOut();
+      try { await _supabase.rpc('logout_staff'); } catch (e) {}
+      clearStaffSession();
       sessionStorage.removeItem('salon_waiter_name');
       currentWaiterName = "";
       currentWaiterAvatar = "";
+      currentStaffRole = "";
+      userIsAdmin = false;
+      userCanEdit = false;
+      isAdmin = false;
       currentEnteredPin = "";
       selectedWaiterForPin = "";
       updatePinDisplay();
@@ -2123,61 +2088,19 @@
     }
 
     function checkManagerAuth(callback) {
-      if (isAdmin) {
+      if (userIsAdmin) {
         if (callback) callback();
         return;
       }
-      pendingAuthCallback = callback;
-      document.getElementById('modalAuthEmail').value = '';
-      document.getElementById('modalAuthPassword').value = '';
-      document.getElementById('modalAuthError').classList.add('hidden');
-      document.getElementById('authModal').classList.remove('hidden');
-      document.getElementById('authModal').classList.add('flex');
+      alert("Diese Aktion ist nur für Manager und Developer erlaubt.");
     }
 
-    function closeAuthModal() {
-      document.getElementById('authModal').classList.remove('flex');
-      document.getElementById('authModal').classList.add('hidden');
-      pendingAuthCallback = null;
-    }
-
-    async function verifyManagerAuthModal() {
-      const email = document.getElementById('modalAuthEmail').value;
-      const password = document.getElementById('modalAuthPassword').value;
-      const errDiv = document.getElementById('modalAuthError');
-      errDiv.classList.add('hidden');
-
-      if (!email || !password) {
-        errDiv.innerText = "Bitte E-Mail und Passwort eingeben.";
-        errDiv.classList.remove('hidden');
+    function checkDrinkEditAuth(callback) {
+      if (userCanEdit) {
+        if (callback) callback();
         return;
       }
-
-      const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
-      if (error || !data.user || (data.user.email !== "kdstom@outlook.com" && !data.user.email.includes("amim@salonplafond.wien"))) {
-        errDiv.innerText = "Ungültige Administrator-Anmeldedaten!";
-        errDiv.classList.remove('hidden');
-      } else {
-        isAdmin = true;
-        document.getElementById('btnMenuImportExport').classList.remove('hidden');
-        document.getElementById('btnMenuImportExport').classList.add('flex');
-        document.getElementById('menuAddDrinkBtn').classList.remove('hidden');
-        document.getElementById('menuAddDrinkBtn').classList.add('flex');
-        document.getElementById('menuStaffPinBtn').classList.remove('hidden');
-        document.getElementById('menuStaffPinBtn').classList.add('flex');
-        document.getElementById('menuLoginHistoryBtn').classList.remove('hidden');
-        document.getElementById('menuLoginHistoryBtn').classList.add('flex');
-        document.getElementById('addDrinkBtnContainer').classList.remove('hidden');
-        const adminChangelogCont = document.getElementById('adminChangelogFormContainer');
-        if (adminChangelogCont) adminChangelogCont.classList.remove('hidden');
-        
-        closeAuthModal();
-        alert("Erfolgreich als Administrator autorisiert!");
-        if (pendingAuthCallback) {
-          pendingAuthCallback();
-          pendingAuthCallback = null;
-        }
-      }
+      alert("Du hast keine Berechtigung, Getränke zu bearbeiten.");
     }
 
     async function checkPendingTicketsBadge() {
@@ -2281,7 +2204,7 @@
         return;
       }
 
-      const isDevUser = (currentWaiterName.toLowerCase() === 'tomas' || currentWaiterName.toLowerCase() === 'tomas kardos' || currentLoggedInUserEmail === 'kdstom@outlook.com');
+      const isDevUser = (currentStaffRole === 'developer');
 
       container.innerHTML = data.map(t => {
         let isResolved = t.status === 'resolved';
@@ -2293,7 +2216,7 @@
         let commentHtml = t.admin_comment ? `<div class="mt-2 text-[11px] custom-box p-2 rounded border text-amber-600 dark:text-amber-300"><b>Kommentar (Tomas Kardos - Developer):</b> ${t.admin_comment}</div>` : '';
 
         let adminActionHtml = '';
-        if (isAdmin) {
+        if (userIsAdmin && isAdmin) {
           let deleteTicketBtnHtml = isDevUser ? `<button onclick="deleteTicket('${t.id}')" class="px-3 py-1.5 rounded text-[11px] font-bold bg-red-100 hover:bg-red-200 dark:bg-red-600/20 dark:hover:bg-red-600/40 text-red-600 dark:text-red-400 border border-red-300 dark:border-red-500/30">🗑️ Löschen</button>` : '';
 
           adminActionHtml = `
@@ -2357,7 +2280,7 @@
     }
 
     async function deleteTicket(id) {
-      const isDevUser = (currentWaiterName.toLowerCase() === 'tomas' || currentWaiterName.toLowerCase() === 'tomas kardos' || currentLoggedInUserEmail === 'kdstom@outlook.com');
+      const isDevUser = (currentStaffRole === 'developer');
       if (!isDevUser) {
         alert("Nur der Entwickler (Tomas) darf Tickets löschen!");
         return;
@@ -2724,7 +2647,7 @@
 
     function createNewSeasonPrompt() {
       document.getElementById('settingsDropdown').classList.add('hidden');
-      checkManagerAuth(async () => {
+      checkDrinkEditAuth(async () => {
         let newSeasonName = prompt("Namen für die neue Saison eingeben (z. B. Sommer 2027 oder 01.05.2027 - 31.10.2027):");
         if (!newSeasonName || newSeasonName.trim() === '') return;
 
@@ -2883,7 +2806,7 @@
 
     async function renameSeason(oldSeasonName, event) {
       if (event) event.stopPropagation();
-      checkManagerAuth(async () => {
+      checkDrinkEditAuth(async () => {
         const newSeasonName = prompt(`Neuen Namen für die Saison "${oldSeasonName}" eingeben:`, oldSeasonName);
         if (!newSeasonName || newSeasonName.trim() === '' || newSeasonName.trim() === oldSeasonName) return;
 
@@ -2904,7 +2827,7 @@
 
     async function deleteEntireSeason(seasonKey, event) {
       if (event) event.stopPropagation();
-      checkManagerAuth(async () => {
+      checkDrinkEditAuth(async () => {
         if (!confirm(`Möchten Sie wirklich die gesamte Saison "${seasonKey}" und alle darin enthaltenen Getränke permanent löschen?`)) return;
 
         const { error: drinksErr } = await _supabase.from('drinks').delete().eq('season', seasonKey);
@@ -3392,7 +3315,7 @@
       html += `<div class="flex items-center gap-2 mb-2 flex-wrap"><span class="text-xs font-semibold px-2.5 py-1 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">${d.category || 'Getränk'}</span></div>`;
       html += `<h2 class="text-3xl font-bold mb-4">${d.name}${priceText}</h2>`;
 
-      if (isAdmin && d.selling_price && d.cost_price && parseFloat(d.selling_price) > 0) {
+      if (userIsAdmin && isAdmin && d.selling_price && d.cost_price && parseFloat(d.selling_price) > 0) {
         let sp = parseFloat(d.selling_price);
         let cp = parseFloat(d.cost_price);
         let profit = sp - cp;
@@ -3440,11 +3363,11 @@
 
       document.getElementById('modalEditBtn').onclick = function() {
         closeModal();
-        checkManagerAuth(() => editDrink(d.id));
+        checkDrinkEditAuth(() => editDrink(d.id));
       };
 
       document.getElementById('modalDeleteBtn').onclick = function() {
-        checkManagerAuth(() => deleteDrinkConfirm(d.id));
+        checkDrinkEditAuth(() => deleteDrinkConfirm(d.id));
       };
 
       document.getElementById('drinkModal').classList.remove('hidden');
@@ -3479,42 +3402,18 @@
     }
 
     function toggleMode() {
-      if (!isAdmin) {
-        checkManagerAuth(() => {
-          isAdmin = true;
-          document.getElementById('btnMenuImportExport').classList.remove('hidden');
-          document.getElementById('btnMenuImportExport').classList.add('flex');
-          document.getElementById('menuAddDrinkBtn').classList.remove('hidden');
-          document.getElementById('menuAddDrinkBtn').classList.add('flex');
-          document.getElementById('menuStaffPinBtn').classList.remove('hidden');
-          document.getElementById('menuStaffPinBtn').classList.add('flex');
-          document.getElementById('menuLoginHistoryBtn').classList.remove('hidden');
-          document.getElementById('menuLoginHistoryBtn').classList.add('flex');
-          document.getElementById('addDrinkBtnContainer').classList.remove('hidden');
-          const adminChangelogCont = document.getElementById('adminChangelogFormContainer');
-          if (adminChangelogCont) adminChangelogCont.classList.remove('hidden');
-          renderDrinks();
-        });
-      } else {
-        isAdmin = false;
-        document.getElementById('btnMenuImportExport').classList.add('hidden');
-        document.getElementById('btnMenuImportExport').classList.remove('flex');
-        document.getElementById('menuAddDrinkBtn').classList.add('hidden');
-        document.getElementById('menuAddDrinkBtn').classList.remove('flex');
-        document.getElementById('menuStaffPinBtn').classList.add('hidden');
-        document.getElementById('menuStaffPinBtn').classList.remove('flex');
-        document.getElementById('menuLoginHistoryBtn').classList.add('hidden');
-        document.getElementById('menuLoginHistoryBtn').classList.remove('flex');
-        document.getElementById('addDrinkBtnContainer').classList.add('hidden');
-        const adminChangelogCont = document.getElementById('adminChangelogFormContainer');
-        if (adminChangelogCont) adminChangelogCont.classList.add('hidden');
-        resetForm();
-        renderDrinks();
+      if (!userIsAdmin && !userCanEdit) {
+        alert("Du hast keine Verwaltungsrechte.");
+        return;
       }
+      isAdmin = !isAdmin;
+      if (!isAdmin) resetForm();
+      applyRoleUI();
+      renderDrinks();
     }
 
     function openAddDrinkModal() {
-      checkManagerAuth(() => {
+      checkDrinkEditAuth(() => {
         resetForm();
         document.getElementById('formTitle').innerText = "➕ Neues Getränk hinzufügen";
         renderSeasonFormSelect(currentSeasonFilter);
@@ -3571,7 +3470,7 @@
 
     function deleteDrinkFromForm() {
       const id = document.getElementById('editingId').value;
-      if (id) checkManagerAuth(() => deleteDrinkConfirm(id));
+      if (id) checkDrinkEditAuth(() => deleteDrinkConfirm(id));
     }
 
     function resetForm() {
@@ -3592,7 +3491,7 @@
     }
 
     async function saveDrink() {
-      checkManagerAuth(async () => {
+      checkDrinkEditAuth(async () => {
         const name = document.getElementById('dName').value;
         let category = '';
         document.getElementsByName('dCatRadio').forEach(r => { if (r.checked) category = r.value; });
@@ -3733,7 +3632,7 @@
 
     function openImportExportModal() {
       document.getElementById('settingsDropdown').classList.add('hidden');
-      checkManagerAuth(() => {
+      checkDrinkEditAuth(() => {
         renderWizardSeasonSelect();
         renderExportSeasonSelect();
         document.getElementById('wizardExcelFile').value = '';
