@@ -1,6 +1,6 @@
 /* ============================================================
    js/chat.js
-   Team-Chat
+   Team-Chat (inkl. @Mention Autocomplete & Text Styling)
    ============================================================ */
     function openTeamChatModal() {
       closeSettingsMenu();
@@ -20,6 +20,7 @@
       const modal = document.getElementById('teamChatModal');
       modal.classList.remove('flex');
       modal.classList.add('hidden');
+      hideMentionDropdown();
     }
 
     function toggleChatSidebar() {
@@ -69,9 +70,87 @@
 
     function appendChatMention(name) {
       const input = document.getElementById('chatMessageInput');
-      input.value += `@${name} `;
+      const val = input.value;
+      const lastAt = val.lastIndexOf('@');
+      if (lastAt !== -1) {
+        input.value = val.substring(0, lastAt) + `@${name} `;
+      } else {
+        input.value += `@${name} `;
+      }
       input.focus();
+      hideMentionDropdown();
     }
+
+    // --- @MENTION AUTOCOMPLETE & TEXT STYLING LOGIC ---
+    document.addEventListener('DOMContentLoaded', () => {
+      const input = document.getElementById('chatMessageInput');
+      if (!input) return;
+
+      // Vytvorenie kontajnera pre mention dropdown ak neexistuje
+      let dropdown = document.getElementById('chatMentionDropdown');
+      if (!dropdown) {
+        dropdown = document.createElement('div');
+        dropdown.id = 'chatMentionDropdown';
+        dropdown.className = 'hidden absolute bottom-full left-0 mb-1 w-64 bg-slate-900 border border-amber-500/40 rounded-xl shadow-2xl p-1.5 z-50 max-h-40 overflow-y-auto text-xs';
+        input.parentNode.style.position = 'relative';
+        input.parentNode.appendChild(dropdown);
+      }
+
+      input.addEventListener('input', async function() {
+        const val = this.value;
+        const cursorPos = this.selectionStart;
+        const textBeforeCursor = val.substring(0, cursorPos);
+        
+        // Hľadáme, či užívateľ píše @ niečo
+        const match = textBeforeCursor.match(/@([\w]*)$/);
+        if (match) {
+          const query = match[1].toLowerCase();
+          const { data } = await _supabase.rpc('list_staff');
+          if (data && data.length > 0) {
+            const filtered = data.filter(s => s.name.toLowerCase().includes(query));
+            if (filtered.length > 0) {
+              dropdown.innerHTML = filtered.map(staff => `
+                <div onclick="appendChatMention('${escapeHtml(staff.name)}')" class="p-2 hover:bg-amber-500/20 text-slate-200 hover:text-amber-400 cursor-pointer rounded-lg font-bold flex items-center justify-between transition">
+                  <span>@${escapeHtml(staff.name)}</span>
+                  <span class="text-[9px] text-slate-400 uppercase">${escapeHtml(staff.role || 'staff')}</span>
+                </div>
+              `).join('');
+              dropdown.classList.remove('hidden');
+              dropdown.classList.add('flex', 'flex-col');
+              return;
+            }
+          }
+        }
+        hideMentionDropdown();
+      });
+
+      input.addEventListener('blur', () => {
+        setTimeout(hideMentionDropdown, 200); // zohľadní kliknutie na položku
+      });
+    });
+
+    function hideMentionDropdown() {
+      const dropdown = document.getElementById('chatMentionDropdown');
+      if (dropdown) {
+        dropdown.classList.remove('flex', 'flex-col');
+        dropdown.classList.add('hidden');
+      }
+    }
+
+    function applyTextStyling(syntaxOpen, syntaxClose = syntaxOpen) {
+      const input = document.getElementById('chatMessageInput');
+      const start = input.selectionStart;
+      const end = input.selectionEnd;
+      const val = input.value;
+      
+      const selectedText = val.substring(start, end);
+      const replacement = syntaxOpen + (selectedText || 'Text') + syntaxClose;
+      
+      input.value = val.substring(0, start) + replacement + val.substring(end);
+      input.focus();
+      input.setSelectionRange(start + syntaxOpen.length, end + syntaxOpen.length);
+    }
+    // ------------------------------------------------
 
     function setupChatRealtimeListener() {
       if (chatRealtimeSubscription) return;
@@ -156,6 +235,12 @@
           `;
         }
 
+        // Formátovanie textu správy (zvýraznenie @mention a základný markdown)
+        let formattedMessage = escapeHtml(msg.message)
+          .replace(/(\B@[a-zA-ZÄÖÜäöüß]+)/g, '<span class="text-amber-400 font-bold bg-amber-500/10 px-1 rounded">$1</span>')
+          .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-white">$1</strong>')
+          .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>');
+
         return `
           <div class="flex items-start gap-2.5 p-2.5 rounded-xl custom-box border text-xs relative group">
             ${avatarHtml}
@@ -168,7 +253,7 @@
                 </div>
               </div>
               ${replyQuoteHtml}
-              <p class="mt-1 text-slate-200 break-words">${escapeHtml(msg.message)}</p>
+              <p class="mt-1 text-slate-200 break-words">${formattedMessage}</p>
             </div>
             ${canDelete ? `<button onclick="deleteChatMessage(${jsArg(msg.id)})" class="text-slate-500 hover:text-red-400 font-bold p-1 transition" title="Nachricht löschen">&times;</button>` : ''}
           </div>
