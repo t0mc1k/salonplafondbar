@@ -124,8 +124,8 @@
         let deleteBtnHtml = `<button onclick="deleteEntireSeason(${jsArg(s)}, event)" class="p-1.5 px-2.5 bg-red-500/20 hover:bg-red-500 text-red-600 dark:text-red-400 hover:text-white rounded-lg transition text-xs font-bold border border-red-500/30 ml-1" title="Saison löschen">🗑️</button>`;
 
         return `
-          <div class="p-3.5 rounded-xl ${activeClass} transition flex items-center justify-between gap-2 cursor-pointer hover:border-amber-400" onclick="selectSeason(${jsArg(s)})">
-            <div class="flex flex-col text-left min-w-0 max-w-[calc(100%-110px)]">
+          <div class="p-3.5 rounded-xl ${activeClass} transition flex items-center justify-between gap-3 cursor-pointer hover:border-amber-400" onclick="selectSeason(${jsArg(s)})">
+            <div class="flex flex-col text-left min-w-0">
               <span class="text-sm font-bold truncate">📅 ${escapeHtml(s)}</span>
               <span class="text-[10px] text-slate-400">${currentSeasonFilter === s ? 'Aktive Saison ✓' : 'Klicken zum Aktivieren'}</span>
             </div>
