@@ -3517,8 +3517,18 @@
         };
 
         const id = document.getElementById('editingId').value;
-        if (id) await _supabase.from('drinks').update(drinkObj).eq('id', id);
-        else await _supabase.from('drinks').insert([drinkObj]);
+        let saveRes;
+        if (id) saveRes = await _supabase.from('drinks').update(drinkObj).select().eq('id', id);
+        else saveRes = await _supabase.from('drinks').insert([drinkObj]).select();
+
+        if (saveRes.error) {
+          alert("Fehler beim Speichern: " + saveRes.error.message);
+          return;
+        }
+        if (!saveRes.data || saveRes.data.length === 0) {
+          alert("Das Getränk wurde NICHT gespeichert (keine Berechtigung in der Datenbank).");
+          return;
+        }
 
         closeAdminModal();
         loadDrinks();
