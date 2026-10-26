@@ -4,17 +4,103 @@
    ============================================================ */
     function startLogoIconCycler() {
       setInterval(() => {
-        const charEl = document.getElementById('headerLogoChar');
-        if (!charEl) return;
-        if (charEl.innerText === 'O') {
-          charEl.innerText = '🍸';
-          setTimeout(() => {
-            if (document.getElementById('headerLogoChar')) {
-              document.getElementById('headerLogoChar').innerText = 'O';
-            }
-          }, 2500);
+        const box = document.querySelector('.header-logo-container');
+        if (!box || !currentWaiterName) return;           // nur wenn jemand angemeldet ist
+        if (box.querySelector('.logo-avatar')) return;    // läuft gerade schon
+
+        const ov = document.createElement('div');
+        ov.className = 'logo-avatar';
+        if (currentWaiterAvatar) {
+          const img = document.createElement('img');
+          img.src = currentWaiterAvatar;
+          img.alt = currentWaiterName;
+          ov.appendChild(img);
+        } else {
+          ov.classList.add('logo-avatar-initial');
+          ov.textContent = currentWaiterName.charAt(0).toUpperCase();
         }
+        box.appendChild(ov);
+        setTimeout(() => ov.remove(), 2800);
       }, 9000);
+    }
+
+    // ---------- Hinweise (Toast), kurz sichtbar und dann automatisch weg ----------
+    function showAppToast(opts) {
+      const o = opts || {};
+      let host = document.getElementById('appToastHost');
+      if (!host) {
+        host = document.createElement('div');
+        host.id = 'appToastHost';
+        host.className = 'app-toast-host';
+        document.body.appendChild(host);
+      }
+      const toast = document.createElement('div');
+      toast.className = 'app-toast glass-surface';
+
+      const av = document.createElement('div');
+      av.className = 'app-toast-avatar';
+      if (o.avatarUrl) {
+        const img = document.createElement('img');
+        img.src = o.avatarUrl;
+        img.alt = '';
+        av.appendChild(img);
+      } else {
+        av.textContent = o.initial || '🔔';
+      }
+
+      const body = document.createElement('div');
+      body.className = 'app-toast-body';
+      const title = document.createElement('div');
+      title.className = 'app-toast-title';
+      title.textContent = o.title || '';
+      const text = document.createElement('div');
+      text.className = 'app-toast-text';
+      text.textContent = o.text || '';
+      body.appendChild(title);
+      if (o.text) body.appendChild(text);
+
+      toast.appendChild(av);
+      toast.appendChild(body);
+      host.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.add('show'));
+
+      const close = () => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 350);
+      };
+      toast.addEventListener('click', close);
+      setTimeout(close, o.ms || 5000);
+    }
+
+    // ---------- Weichzeichner (Blur) an/aus ----------
+    function isBlurEnabled() {
+      return document.documentElement.classList.contains('blur-on');
+    }
+
+    function setBlurEnabled(on) {
+      document.documentElement.classList.toggle('blur-on', !!on);
+      try { localStorage.setItem('salon_blur', on ? 'on' : 'off'); } catch (e) {}
+      updateUnifiedSettingsUI();
+    }
+
+    function toggleBlurEffect() {
+      setBlurEnabled(!isBlurEnabled());
+    }
+
+    // ---------- Zeit als „vor 5 Min.“ ----------
+    function formatRelativeTime(iso) {
+      if (!iso) return 'noch nie';
+      const t = new Date(iso).getTime();
+      if (isNaN(t)) return 'unbekannt';
+      const min = Math.floor(Math.max(0, Date.now() - t) / 60000);
+      if (min < 1) return 'gerade eben';
+      if (min < 60) return `vor ${min} Min.`;
+      const h = Math.floor(min / 60);
+      if (h < 24) return `vor ${h} Std.`;
+      const d = Math.floor(h / 24);
+      if (d === 1) return 'gestern';
+      if (d < 7) return `vor ${d} Tagen`;
+      return new Date(t).toLocaleDateString('de-AT');
     }
 
     function handleScrollPosition() {
@@ -130,6 +216,9 @@
     }
 
     function updateUnifiedSettingsUI() {
+      const blurCheck = document.getElementById('unifiedBlurCheck');
+      if (blurCheck) blurCheck.checked = isBlurEnabled();
+
       const themeBtn = document.getElementById('unifiedThemeBtn');
       if (themeBtn) themeBtn.innerText = themeMode === 'dark' ? "Dunkel" : "Hell";
 

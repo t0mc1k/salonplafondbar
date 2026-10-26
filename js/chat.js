@@ -105,12 +105,12 @@
         const match = textBeforeCursor.match(/@([\w]*)$/);
         if (match) {
           const query = match[1].toLowerCase();
-          const { data } = await _supabase.rpc('list_staff');
+          const data = (staffDatabaseRecords && staffDatabaseRecords.length) ? staffDatabaseRecords : (await _supabase.rpc('list_staff')).data;
           if (data && data.length > 0) {
             const filtered = data.filter(s => s.name.toLowerCase().includes(query));
             if (filtered.length > 0) {
               dropdown.innerHTML = filtered.map(staff => `
-                <div onclick="appendChatMention('${escapeHtml(staff.name)}')" class="p-2 hover:bg-amber-500/20 text-slate-200 hover:text-amber-400 cursor-pointer rounded-lg font-bold flex items-center justify-between transition">
+                <div onclick="appendChatMention(${jsArg(staff.name)})" class="p-2 hover:bg-amber-500/20 text-slate-200 hover:text-amber-400 cursor-pointer rounded-lg font-bold flex items-center justify-between transition">
                   <span>@${escapeHtml(staff.name)}</span>
                   <span class="text-[9px] text-slate-400 uppercase">${escapeHtml(staff.role || 'staff')}</span>
                 </div>

@@ -142,6 +142,50 @@
       await loadDrinks();
       await checkPendingTicketsBadge();
       setupChatRealtimeListener();
+      startLoginWatcher();
+    }
+
+    // ---------- Hinweis, wenn sich ein Kollege anmeldet ----------
+    let loginWatchTimer = null;
+    let loginWatchBaseline = null;   // Map: Name -> letzter Login (ms)
+
+    async function pollLoginWatcher() {
+      if (document.hidden || !currentWaiterName) return;
+      const { data, error } = await _supabase.rpc('list_staff');
+      if (error || !Array.isArray(data)) return;
+
+      const fresh = new Map(data.map(st => [st.name, st.last_used_at ? new Date(st.last_used_at).getTime() : 0]));
+      if (loginWatchBaseline) {
+        data.forEach(st => {
+          const before = loginWatchBaseline.get(st.name) || 0;
+          const now = fresh.get(st.name) || 0;
+          const isMe = st.name.toLowerCase() === currentWaiterName.toLowerCase();
+          const recent = (Date.now() - now) < 2 * 60 * 1000;
+          if (!isMe && now > before && recent) {
+            showAppToast({
+              avatarUrl: st.avatar_url,
+              initial: st.name.charAt(0).toUpperCase(),
+              title: st.name + ' hat sich angemeldet',
+              text: '👋 Dein Kollege ist jetzt online.',
+              ms: 6000
+            });
+          }
+        });
+      }
+      loginWatchBaseline = fresh;
+      staffDatabaseRecords = data;   // aktuelle Fotos/Namen für Chat und @-Vorschläge
+    }
+
+    function startLoginWatcher() {
+      stopLoginWatcher();
+      pollLoginWatcher();
+      loginWatchTimer = setInterval(pollLoginWatcher, 15000);
+    }
+
+    function stopLoginWatcher() {
+      if (loginWatchTimer) clearInterval(loginWatchTimer);
+      loginWatchTimer = null;
+      loginWatchBaseline = null;
     }
 
     function setVisible(id, on, useFlex) {
@@ -158,7 +202,6 @@
       setVisible('menuAddDrinkBtn', showEdit, true);
       setVisible('addDrinkBtnContainer', showEdit, false);
       setVisible('menuStaffPinBtn', showAdmin, true);
-      setVisible('menuLoginHistoryBtn', showAdmin, true);
       setVisible('adminChangelogFormContainer', showAdmin, false);
       const label = document.getElementById('currentUserEmail');
       if (label) {
@@ -169,6 +212,7 @@
 
     async function handleLogout() {
       closeSettingsMenu();
+      stopLoginWatcher();
       try { await _supabase.rpc('logout_staff'); } catch (e) {}
       clearStaffSession();
       sessionStorage.removeItem('salon_waiter_name');

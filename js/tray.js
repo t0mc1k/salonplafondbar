@@ -61,7 +61,8 @@
       if (!t) {
         t = document.createElement('div');
         t.id = 'trayToast';
-        t.style.cssText = 'position:fixed;left:50%;bottom:6.5rem;transform:translateX(-50%);z-index:320;padding:.6rem 1rem;border-radius:.75rem;background:#0f172a;color:#fbbf24;border:1px solid rgba(245,158,11,.5);font-size:.75rem;font-weight:700;box-shadow:0 10px 25px rgba(0,0,0,.4);transition:opacity .25s;pointer-events:none;max-width:90vw;text-align:center';
+        t.className = 'glass-surface';
+        t.style.cssText = 'position:fixed;left:50%;bottom:6.5rem;transform:translateX(-50%);z-index:320;padding:.6rem 1rem;border-radius:.75rem;color:#fbbf24;border:1px solid rgba(245,158,11,.5);font-size:.75rem;font-weight:700;box-shadow:0 10px 25px rgba(0,0,0,.4);transition:opacity .25s;pointer-events:none;max-width:90vw;text-align:center';
         document.body.appendChild(t);
       }
       t.textContent = msg;
@@ -119,7 +120,8 @@
       if (trayDrag.srcEl) trayDrag.srcEl.classList.add('tray-source-dragging');
 
       const g = document.createElement('div');
-      g.style.cssText = 'position:fixed;left:0;top:0;z-index:330;pointer-events:none;display:flex;align-items:center;gap:.5rem;padding:.4rem .75rem;border-radius:.75rem;background:#0f172a;color:#fbbf24;border:2px solid #f59e0b;font-size:.8rem;font-weight:800;box-shadow:0 12px 30px rgba(0,0,0,.5);max-width:220px;transform:translate(-50%,-120%)';
+      g.className = 'glass-surface';
+      g.style.cssText = 'position:fixed;left:0;top:0;z-index:330;pointer-events:none;display:flex;align-items:center;gap:.5rem;padding:.4rem .75rem;border-radius:.75rem;color:#fbbf24;border:2px solid #f59e0b;font-size:.8rem;font-weight:800;box-shadow:0 12px 30px rgba(0,0,0,.5);max-width:220px;transform:translate(-50%,-120%)';
       if (d.photo_url) {
         const img = document.createElement('img');
         img.src = d.photo_url;
@@ -135,8 +137,9 @@
 
       const z = document.createElement('div');
       z.id = 'trayDropZone';
+      z.className = 'glass-blur';
       const barVisible = !document.getElementById('barTrayBar').classList.contains('hidden');
-      z.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:' + (barVisible ? '6rem' : '1.5rem') + ';z-index:310;padding:1rem 1.5rem;border-radius:1rem;border:2px dashed #f59e0b;font-weight:900;font-size:.85rem;text-align:center;backdrop-filter:blur(6px);transition:transform .12s,background .12s;white-space:nowrap';
+      z.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:' + (barVisible ? '6rem' : '1.5rem') + ';z-index:310;padding:1rem 1.5rem;border-radius:1rem;border:2px dashed #f59e0b;font-weight:900;font-size:.85rem;text-align:center;transition:transform .12s,background .12s;white-space:nowrap';
       document.body.appendChild(z);
       trayDrag.zone = z;
       trayDropZoneRefresh(false);

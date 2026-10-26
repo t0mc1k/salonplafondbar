@@ -4,6 +4,7 @@
    ============================================================ */
     window.addEventListener("DOMContentLoaded", async () => {
       window.addEventListener('scroll', handleScrollPosition);
+      applyVersionLabels();
       startLogoIconCycler();
       await loadStaffPresenceRecordsForLogin();
 

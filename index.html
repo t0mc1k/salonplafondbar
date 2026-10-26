@@ -3,14 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.1.00</title>
+  <title>Salonplafond BAR v3.1.01</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import & Export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="css/style.css?v=3.1.00">
+  <script>try { if (localStorage.getItem('salon_blur') !== 'off') document.documentElement.classList.add('blur-on'); } catch (e) {}</script>
+  <link rel="stylesheet" href="css/style.css?v=3.1.01">
 </head>
 <body class="dark-mode p-4 md:p-8 max-w-6xl mx-auto pb-32" onclick="closeDropdowns(event)">
 
@@ -19,7 +20,7 @@
     <div class="flex flex-col items-center gap-4 w-full max-w-lg my-auto">
       
       <div class="login-logo-advanced w-16 h-16 bg-amber-400 rounded-2xl flex flex-col items-center justify-center shadow-2xl p-1 text-slate-950 font-bold select-none border-2 border-amber-300 mx-auto">
-        <div class="text-[12px] font-black tracking-[1px] leading-none mb-0.5">——</div>
+        <div class="logo-bar-login"></div>
         <div class="text-2xl font-black leading-none my-0">O</div>
         <div class="text-[10px] font-black leading-none mt-0.5">•</div>
       </div>
@@ -27,7 +28,7 @@
       <div>
         <h1 class="text-lg md:text-xl font-black tracking-wider text-white uppercase">Anmeldung</h1>
         <h2 class="text-xl md:text-2xl font-extrabold text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-400 font-medium mt-0.5 block">v3.1.00 • Touch-Grid PIN-Login</span>
+        <span class="text-xs text-slate-400 font-medium mt-0.5 block"><span data-app-version>v3.1.01</span> • Touch-Grid PIN-Login</span>
       </div>
 
       <div id="pinLoginForm" class="w-full bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-2xl space-y-4 text-left mt-1">
@@ -79,69 +80,116 @@
 
   <!-- SPRÁVCOVSKÝ PANEL PRE PERSONAL & PINs -->
   <div id="staffPinManagementModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[260]">
-    <div class="card max-w-2xl w-full p-6 relative flex flex-col gap-5 max-h-[85vh] overflow-y-auto border-amber-500/50 shadow-2xl">
-      <button onclick="closeStaffPinModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
-      <div>
-        <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400 flex items-center gap-2">👤 Personal & PINs (Zentrale)</h3>
-        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Verwaltung von Personal, PIN-Codes, Profilbildern und Zugriffsberechtigungen.</p>
-      </div>
+    <div class="card max-w-3xl w-full relative flex flex-col max-h-[88vh] overflow-hidden p-0 border-amber-500/50 shadow-2xl">
 
-      <div class="custom-box p-4 rounded-xl border flex flex-col gap-3">
-        <h4 class="text-xs font-bold uppercase text-amber-600 dark:text-amber-400" id="staffFormTitle">➕ Neuen Mitarbeiter hinzufügen</h4>
-        <input type="hidden" id="editingStaffOriginalName" value="">
-        <input type="hidden" id="staffInputAvatar" value="">
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-          <div>
-            <label class="block text-[10px] font-semibold uppercase mb-1">Name / Vorname</label>
-            <input type="text" id="staffInputName" placeholder="z. B. Max" class="w-full p-2.5 rounded-lg border text-xs">
-          </div>
-          <div>
-            <label class="block text-[10px] font-semibold uppercase mb-1">PIN-Code</label>
-            <input type="text" id="staffInputPin" placeholder="z. B. 1234" class="w-full p-2.5 rounded-lg border text-xs">
-          </div>
-          <div>
-            <label class="block text-[10px] font-semibold uppercase mb-1">Rolle</label>
-            <select id="staffInputRole" class="w-full p-2.5 rounded-lg border text-xs">
-              <option value="staff">staff (Kellner)</option>
-              <option value="manager">manager (Manager)</option>
-              <option value="developer">developer (Entwickler)</option>
-            </select>
-          </div>
-        </div>
-
-        <label class="flex items-center gap-2 text-xs font-semibold cursor-pointer">
-          <input type="checkbox" id="staffInputCanEdit" class="w-4 h-4 accent-amber-500">
-          <span>🍸 Darf Getränke bearbeiten (Manager &amp; Developer immer)</span>
-        </label>
-
+      <div class="ui-head">
         <div>
-          <label class="block text-[10px] font-semibold uppercase mb-1">Profilbild hochladen:</label>
-          <div class="flex gap-2 items-center">
-            <input type="file" id="staffAvatarFile" accept="image/*" onchange="uploadStaffAvatarToSupabase(event)" class="text-xs file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-600 cursor-pointer">
-            <span id="staffAvatarStatus" class="text-[11px] text-amber-500 font-medium"></span>
+          <h3 class="ui-head-title">👤 Personal & PINs</h3>
+          <p class="ui-head-sub">Mitarbeiter, PIN-Codes, Rollen und Rechte verwalten.</p>
+        </div>
+        <button type="button" onclick="closeStaffPinModal()" class="ui-close" aria-label="Schließen">&times;</button>
+      </div>
+
+      <!-- Ansicht 1: Mitarbeiter-Liste -->
+      <div id="staffViewList" class="flex flex-col min-h-0 flex-1">
+        <div class="ui-toolbar">
+          <div class="flex gap-2 flex-wrap items-center">
+            <input type="search" id="staffSearchInput" oninput="renderStaffList()" placeholder="🔍 Mitarbeiter suchen..." class="ui-search flex-1 min-w-[10rem]">
+            <button type="button" onclick="startNewStaff()" class="ui-btn-primary">➕ Neuer Mitarbeiter</button>
+            <button type="button" onclick="openLoginHistoryModal()" class="ui-btn-ghost">📜 Login-Protokoll</button>
+          </div>
+          <div class="flex gap-1.5 flex-wrap items-center">
+            <button type="button" id="staffChip_all" onclick="setStaffRoleFilter('all')" class="ui-chip active">Alle</button>
+            <button type="button" id="staffChip_staff" onclick="setStaffRoleFilter('staff')" class="ui-chip">Kellner</button>
+            <button type="button" id="staffChip_manager" onclick="setStaffRoleFilter('manager')" class="ui-chip">Manager</button>
+            <button type="button" id="staffChip_developer" onclick="setStaffRoleFilter('developer')" class="ui-chip">Developer</button>
+            <span id="staffSummary" class="staff-summary"></span>
+          </div>
+        </div>
+        <div id="staffManagementListContainer" class="staff-grid">
+          <p class="staff-empty">Lade Personal...</p>
+        </div>
+      </div>
+
+      <!-- Ansicht 2: Mitarbeiter anlegen / bearbeiten -->
+      <div id="staffViewForm" class="hidden flex-col min-h-0 flex-1">
+        <div class="ui-toolbar">
+          <div class="flex items-center gap-3 flex-wrap">
+            <button type="button" onclick="cancelStaffForm()" class="ui-btn-ghost">← Zurück zur Liste</button>
+            <h4 id="staffFormTitle" class="staff-form-title">➕ Neuer Mitarbeiter</h4>
           </div>
         </div>
 
-        <div class="flex gap-2 mt-1">
-          <button onclick="saveStaffMember()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs transition">Speichern</button>
-          <button onclick="resetStaffForm()" class="px-4 py-2 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold rounded-lg text-xs transition border">Zurücksetzen</button>
+        <div id="staffFormScroll" class="flex-1 overflow-y-auto p-5 flex flex-col gap-4">
+          <input type="hidden" id="editingStaffOriginalName" value="">
+          <input type="hidden" id="staffInputAvatar" value="">
+          <select id="staffInputRole" class="hidden">
+            <option value="staff">staff</option>
+            <option value="manager">manager</option>
+            <option value="developer">developer</option>
+          </select>
+
+          <div class="form-section">
+            <div class="form-section-title">1 · Profil</div>
+            <div class="flex gap-4 items-start flex-wrap">
+              <div id="staffAvatarPreview" class="staff-avatar-lg">?</div>
+              <div class="flex-1 min-w-[13rem] flex flex-col gap-3">
+                <div>
+                  <label class="form-label" for="staffInputName">Name / Vorname</label>
+                  <input type="text" id="staffInputName" oninput="updateStaffAvatarPreview()" maxlength="40" placeholder="z. B. Max" class="ui-field">
+                </div>
+                <div>
+                  <label class="form-label">Profilbild (optional)</label>
+                  <input type="file" id="staffAvatarFile" accept="image/*" onchange="uploadStaffAvatarToSupabase(event)" class="text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-600 cursor-pointer">
+                  <span id="staffAvatarStatus" class="form-hint block mt-1"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title">2 · Rolle</div>
+            <div class="role-seg">
+              <button type="button" id="staffRoleBtn_staff" onclick="setStaffRole('staff')" class="role-opt active">
+                <span class="role-ico">🍹</span><b>Kellner</b><small>Rezepte ansehen, Chat, eigenes Profil</small>
+              </button>
+              <button type="button" id="staffRoleBtn_manager" onclick="setStaffRole('manager')" class="role-opt">
+                <span class="role-ico">🧑‍💼</span><b>Manager</b><small>Personal, Tickets, Login-Protokoll und Getränke verwalten</small>
+              </button>
+              <button type="button" id="staffRoleBtn_developer" onclick="setStaffRole('developer')" class="role-opt">
+                <span class="role-ico">🛠️</span><b>Developer</b><small>Wie Manager, zusätzlich Tickets löschen</small>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title">3 · PIN-Code</div>
+            <div class="flex gap-2 items-center flex-wrap">
+              <input type="password" id="staffInputPin" inputmode="numeric" maxlength="6" autocomplete="new-password" placeholder="4 bis 6 Ziffern" class="ui-field flex-1 min-w-[10rem] tracking-widest">
+              <button type="button" onclick="toggleStaffPinVisibility()" class="ui-btn-ghost" title="PIN anzeigen oder verbergen">👁️ Anzeigen</button>
+              <button type="button" onclick="generateStaffPin()" class="ui-btn-ghost" title="Zufälligen 4-stelligen PIN erzeugen">🎲 Vorschlag</button>
+            </div>
+            <p id="staffPinHint" class="form-hint mt-1.5">Pflichtfeld: 4 bis 6 Ziffern.</p>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title">4 · Rechte</div>
+            <label class="switch-row">
+              <span class="min-w-0">
+                <b class="block text-xs">🍸 Darf Getränke bearbeiten</b>
+                <small id="staffCanEditNote" class="form-hint block mt-0.5">Erlaubt dem Mitarbeiter, Getränke anzulegen, zu ändern und zu löschen.</small>
+              </span>
+              <span class="switch"><input type="checkbox" id="staffInputCanEdit"><span class="switch-track"></span></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="ui-foot">
+          <button type="button" onclick="cancelStaffForm()" class="ui-btn-ghost">Abbrechen</button>
+          <button type="button" onclick="saveStaffMember()" class="ui-btn-primary">💾 Speichern</button>
         </div>
       </div>
 
-      <div class="flex justify-between items-center pt-1">
-        <h4 class="text-xs font-bold uppercase tracking-wider">Aktuelles Personal in der Datenbank:</h4>
-        <button onclick="openLoginHistoryModal()" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 font-bold rounded-lg text-xs transition border border-slate-300 dark:border-slate-700 flex items-center gap-1.5">
-          📜 Login-Protokoll anzeigen
-        </button>
-      </div>
-
-      <div id="staffManagementListContainer" class="flex flex-col gap-2 max-h-[35vh] overflow-y-auto pr-1">
-        <p class="text-slate-500 italic text-xs text-center py-4">Lade Personal...</p>
-      </div>
-
-      <div class="flex justify-end pt-3 border-t border-slate-200 dark:border-slate-800">
-        <button onclick="closeStaffPinModal()" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 font-bold text-slate-800 dark:text-white rounded-xl text-xs transition">Schließen</button>
-      </div>
     </div>
   </div>
 
@@ -156,7 +204,7 @@
           <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Übersicht darüber, welcher Benutzer sich wann im System angemeldet hat und wer aktuell online ist.</p>
         </div>
         <button onclick="clearLoginHistoryLogs()" class="px-3 py-1.5 bg-red-500/20 hover:bg-red-500 text-red-600 dark:text-red-400 hover:text-white rounded-lg transition text-xs font-bold border border-red-500/30 shrink-0 flex items-center gap-1" title="Login-Protokoll leeren">
-          🗑️ Log vyčistiť
+          🗑️ Protokoll leeren
         </button>
       </div>
 
@@ -251,14 +299,14 @@
     <header class="flex flex-col md:flex-row justify-between items-center gap-4 mb-4 pb-4 border-b border-slate-300 dark:border-slate-700">
       <div class="flex items-center gap-3">
         <div class="header-logo-container" onclick="showRandomMotivation(event)" title="Klick mich für Osterei-Motivation! 🍸">
-          <span class="logo-macron" id="headerLogoMacron">——</span>
+          <span class="logo-macron" id="headerLogoMacron"></span>
           <span class="logo-main-char" id="headerLogoChar">O</span>
           <span class="logo-dot" id="headerLogoDot">•</span>
         </div>
 
         <div class="flex flex-col justify-center">
           <h1 class="text-3xl font-bold tracking-tight text-amber-500 dark:text-amber-400 leading-none">Salonplafond BAR</h1>
-          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium block mt-0.5">v3.1.00</span>
+          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium block mt-0.5" data-app-version>v3.1.01</span>
         </div>
       </div>
 
@@ -434,7 +482,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-300 dark:border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App v3.1.00 • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App <span data-app-version>v3.1.01</span> • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div>
@@ -663,6 +711,14 @@
             <button onclick="setViewMode('grid'); updateUnifiedSettingsUI();" id="unifiedViewGrid" class="px-2.5 py-1 text-xs font-bold rounded bg-amber-500 text-slate-950">Grid</button>
             <button onclick="setViewMode('list'); updateUnifiedSettingsUI();" id="unifiedViewList" class="px-2.5 py-1 text-xs font-bold rounded bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">Liste</button>
           </div>
+        </div>
+
+        <div class="custom-box p-3 rounded-xl border flex items-center justify-between gap-3">
+          <div class="min-w-0">
+            <span class="text-xs font-semibold block">🫧 Weichzeichner (Blur):</span>
+            <span class="text-[10px] text-slate-500 dark:text-slate-400 block mt-0.5">Milchglas-Effekt in Dialogen, Menüs und Hinweisen. Auf schwächeren Geräten ausschalten.</span>
+          </div>
+          <label class="switch"><input type="checkbox" id="unifiedBlurCheck" onchange="setBlurEnabled(this.checked)"><span class="switch-track"></span></label>
         </div>
 
         <div class="custom-box p-3 rounded-xl border flex flex-col gap-2">
@@ -900,40 +956,68 @@
     </div>
   </div>
 
-  <!-- Changelog (Was ist neu?) & Historie zmien -->
+  <!-- Changelog (Was ist neu?) -->
   <div id="changelogModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[280]">
-    <div class="card max-w-2xl w-full p-6 relative flex flex-col gap-4 max-h-[85vh] overflow-y-auto border-amber-500/50 shadow-2xl">
-      <button onclick="closeChangelogModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
-      <div>
-        <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400 flex items-center gap-2">🚀 Was ist neu? (Changelog)</h3>
-        <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Hier siehst du die aktuellsten Änderungen der App sowie die komplette Historie aller Versionen.</p>
-      </div>
+    <div class="card max-w-3xl w-full relative flex flex-col max-h-[88vh] overflow-hidden p-0 border-amber-500/50 shadow-2xl">
 
-      <!-- Aktuálna novinka -->
-      <div class="custom-box p-4 rounded-xl border border-amber-500/40 text-xs shrink-0">
-        <div class="flex justify-between items-center mb-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold">
-          <span>Version v3.1.00 (Tomas Kardos - Developer)</span>
-          <span class="text-slate-500">Oktober 2026</span>
+      <div class="ui-head">
+        <div>
+          <h3 class="ui-head-title">🚀 Was ist neu?</h3>
+          <p class="ui-head-sub">Aktuelle Version <span id="changelogVersionBadge" class="cl-ver">v3.1.01</span></p>
         </div>
-        <p class="leading-relaxed font-semibold">Modularisierung der App, verbesserte Menüstrukturen, Login-Protokoll-Bereinigung und UI-Optimierungen.</p>
+        <button type="button" onclick="closeChangelogModal()" class="ui-close" aria-label="Schließen">&times;</button>
       </div>
 
-      <div id="adminChangelogFormContainer" class="hidden custom-box p-4 rounded-xl border flex flex-col gap-2.5">
-        <label class="text-xs font-bold text-amber-600 dark:text-amber-300">➕ Neue Neuigkeit hinzufügen (Tomas - Developer):</label>
-        <textarea id="newChangelogText" rows="2" placeholder="z. B. v3.1.00: Neue Features..." class="p-3 rounded-lg border text-xs focus:outline-none focus:border-amber-500"></textarea>
-        <button onclick="submitNewChangelog()" class="py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs transition shadow">Als Neuigkeit veröffentlichen</button>
+      <div class="ui-tabs" role="tablist">
+        <button type="button" id="clTab_current" onclick="setChangelogTab('current')" class="ui-tab active" role="tab" aria-selected="true">✨ Neu in dieser Version</button>
+        <button type="button" id="clTab_all" onclick="setChangelogTab('all')" class="ui-tab" role="tab" aria-selected="false">📜 Alle Versionen <span id="clAllCount" class="ui-count">0</span></button>
+        <button type="button" id="clTab_news" onclick="setChangelogTab('news')" class="ui-tab" role="tab" aria-selected="false">📣 Team-News <span id="clNewsCount" class="ui-count">0</span></button>
       </div>
 
-      <button onclick="toggleChangelogHistory()" id="toggleHistoryBtn" class="w-full py-2.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 font-bold rounded-xl text-xs transition border border-slate-300 dark:border-slate-700 flex items-center justify-center gap-1.5">
-        📜 Versionshistorie / Archiv (v1.0 – v3.0.50) anzeigen
-      </button>
+      <div id="clBody" class="flex-1 overflow-y-auto p-5">
 
-      <div id="changelogHistoryContainer" class="hidden flex-col gap-2.5 max-h-[40vh] overflow-y-auto pr-2 pt-1 border-t border-slate-200 dark:border-slate-800">
-        <p class="text-slate-500 italic text-xs text-center py-2">Lade Historie...</p>
+        <div id="clPanel_current">
+          <div id="clCurrentContent"></div>
+        </div>
+
+        <div id="clPanel_all" class="hidden">
+          <div class="cl-toolbar">
+            <input type="search" id="clSearch" oninput="onChangelogSearch(this.value)" placeholder="🔍 Version oder Stichwort suchen..." class="ui-search">
+            <div class="flex gap-1.5 flex-wrap items-center">
+              <button type="button" id="clChip_all" onclick="setChangelogFilter('all')" class="ui-chip active">Alle</button>
+              <button type="button" id="clChip_new" onclick="setChangelogFilter('new')" class="ui-chip">✨ Neu</button>
+              <button type="button" id="clChip_improved" onclick="setChangelogFilter('improved')" class="ui-chip">🔧 Verbessert</button>
+              <button type="button" id="clChip_fixed" onclick="setChangelogFilter('fixed')" class="ui-chip">🐞 Behoben</button>
+              <button type="button" id="clChip_security" onclick="setChangelogFilter('security')" class="ui-chip">🔒 Sicherheit</button>
+            </div>
+            <div class="flex items-center justify-between gap-2">
+              <span id="clResultInfo" class="cl-result-info"></span>
+              <span class="flex gap-3">
+                <button type="button" onclick="toggleAllChangelogItems(true)" class="ui-link-btn">Alle aufklappen</button>
+                <button type="button" onclick="toggleAllChangelogItems(false)" class="ui-link-btn">Alle zuklappen</button>
+              </span>
+            </div>
+          </div>
+          <div id="clAllList" class="flex flex-col gap-2"></div>
+        </div>
+
+        <div id="clPanel_news" class="hidden">
+          <div id="adminChangelogFormContainer" class="hidden">
+            <div class="cl-form">
+              <label class="form-label" for="newChangelogText">➕ Neue Team-News veröffentlichen</label>
+              <textarea id="newChangelogText" rows="3" placeholder="z. B. Ab Freitag gibt es eine neue Sommerkarte ..." class="ui-field"></textarea>
+              <div class="flex justify-end">
+                <button type="button" onclick="submitNewChangelog()" class="ui-btn-primary">📣 Veröffentlichen</button>
+              </div>
+            </div>
+          </div>
+          <div id="clNewsList" class="flex flex-col gap-2.5"></div>
+        </div>
+
       </div>
 
-      <div class="flex justify-end pt-3 border-t border-slate-200 dark:border-slate-800">
-        <button onclick="closeChangelogModal()" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 font-bold text-slate-800 dark:text-white rounded-xl text-xs transition">Schließen</button>
+      <div class="ui-foot">
+        <button type="button" onclick="closeChangelogModal()" class="ui-btn-ghost">Schließen</button>
       </div>
     </div>
   </div>
@@ -1068,21 +1152,22 @@
     </div>
   </div>
 
-  <script src="js/config.js?v=3.1.00"></script>
-  <script src="js/ui.js?v=3.1.00"></script>
-  <script src="js/auth.js?v=3.1.00"></script>
-  <script src="js/profile.js?v=3.1.00"></script>
-  <script src="js/staff-admin.js?v=3.1.00"></script>
-  <script src="js/chat.js?v=3.1.00"></script>
-  <script src="js/tickets.js?v=3.1.00"></script>
-  <script src="js/schedule.js?v=3.1.00"></script>
-  <script src="js/seasons.js?v=3.1.00"></script>
-  <script src="js/drinks.js?v=3.1.00"></script>
-  <script src="js/drink-admin.js?v=3.1.00"></script>
-  <script src="js/tray.js?v=3.1.00"></script>
-  <script src="js/shopping.js?v=3.1.00"></script>
-  <script src="js/import-export.js?v=3.1.00"></script>
-  <script src="js/print-a3.js?v=3.1.00"></script>
-  <script src="js/app.js?v=3.1.00"></script>
+  <script src="js/config.js?v=3.1.01"></script>
+  <script src="js/ui.js?v=3.1.01"></script>
+  <script src="js/auth.js?v=3.1.01"></script>
+  <script src="js/profile.js?v=3.1.01"></script>
+  <script src="js/staff-admin.js?v=3.1.01"></script>
+  <script src="js/chat.js?v=3.1.01"></script>
+  <script src="js/tickets.js?v=3.1.01"></script>
+  <script src="js/changelog.js?v=3.1.01"></script>
+  <script src="js/schedule.js?v=3.1.01"></script>
+  <script src="js/seasons.js?v=3.1.01"></script>
+  <script src="js/drinks.js?v=3.1.01"></script>
+  <script src="js/drink-admin.js?v=3.1.01"></script>
+  <script src="js/tray.js?v=3.1.01"></script>
+  <script src="js/shopping.js?v=3.1.01"></script>
+  <script src="js/import-export.js?v=3.1.01"></script>
+  <script src="js/print-a3.js?v=3.1.01"></script>
+  <script src="js/app.js?v=3.1.01"></script>
 </body>
 </html>
