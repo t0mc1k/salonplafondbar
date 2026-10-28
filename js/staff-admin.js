@@ -26,7 +26,7 @@
 
       const { data, error } = await _supabase.rpc('list_staff');
       if (error || !data) {
-        container.innerHTML = `<span class="text-red-400">Fehler beim Laden</span>`;
+        container.innerHTML = `<span class="text-red-700 dark:text-red-400">Fehler beim Laden</span>`;
         countBadge.innerText = "0";
         return 0;
       }
@@ -45,13 +45,13 @@
       if (chatCountLabel) chatCountLabel.innerText = `${onlineUsers.length} ${onlineUsers.length === 1 ? 'Mitglied' : 'Mitglieder'}`;
 
       if (onlineUsers.length === 0) {
-        container.innerHTML = `<span class="text-slate-400 italic">Keine Benutzer in den letzten 15 Minuten aktiv.</span>`;
+        container.innerHTML = `<span class="text-slate-600 dark:text-slate-400 italic">Keine Benutzer in den letzten 15 Minuten aktiv.</span>`;
         return 0;
       }
 
       container.innerHTML = onlineUsers.map(user => {
         return `
-          <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30 text-[11px] flex items-center gap-1">
+          <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold border border-emerald-500/30 text-[11px] flex items-center gap-1">
             🟢 ${escapeHtml(user.name)} <span class="text-[9px] opacity-75 uppercase">(${escapeHtml(user.role || 'staff')})</span>
           </span>
         `;
@@ -77,14 +77,14 @@
 
       container.innerHTML = data.map(item => {
         let dateStr = new Date(item.logged_in_at).toLocaleString();
-        let roleBadge = `<span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] uppercase font-bold">${escapeHtml(item.role || 'staff')}</span>`;
+        let roleBadge = `<span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-700 dark:text-amber-300 text-[10px] uppercase font-bold">${escapeHtml(item.role || 'staff')}</span>`;
         return `
           <div class="custom-box p-3 rounded-xl border flex items-center justify-between gap-2 text-xs">
             <div class="flex items-center gap-2">
               <span class="text-amber-500 font-bold">👤 ${escapeHtml(item.user_name)}</span>
               ${roleBadge}
             </div>
-            <span class="text-slate-400 text-[11px]">${dateStr}</span>
+            <span class="text-slate-600 dark:text-slate-400 text-[11px]">${dateStr}</span>
           </div>
         `;
       }).join('');
@@ -293,7 +293,7 @@
           <span class="staff-sum"><b>${total}</b> Mitarbeiter</span>
           <span class="staff-sum"><b>${admins}</b> Admins</span>
           <span class="staff-sum"><b class="text-emerald-500">${online}</b> online</span>
-          ${withoutPin ? `<span class="staff-sum text-red-400"><b>${withoutPin}</b> ohne PIN</span>` : ''}`;
+          ${withoutPin ? `<span class="staff-sum text-red-700 dark:text-red-400"><b>${withoutPin}</b> ohne PIN</span>` : ''}`;
       }
 
       // Filter-Chips

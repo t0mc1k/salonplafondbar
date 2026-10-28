@@ -61,8 +61,8 @@
           ${userSchedule.map(s => `
             <div class="custom-box p-2.5 rounded-lg border flex items-center justify-between text-xs">
               <div>
-                <span class="font-bold text-white">${escapeHtml(s.day)}</span>
-                <span class="text-[10px] text-slate-400 block">Station: ${escapeHtml(s.station)}</span>
+                <span class="font-bold text-slate-900 dark:text-white">${escapeHtml(s.day)}</span>
+                <span class="text-[10px] text-slate-600 dark:text-slate-400 block">Station: ${escapeHtml(s.station)}</span>
               </div>
               <span class="font-bold text-amber-500">${escapeHtml(s.time)}</span>
             </div>

@@ -22,13 +22,13 @@
       gridContainer.innerHTML = data.map(staff => {
         let avatarHtml = staff.avatar_url 
           ? `<img src="${escapeHtml(staff.avatar_url)}" class="w-12 h-12 rounded-full object-cover border border-amber-500/50 shadow" alt="${escapeHtml(staff.name)}">` 
-          : `<div class="w-12 h-12 rounded-full bg-slate-800 text-amber-400 font-black flex items-center justify-center border border-slate-700 text-sm">${escapeHtml(staff.name.charAt(0).toUpperCase())}</div>`;
+          : `<div class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 text-amber-700 dark:text-amber-400 font-black flex items-center justify-center border border-slate-300 dark:border-slate-700 text-sm">${escapeHtml(staff.name.charAt(0).toUpperCase())}</div>`;
 
         return `
-          <button type="button" onclick="selectWaiterForLogin(${jsArg(staff.name)})" class="p-3 bg-slate-950 hover:bg-amber-500/20 hover:border-amber-500 border border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 transition group">
+          <button type="button" onclick="selectWaiterForLogin(${jsArg(staff.name)})" class="p-3 bg-slate-100 dark:bg-slate-950 hover:bg-amber-500/20 hover:border-amber-500 border border-slate-300 dark:border-slate-800 rounded-xl flex flex-col items-center justify-center gap-1.5 transition group">
             ${avatarHtml}
-            <span class="text-xs font-black text-white group-hover:text-amber-400 truncate w-full">${escapeHtml(staff.name)}</span>
-            <span class="text-[9px] text-slate-400 uppercase tracking-wider">${escapeHtml(staff.role || 'staff')}</span>
+            <span class="text-xs font-black text-slate-900 dark:text-white group-hover:text-amber-400 truncate w-full">${escapeHtml(staff.name)}</span>
+            <span class="text-[9px] text-slate-600 dark:text-slate-400 uppercase tracking-wider">${escapeHtml(staff.role || 'staff')}</span>
           </button>
         `;
       }).join('');
@@ -161,7 +161,7 @@
           const now = fresh.get(st.name) || 0;
           const isMe = st.name.toLowerCase() === currentWaiterName.toLowerCase();
           const recent = (Date.now() - now) < 2 * 60 * 1000;
-          if (!isMe && now > before && recent) {
+          if (!isMe && now > before && recent && getSetting('loginToast')) {
             showAppToast({
               avatarUrl: st.avatar_url,
               initial: st.name.charAt(0).toUpperCase(),
@@ -202,7 +202,10 @@
       setVisible('menuAddDrinkBtn', showEdit, true);
       setVisible('addDrinkBtnContainer', showEdit, false);
       setVisible('menuStaffPinBtn', showAdmin, true);
+      setVisible('menuAdminSection', showAdmin, true);
+      setVisible('menuNewSeasonBtn', showEdit, true);
       setVisible('adminChangelogFormContainer', showAdmin, false);
+      if (typeof updateHeaderAvatarUI === 'function') updateHeaderAvatarUI();
       const label = document.getElementById('currentUserEmail');
       if (label) {
         const roleTxt = (userIsAdmin || userCanEdit) && currentStaffRole && currentStaffRole !== 'staff' ? ` (${escapeHtml(currentStaffRole)})` : '';

@@ -88,11 +88,26 @@
       renderBarTrayUI();
     }
 
+    const DEFAULT_CATEGORIES = ['Cocktails', 'Mocktails', 'Salonplafond Classic', 'After Dinner Drinks', 'APERITTIF'];
+
+    // Standard-Kategorien + alle Kategorien, die in Getränken vorkommen (neue Kategorien erscheinen automatisch)
+    function getAllCategories(extra) {
+      const list = DEFAULT_CATEGORIES.slice();
+      const seen = new Set(list.map(c => c.toLowerCase()));
+      const others = [];
+      (allDrinks || []).concat((extra || []).map(c => ({ category: c }))).forEach(d => {
+        const c = String(d.category || '').trim();
+        if (c && !seen.has(c.toLowerCase())) { seen.add(c.toLowerCase()); others.push(c); }
+      });
+      others.sort((a, b) => a.localeCompare(b, 'de', { sensitivity: 'base' }));
+      return list.concat(others);
+    }
+
     function renderCategories() {
-      const fixedCategories = ['Alle', 'Cocktails', 'Mocktails', 'Salonplafond Classic', 'After Dinner Drinks', 'APERITTIF'];
-      if (!fixedCategories.includes(selectedCat)) selectedCat = 'Alle';
-      document.getElementById('categories').innerHTML = fixedCategories.map(c => `
-        <button onclick="setCategory(${jsArg(c)})" class="px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap ${selectedCat === c ? 'bg-amber-500 text-slate-950 font-bold' : 'custom-box hover:bg-slate-200 dark:hover:bg-slate-700'}">${c}</button>
+      const cats = ['Alle'].concat(getAllCategories());
+      if (!cats.includes(selectedCat)) selectedCat = 'Alle';
+      document.getElementById('categories').innerHTML = cats.map(c => `
+        <button onclick="setCategory(${jsArg(c)})" class="px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap ${selectedCat === c ? 'bg-amber-500 text-slate-950 font-bold' : 'custom-box hover:bg-slate-200 dark:hover:bg-slate-700'}">${escapeHtml(c)}</button>
       `).join('');
     }
 
@@ -120,6 +135,8 @@
         return matchesSeason && matchesCat && matchesSearch && matchesFilter && matchesGlass;
       });
 
+      filtered = sortDrinks(filtered);
+
       const container = document.getElementById('drinksGrid');
       if (filtered.length === 0) {
         container.className = 'block';
@@ -133,10 +150,10 @@
           let photoHtml = d.photo_url ? `<img src="${escapeHtml(d.photo_url)}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="">` : `<div class="flex items-center justify-center h-full text-slate-500 text-xs">Kein Bild</div>`;
           let badgeHtml = d.is_featured ? '<span class="absolute top-2 right-2 text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500 text-slate-950 shadow">⭐ TOP</span>' : '';
           let isFav = shiftFavorites.includes(d.id);
-          let favBtnHtml = `<button onclick="toggleShiftFavorite(${jsArg(d.id)}, event)" class="absolute top-2 left-2 text-sm p-1 rounded-full bg-white/80 dark:bg-slate-900/80 hover:bg-white dark:hover:bg-slate-900 ${isFav ? 'text-red-500' : 'text-slate-400'}">${isFav ? '❤️' : '🤍'}</button>`;
+          let favBtnHtml = `<button onclick="toggleShiftFavorite(${jsArg(d.id)}, event)" class="absolute top-2 left-2 text-sm p-1 rounded-full bg-white/80 dark:bg-slate-900/80 hover:bg-white dark:hover:bg-slate-900 ${isFav ? 'text-red-500' : 'text-slate-600 dark:text-slate-400'}">${isFav ? '❤️' : '🤍'}</button>`;
           let isTray = barTraySelection.includes(d.id);
           let trayBtnHtml = `<button onclick="toggleBarTrayItem(${jsArg(d.id)}, event)" class="absolute bottom-2 right-2 text-xs px-2.5 py-1.5 rounded-xl font-black shadow-lg transition ${isTray ? 'bg-amber-500 text-slate-950 ring-2 ring-amber-300' : 'bg-white/90 dark:bg-slate-900/90 text-amber-600 dark:text-amber-400 border border-amber-500/50 hover:bg-white dark:hover:bg-slate-900'}" title="In Multi-View werfen">⚡</button>`;
-          let priceText = d.selling_price ? ` (€ ${parseFloat(d.selling_price).toFixed(2)})` : '';
+          let priceText = (d.selling_price && getSetting('showPrices')) ? ` (€ ${parseFloat(d.selling_price).toFixed(2)})` : '';
           return `<div data-drink-id="${escapeHtml(d.id)}" onclick="openDrinkModal(${jsArg(d.id)})" class="card overflow-hidden cursor-pointer flex flex-col justify-between group"><div class="relative h-48 bg-slate-200 dark:bg-slate-800">${photoHtml}${badgeHtml}${favBtnHtml}${trayBtnHtml}<span class="absolute bottom-2 left-2 text-[10px] font-semibold px-2 py-0.5 rounded bg-white/90 dark:bg-slate-900/85 text-amber-600 dark:text-amber-400 border border-amber-500/30">${escapeHtml(d.category || 'Getränk')}</span></div><div class="p-4 text-center"><h3 class="text-lg font-bold group-hover:text-amber-500 transition">${escapeHtml(d.name)}${priceText}</h3><span class="text-xs text-slate-500 dark:text-slate-400 mt-1 inline-block">Klicken für Rezept</span></div></div>`;
         }).join('');
       } else {
@@ -147,7 +164,7 @@
           let isFav = shiftFavorites.includes(d.id);
           let isTray = barTraySelection.includes(d.id);
           let trayBtnHtml = `<button onclick="toggleBarTrayItem(${jsArg(d.id)}, event)" class="text-xs px-2.5 py-1.5 rounded-xl font-bold transition ${isTray ? 'bg-amber-500 text-slate-950' : 'custom-box hover:bg-slate-200 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 border'}" title="In Multi-View werfen">⚡</button>`;
-          let priceText = d.selling_price ? ` (€ ${parseFloat(d.selling_price).toFixed(2)})` : '';
+          let priceText = (d.selling_price && getSetting('showPrices')) ? ` (€ ${parseFloat(d.selling_price).toFixed(2)})` : '';
           return `<div data-drink-id="${escapeHtml(d.id)}" onclick="openDrinkModal(${jsArg(d.id)})" class="list-item p-3 cursor-pointer flex items-center justify-between gap-4 group"><div class="flex items-center gap-4 min-w-0">${photoHtml}<div class="min-w-0"><div class="flex items-center gap-2 flex-wrap"><h3 class="text-base font-bold group-hover:text-amber-500 transition truncate">${escapeHtml(d.name)}${priceText}</h3>${badgeHtml}</div><p class="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">${escapeHtml(d.method ? 'Method: ' + d.method : (d.category || ''))}</p></div></div><div class="flex items-center gap-2 shrink-0">${trayBtnHtml}<button onclick="toggleShiftFavorite(${jsArg(d.id)}, event)" class="text-sm p-1.5 rounded-lg custom-box border hover:bg-slate-200 dark:hover:bg-slate-700">${isFav ? '❤️' : '🤍'}</button><span class="text-xs font-semibold px-2.5 py-1 rounded custom-box border">${escapeHtml(d.category || 'Getränk')}</span></div></div>`;
         }).join('');
       }
@@ -169,7 +186,7 @@
 
       let html = '';
       if (d.photo_url) html += `<img id="printModalImage" src="${escapeHtml(d.photo_url)}" onclick="openPhotoPreview(${jsArg(d.photo_url)})" class="w-full h-64 object-cover rounded-xl mb-4 shadow cursor-pointer hover:opacity-95 transition" title="Klicken für Großansicht" alt="${escapeHtml(d.name)}">`;
-      let priceText = d.selling_price ? ` (€ ${parseFloat(d.selling_price).toFixed(2)})` : '';
+      let priceText = (d.selling_price && getSetting('showPrices')) ? ` (€ ${parseFloat(d.selling_price).toFixed(2)})` : '';
       html += `<div class="flex items-center gap-2 mb-2 flex-wrap"><span class="text-xs font-semibold px-2.5 py-1 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">${escapeHtml(d.category || 'Getränk')}</span></div>`;
       html += `<h2 class="text-3xl font-bold mb-4">${escapeHtml(d.name)}${priceText}</h2>`;
 

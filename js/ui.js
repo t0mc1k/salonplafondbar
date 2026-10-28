@@ -1,11 +1,11 @@
 /* ============================================================
    js/ui.js
-   Allgemeine Oberfläche: Menü, Einstellungen, Theme, Vollbild, Foto-Vorschau, Motivations-Sprüche
+   Allgemeine Oberfläche: Menü, Hinweise (Toast), Vollbild, Foto-Vorschau, Motivations-Sprüche
    ============================================================ */
     function startLogoIconCycler() {
       setInterval(() => {
         const box = document.querySelector('.header-logo-container');
-        if (!box || !currentWaiterName) return;           // nur wenn jemand angemeldet ist
+        if (!box || !currentWaiterName || getSetting('reduceMotion')) return;   // nur wenn jemand angemeldet ist
         if (box.querySelector('.logo-avatar')) return;    // läuft gerade schon
 
         const ov = document.createElement('div');
@@ -72,21 +72,6 @@
       setTimeout(close, o.ms || 5000);
     }
 
-    // ---------- Weichzeichner (Blur) an/aus ----------
-    function isBlurEnabled() {
-      return document.documentElement.classList.contains('blur-on');
-    }
-
-    function setBlurEnabled(on) {
-      document.documentElement.classList.toggle('blur-on', !!on);
-      try { localStorage.setItem('salon_blur', on ? 'on' : 'off'); } catch (e) {}
-      updateUnifiedSettingsUI();
-    }
-
-    function toggleBlurEffect() {
-      setBlurEnabled(!isBlurEnabled());
-    }
-
     // ---------- Zeit als „vor 5 Min.“ ----------
     function formatRelativeTime(iso) {
       if (!iso) return 'noch nie';
@@ -146,19 +131,6 @@
       document.getElementById(fieldId).value = value;
     }
 
-    function toggleThemeMode() {
-      const body = document.body;
-      if (themeMode === 'dark') {
-        themeMode = 'light';
-        body.classList.remove('dark-mode');
-        body.classList.add('light-mode');
-      } else {
-        themeMode = 'dark';
-        body.classList.remove('light-mode');
-        body.classList.add('dark-mode');
-      }
-    }
-
     function toggleFilterDrawer() {
       const drawer = document.getElementById('filterDrawer');
       const arrow = document.getElementById('filterArrow');
@@ -200,56 +172,6 @@
       closeSettingsMenu();
     }
 
-    function openUnifiedSettingsModal() {
-      closeSettingsMenu();
-      renderUnifiedSeasonSelect();
-      updateUnifiedSettingsUI();
-      const modal = document.getElementById('unifiedSettingsModal');
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-    }
-
-    function closeUnifiedSettingsModal() {
-      const modal = document.getElementById('unifiedSettingsModal');
-      modal.classList.remove('flex');
-      modal.classList.add('hidden');
-    }
-
-    function updateUnifiedSettingsUI() {
-      const blurCheck = document.getElementById('unifiedBlurCheck');
-      if (blurCheck) blurCheck.checked = isBlurEnabled();
-
-      const themeBtn = document.getElementById('unifiedThemeBtn');
-      if (themeBtn) themeBtn.innerText = themeMode === 'dark' ? "Dunkel" : "Hell";
-
-      const gridBtn = document.getElementById('unifiedViewGrid');
-      const listBtn = document.getElementById('unifiedViewList');
-      if (gridBtn && listBtn) {
-        gridBtn.className = viewMode === 'grid' ? 'px-2.5 py-1 text-xs font-bold rounded bg-amber-500 text-slate-950' : 'px-2.5 py-1 text-xs font-bold rounded bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-300';
-        listBtn.className = viewMode === 'list' ? 'px-2.5 py-1 text-xs font-bold rounded bg-amber-500 text-slate-950' : 'px-2.5 py-1 text-xs font-bold rounded bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300';
-      }
-    }
-
-    function renderUnifiedSeasonSelect() {
-      const seasons = getAllSeasons();
-      const select = document.getElementById('unifiedSeasonSelect');
-      let html = '';
-      seasons.forEach(s => {
-        html += `<option value="${escapeHtml(s)}" ${currentSeasonFilter === s ? 'selected' : ''}>📅 ${escapeHtml(s)}</option>`;
-      });
-      select.innerHTML = html;
-    }
-
-    function onUnifiedSeasonChange(selectEl) {
-      selectSeason(selectEl.value);
-    }
-
-    function setViewMode(mode) {
-      viewMode = mode;
-      updateUnifiedSettingsUI();
-      renderDrinks();
-    }
-
     function toggleFullscreen() {
       if (!document.fullscreenElement) document.documentElement.requestFullscreen();
       else if (document.exitFullscreen) document.exitFullscreen();
@@ -273,4 +195,27 @@
       if (currentPhotoPreviewUrl) {
         openPhotoPreview(currentPhotoPreviewUrl);
       }
+    }
+
+    // ---------- kurzer Signalton (ohne Audio-Datei) ----------
+    function playChatSound() {
+      try {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        const ac = new AC();
+        const now = ac.currentTime;
+        [880, 1175].forEach((f, i) => {
+          const o = ac.createOscillator();
+          const g = ac.createGain();
+          o.type = 'sine';
+          o.frequency.value = f;
+          g.gain.setValueAtTime(0.0001, now + i * 0.11);
+          g.gain.exponentialRampToValueAtTime(0.18, now + i * 0.11 + 0.02);
+          g.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.11 + 0.18);
+          o.connect(g); g.connect(ac.destination);
+          o.start(now + i * 0.11);
+          o.stop(now + i * 0.11 + 0.2);
+        });
+        setTimeout(() => { try { ac.close(); } catch (e) {} }, 700);
+      } catch (e) {}
     }

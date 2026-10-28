@@ -30,9 +30,9 @@
       }
 
       container.innerHTML = seasonDrinks.map(d => `
-        <label class="flex items-center gap-2.5 p-2 rounded hover:bg-slate-800/50 cursor-pointer text-xs">
+        <label class="flex items-center gap-2.5 p-2 rounded hover:bg-slate-200/60 dark:hover:bg-slate-800/50 cursor-pointer text-xs">
           <input type="checkbox" name="a3DrinkCheckbox" value="${d.id}" onchange="updateA3SelectionCount()" class="accent-amber-500 w-4 h-4">
-          <span class="font-bold">${escapeHtml(d.name)}</span> <span class="text-slate-400">(${escapeHtml(d.category || '')})</span>
+          <span class="font-bold">${escapeHtml(d.name)}</span> <span class="text-slate-600 dark:text-slate-400">(${escapeHtml(d.category || '')})</span>
         </label>
       `).join('');
       updateA3SelectionCount();

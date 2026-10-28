@@ -10,9 +10,22 @@
    Änderungs-Typen: 'new' Neu, 'improved' Verbessert, 'fixed' Behoben,
                     'security' Sicherheit, 'info' Allgemein
    ============================================================ */
-    const APP_VERSION = '3.1.01';
+    const APP_VERSION = '3.1.02';
 
     const CHANGELOG = [
+  { version: '3.1.02', range: '', date: 'Oktober 2026', title: 'Team-Chat, neues Menü, Einstellungen & augenschonender Hellmodus',
+    changes: [
+      ['new', 'Team-Chat als echte Kommunikations-App: Reaktionen mit Emoji, Nachrichten bearbeiten, Fotos senden, wichtige Nachricht anpinnen, Suche, „schreibt ...“-Anzeige, Trennung nach Tagen und Markierung neuer Nachrichten.'],
+      ['new', 'Neue Kategorie direkt beim Anlegen eines Getränks erstellen. Sie erscheint nach dem Speichern automatisch in der Kategorien-Leiste.'],
+      ['new', 'Einstellungen & Zentrale mit vielen neuen Optionen: Design Hell/Dunkel/Automatisch, Schriftgröße, Sortierung, Preise ein/aus, weniger Animationen sowie einzeln schaltbare Hinweise und Chat-Ton.'],
+      ['improved', 'Menü übersichtlich in Bereiche gegliedert (Getränke & Karte, Team & Arbeit, Verwaltung, App) – jeder Punkt mit kurzer Erklärung und dein Profil gleich oben.'],
+      ['improved', 'Mein Profil neu gestaltet: Profilkarte, Status-Vorschläge, PIN mit Wiederholung und Übersicht deiner Rechte.'],
+      ['improved', 'Getränke-Formular neu aufgebaut: Bestseller, Vegan, Glutenfrei und Laktosefrei sind jetzt einstellbar, dazu Live-Marge und Foto-Vorschau.'],
+      ['improved', 'Hellmodus augenschonender: warmer Hintergrund, kräftigere Textfarben und keine dunklen Menüs mehr.'],
+      ['fixed', 'Der Hell/Dunkel-Schalter folgt jetzt der App-Einstellung statt dem Gerät. Dadurch waren Menüs im hellen Modus teils dunkel und Texte schwer lesbar.'],
+      ['fixed', 'Changelog: Die Reiter wurden bei „Alle Versionen“ und „Team-News“ verdeckt.'],
+      ['fixed', 'Design und Ansicht werden jetzt dauerhaft gemerkt.']
+    ] },
   { version: '3.1.01', range: '', date: 'Oktober 2026', title: 'Weichzeichner, neue Verwaltung & neuer Changelog',
     changes: [
       ['new', 'Weichzeichner-Effekt (Milchglas) in Dialogen, Menüs und Hinweisen – in den Einstellungen & Zentrale ein- und ausschaltbar.'],

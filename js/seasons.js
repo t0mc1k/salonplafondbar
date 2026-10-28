@@ -59,6 +59,8 @@
     }
 
     function updateActiveSeasonBadgeUI() {
+      const menuSub = document.getElementById('menuSeasonSub');
+      if (menuSub) menuSub.textContent = currentSeasonFilter ? 'Aktiv: ' + currentSeasonFilter : 'Aktive Karte wechseln';
       const badge = document.getElementById('activeSeasonBadge');
       const seasonNameEl = document.getElementById('activeSeasonName');
       if (!currentSeasonFilter) {
@@ -127,7 +129,7 @@
           <div class="p-3.5 rounded-xl ${activeClass} transition flex items-center justify-between gap-3 cursor-pointer hover:border-amber-400" onclick="selectSeason(${jsArg(s)})">
             <div class="flex flex-col text-left min-w-0">
               <span class="text-sm font-bold truncate">📅 ${escapeHtml(s)}</span>
-              <span class="text-[10px] text-slate-400">${currentSeasonFilter === s ? 'Aktive Saison ✓' : 'Klicken zum Aktivieren'}</span>
+              <span class="text-[10px] text-slate-600 dark:text-slate-400">${currentSeasonFilter === s ? 'Aktive Saison ✓' : 'Klicken zum Aktivieren'}</span>
             </div>
             <div class="flex items-center shrink-0" onclick="event.stopPropagation()">
               ${renameBtnHtml}

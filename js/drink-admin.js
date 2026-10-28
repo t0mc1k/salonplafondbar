@@ -21,11 +21,12 @@
       div.id = rowId;
       div.className = 'flex gap-2 items-center';
       div.innerHTML = `
-        <input type="text" autocomplete="off" placeholder="Zutat (z. B. Tequila)" value="${escapeHtml(name)}" class="ing-name flex-1 p-2 rounded border text-xs">
-        <input type="text" autocomplete="off" placeholder="Menge (z. B. 5cl, 2 Dashes)" value="${escapeHtml(amount)}" class="ing-amount w-36 p-2 rounded border text-xs">
-        <button type="button" onclick="document.getElementById(${jsArg(rowId)}).remove()" class="text-red-500 dark:text-red-400 hover:text-red-300 p-2 text-base font-bold">&times;</button>
+        <input type="text" autocomplete="off" placeholder="Zutat (z. B. Tequila)" value="${escapeHtml(name)}" class="ing-name ui-field flex-1" onkeydown="if (event.key === 'Enter') { event.preventDefault(); this.nextElementSibling.focus(); }">
+        <input type="text" autocomplete="off" placeholder="Menge (z. B. 5 cl)" value="${escapeHtml(amount)}" class="ing-amount ui-field w-32 sm:w-40" onkeydown="if (event.key === 'Enter') { event.preventDefault(); addIngredientRow(); }">
+        <button type="button" onclick="document.getElementById(${jsArg(rowId)}).remove()" class="ing-remove" title="Zutat entfernen">&times;</button>
       `;
       container.appendChild(div);
+      if (!name && !amount && container.children.length > 1) div.querySelector('.ing-name').focus();
     }
 
     function getIngredientsData() {
@@ -67,8 +68,8 @@
       let { data: publicURLData } = _supabase.storage.from('drinks').getPublicUrl(fileName);
       if (publicURLData && publicURLData.publicUrl) {
         document.getElementById('dPhoto').value = publicURLData.publicUrl;
-        status.innerText = '✔ Foto wurde erfolgreich hinzugefügt!';
-        alert("Foto wurde erfolgreich hinzugefügt!");
+        status.innerText = '✔ Foto wurde erfolgreich hochgeladen.';
+        updatePhotoPreview();
       }
     }
 
@@ -112,7 +113,8 @@
       document.getElementById('editingId').value = d.id;
       document.getElementById('formTitle').innerText = "✏️ Getränk bearbeiten";
       document.getElementById('dName').value = d.name || '';
-      document.getElementsByName('dCatRadio').forEach(r => r.checked = (r.value === d.category));
+      formPendingCategories = [];
+      renderCategoryChooser(d.category || '');
       renderSeasonFormSelect(d.season || getAllSeasons()[0]);
       document.getElementById('dGlass').value = d.glass_type || '';
       document.getElementById('dMethod').value = d.method || '';
@@ -124,6 +126,14 @@
       document.getElementById('dAllergens').value = d.allergens || '';
       document.getElementById('dRecipe').value = d.recipe || '';
       document.getElementById('dPhoto').value = d.photo_url || '';
+      document.getElementById('dFeatured').checked = !!d.is_featured;
+      document.getElementById('dVegan').checked = !!d.is_vegan;
+      document.getElementById('dGlutenfree').checked = !!d.is_glutenfree;
+      document.getElementById('dLactosefree').checked = !!d.is_lactosefree;
+      syncAllergenChecks();
+      updateMarginPreview();
+      updatePhotoPreview();
+      document.getElementById('adminFormBody').scrollTop = 0;
       document.getElementById('deleteFormBtn').classList.remove('hidden');
       document.getElementById('adminModal').classList.remove('hidden');
       document.getElementById('adminModal').classList.add('flex');
@@ -147,7 +157,9 @@
     function resetForm() {
       document.getElementById('editingId').value = '';
       document.getElementById('dName').value = '';
-      document.getElementsByName('dCatRadio').forEach(r => r.checked = false);
+      formPendingCategories = [];
+      renderCategoryChooser('');
+      toggleNewCategoryRow(false);
       populateIngredientRows([]);
       document.getElementById('dGlass').value = '';
       document.getElementById('dMethod').value = '';
@@ -158,15 +170,23 @@
       document.getElementById('dAllergens').value = '';
       document.getElementById('dRecipe').value = '';
       document.getElementById('dPhoto').value = '';
+      document.getElementById('dFeatured').checked = false;
+      document.getElementById('dVegan').checked = false;
+      document.getElementById('dGlutenfree').checked = false;
+      document.getElementById('dLactosefree').checked = false;
+      document.querySelectorAll('.preset-alg').forEach(c => c.checked = false);
+      document.getElementById('uploadStatus').innerText = '';
+      updateMarginPreview();
+      updatePhotoPreview();
       document.getElementById('deleteFormBtn').classList.add('hidden');
     }
 
     async function saveDrink() {
       checkDrinkEditAuth(async () => {
         const name = document.getElementById('dName').value;
-        let category = '';
-        document.getElementsByName('dCatRadio').forEach(r => { if (r.checked) category = r.value; });
-        if (!name || !category) return alert("Bitte Name und Kategorie angeben.");
+        const category = document.getElementById('dCategory').value.trim();
+        if (!name.trim()) return alert("Bitte einen Namen angeben.");
+        if (!category) return alert("Bitte eine Kategorie auswählen oder eine neue anlegen.");
 
         const rawCost = document.getElementById('dCost').value;
         const rawPrice = document.getElementById('dPrice').value;
@@ -184,6 +204,10 @@
           allergens: document.getElementById('dAllergens').value,
           recipe: document.getElementById('dRecipe').value,
           photo_url: document.getElementById('dPhoto').value,
+          is_featured: document.getElementById('dFeatured').checked,
+          is_vegan: document.getElementById('dVegan').checked,
+          is_glutenfree: document.getElementById('dGlutenfree').checked,
+          is_lactosefree: document.getElementById('dLactosefree').checked,
           updated_at: new Date().toISOString()
         };
 
@@ -202,6 +226,95 @@
         }
 
         closeAdminModal();
-        loadDrinks();
+        await loadDrinks();
+        showAppToast({ initial: '🍸', title: id ? 'Getränk gespeichert' : 'Getränk angelegt', text: name });
       });
+    }
+
+    // ---------- Kategorie wählen / neu anlegen ----------
+    let formPendingCategories = [];
+
+    function renderCategoryChooser(selected) {
+      const box = document.getElementById('categoryChips');
+      const hidden = document.getElementById('dCategory');
+      if (!box || !hidden) return;
+      const cats = getAllCategories(formPendingCategories);
+      if (selected && !cats.some(c => c.toLowerCase() === selected.toLowerCase())) cats.push(selected);
+      hidden.value = selected || '';
+      box.innerHTML = cats.map(c =>
+        `<button type="button" class="ui-chip ${c === selected ? 'active' : ''}" onclick="selectDrinkCategory(${jsArg(c)})">${escapeHtml(c)}</button>`
+      ).join('') + `<button type="button" class="ui-chip chip-new" onclick="toggleNewCategoryRow()">➕ Neue Kategorie</button>`;
+    }
+
+    function selectDrinkCategory(name) {
+      renderCategoryChooser(name);
+    }
+
+    function toggleNewCategoryRow(force) {
+      const row = document.getElementById('newCategoryRow');
+      if (!row) return;
+      const show = force === undefined ? row.classList.contains('hidden') : !!force;
+      row.classList.toggle('hidden', !show);
+      if (show) document.getElementById('dNewCategory').focus();
+      else document.getElementById('dNewCategory').value = '';
+    }
+
+    function addNewCategory() {
+      const input = document.getElementById('dNewCategory');
+      const name = input.value.trim().replace(/\s+/g, ' ');
+      if (!name) return;
+      if (name.length > 30) return alert("Der Name der Kategorie darf höchstens 30 Zeichen lang sein.");
+      const existing = getAllCategories(formPendingCategories).find(c => c.toLowerCase() === name.toLowerCase());
+      if (existing) {
+        selectDrinkCategory(existing);
+        showAppToast({ initial: '🏷️', title: 'Kategorie gibt es schon', text: `„${existing}“ wurde ausgewählt.` });
+      } else {
+        formPendingCategories.push(name);
+        selectDrinkCategory(name);
+        showAppToast({ initial: '🏷️', title: 'Neue Kategorie', text: `„${name}“ wird mit diesem Getränk gespeichert.` });
+      }
+      toggleNewCategoryRow(false);
+    }
+
+    // ---------- Allergene, Marge, Foto vorschau ----------
+    function syncAllergenChecks() {
+      const text = document.getElementById('dAllergens').value;
+      document.querySelectorAll('.preset-alg').forEach(chk => {
+        const m = /togglePresetAllergen\('([^']+)'/.exec(chk.getAttribute('onchange') || '');
+        if (m) chk.checked = text.indexOf(m[1]) !== -1;
+      });
+    }
+
+    function updateMarginPreview() {
+      const info = document.getElementById('dMarginInfo');
+      if (!info) return;
+      const cost = parseFloat(document.getElementById('dCost').value);
+      const price = parseFloat(document.getElementById('dPrice').value);
+      if (isNaN(cost) || isNaN(price) || price <= 0) {
+        info.textContent = 'Gib beide Preise ein, dann siehst du hier die Marge.';
+        info.classList.remove('margin-good', 'margin-bad');
+        return;
+      }
+      const profit = price - cost;
+      const pct = (profit / price) * 100;
+      const quota = (cost / price) * 100;
+      info.textContent = `Marge: € ${profit.toFixed(2)} (${pct.toFixed(0)} %) · Wareneinsatz-Quote: ${quota.toFixed(0)} %`;
+      info.classList.toggle('margin-good', profit > 0);
+      info.classList.toggle('margin-bad', profit <= 0);
+    }
+
+    function updatePhotoPreview() {
+      const box = document.getElementById('dPhotoPreview');
+      if (!box) return;
+      const url = document.getElementById('dPhoto').value.trim();
+      box.innerHTML = '';
+      if (url) {
+        const img = document.createElement('img');
+        img.src = url;
+        img.alt = 'Vorschau';
+        img.onerror = () => { box.innerHTML = '<span>Foto nicht ladbar</span>'; };
+        box.appendChild(img);
+      } else {
+        box.innerHTML = '<span>Kein Foto</span>';
+      }
     }

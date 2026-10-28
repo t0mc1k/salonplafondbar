@@ -4,6 +4,8 @@
    ============================================================ */
     window.addEventListener("DOMContentLoaded", async () => {
       window.addEventListener('scroll', handleScrollPosition);
+      applyAllSettings();
+      initChatComposer();
       applyVersionLabels();
       startLogoIconCycler();
       await loadStaffPresenceRecordsForLogin();

@@ -48,7 +48,7 @@
         return `
           <div onclick="openDrinkModal(${jsArg(d.id)})" class="cursor-pointer custom-box border hover:border-amber-500 rounded-xl p-1.5 px-3 flex items-center gap-2 shrink-0 transition shadow-sm">
             <span class="text-xs font-bold text-amber-600 dark:text-amber-300 truncate max-w-[120px]">${escapeHtml(d.name)}</span>
-            <button onclick="toggleBarTrayItem(${jsArg(d.id)}, event)" class="text-slate-400 hover:text-red-500 font-bold text-xs p-0.5">&times;</button>
+            <button onclick="toggleBarTrayItem(${jsArg(d.id)}, event)" class="text-slate-600 dark:text-slate-400 hover:text-red-500 font-bold text-xs p-0.5">&times;</button>
           </div>
         `;
       }).join('');
@@ -271,7 +271,7 @@
       container.innerHTML = barTraySelection.map((id, index) => {
         let d = allDrinks.find(item => item.id === id);
         if (!d) return '';
-        let priceText = d.selling_price ? ` (€ ${parseFloat(d.selling_price).toFixed(2)})` : '';
+        let priceText = (d.selling_price && getSetting('showPrices')) ? ` (€ ${parseFloat(d.selling_price).toFixed(2)})` : '';
         let photoHtml = d.photo_url ? `<img src="${escapeHtml(d.photo_url)}" class="w-full h-36 object-cover rounded-lg mb-2 shadow cursor-pointer hover:opacity-95 transition" onclick="openPhotoPreview(${jsArg(d.photo_url)})" alt="${escapeHtml(d.name)}">` : '';
 
         let ingredientsHtml = '';
@@ -287,8 +287,8 @@
               <div class="flex items-center justify-between mb-2">
                 <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">${escapeHtml(d.category || '')}</span>
                 <div class="flex items-center gap-1.5">
-                  <button onclick="openReplaceDrinkModal(${index})" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold rounded text-[11px] border border-slate-700">🔄 Tauschen</button>
-                  <button onclick="toggleBarTrayItem(${jsArg(d.id)}, event); openMultiViewModal();" class="text-red-500 hover:text-red-400 text-xs font-bold p-1">&times;</button>
+                  <button onclick="openReplaceDrinkModal(${index})" class="px-2 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-amber-700 dark:text-amber-400 font-bold rounded text-[11px] border border-slate-300 dark:border-slate-700">🔄 Tauschen</button>
+                  <button onclick="toggleBarTrayItem(${jsArg(d.id)}, event); openMultiViewModal();" class="text-red-500 hover:text-red-700 dark:hover:text-red-400 text-xs font-bold p-1">&times;</button>
                 </div>
               </div>
               ${photoHtml}
@@ -328,7 +328,7 @@
       container.innerHTML = seasonDrinks.map(d => `
         <div onclick="executeReplaceDrink(${jsArg(d.id)})" class="p-2.5 rounded-lg custom-box border hover:border-amber-500 cursor-pointer flex items-center justify-between text-xs transition">
           <span class="font-bold">${escapeHtml(d.name)}</span>
-          <span class="text-[10px] text-slate-400">${escapeHtml(d.category || '')}</span>
+          <span class="text-[10px] text-slate-600 dark:text-slate-400">${escapeHtml(d.category || '')}</span>
         </div>
       `).join('');
 

@@ -13,6 +13,7 @@ js/                 Logik, in Themen aufgeteilt (siehe unten)
 | Ich will ändern ...                                     | Datei                |
 |---------------------------------------------------------|----------------------|
 | Supabase-Adresse/Key, gemeinsame Variablen, Hilfsfunktionen | js/config.js    |
+| Einstellungen & Zentrale (Design, Schrift, Sortierung, Blur ...) | js/settings.js |
 | Menü, Einstellungen, Theme, Blur, Hinweise (Toast), Vollbild, Foto-Vorschau | js/ui.js |
 | PIN-Login, Rollen/Rechte, Abmelden, Hinweis bei Kollegen-Login | js/auth.js    |
 | Eigenes Profil, Profil anderer Mitarbeiter              | js/profile.js        |
