@@ -121,10 +121,6 @@
       showAppToast({ initial: '↩️', title: 'Einstellungen zurückgesetzt', text: 'Alles steht wieder auf Standard.' });
     }
 
-    function reloadApp() {
-      location.reload();
-    }
-
     // ---------- Getränke: Ansicht & Sortierung ----------
     function setViewMode(mode) {
       viewMode = mode === 'list' ? 'list' : 'grid';

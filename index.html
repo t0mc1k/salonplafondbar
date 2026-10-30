@@ -2,8 +2,16 @@
 <html lang="de" id="htmlRoot">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salonplafond BAR v3.1.02</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Salonplafond">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Salonplafond BAR v3.1.03</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import & Export -->
@@ -26,9 +34,9 @@
       window.__salonDark = dark;
     } catch (e) { document.documentElement.classList.add('dark'); window.__salonDark = true; }
   </script>
-  <link rel="stylesheet" href="css/style.css?v=3.1.02">
+  <link rel="stylesheet" href="css/style.css?v=3.1.03">
 </head>
-<body class="dark-mode p-4 md:p-8 max-w-6xl mx-auto pb-32" onclick="closeDropdowns(event)">
+<body class="dark-mode p-3 pt-0 md:p-8 max-w-6xl mx-auto pb-32" onclick="closeDropdowns(event)">
   <script>if (window.__salonDark === false) { document.body.classList.remove('dark-mode'); document.body.classList.add('light-mode'); }</script>
 
   <!-- 1. PRIHLASOVACIA OBRAZOVKA -->
@@ -44,7 +52,7 @@
       <div>
         <h1 class="text-lg md:text-xl font-black tracking-wider text-slate-900 dark:text-white uppercase">Anmeldung</h1>
         <h2 class="text-xl md:text-2xl font-extrabold text-amber-700 dark:text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-600 dark:text-slate-400 font-medium mt-0.5 block"><span data-app-version>v3.1.02</span> • Touch-Grid PIN-Login</span>
+        <span class="text-xs text-slate-600 dark:text-slate-400 font-medium mt-0.5 block"><span data-app-version>v3.1.03</span> • Touch-Grid PIN-Login</span>
       </div>
 
       <div id="pinLoginForm" class="w-full bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 p-5 rounded-2xl shadow-2xl space-y-4 text-left mt-1">
@@ -355,8 +363,8 @@
   <div id="appContainer" class="hidden">
 
     <!-- Header -->
-    <header class="flex flex-col md:flex-row justify-between items-center gap-4 mb-4 pb-4 border-b border-slate-300 dark:border-slate-700">
-      <div class="flex items-center gap-3">
+    <header id="appBar" class="app-bar">
+      <div class="flex items-center gap-2.5 md:gap-3 min-w-0">
         <div class="header-logo-container" onclick="showRandomMotivation(event)" title="Klick mich für Osterei-Motivation! 🍸">
           <span class="logo-macron" id="headerLogoMacron"></span>
           <span class="logo-main-char" id="headerLogoChar">O</span>
@@ -364,28 +372,28 @@
         </div>
 
         <div class="flex flex-col justify-center">
-          <h1 class="text-3xl font-bold tracking-tight text-amber-700 dark:text-amber-400 leading-none">Salonplafond BAR</h1>
-          <span class="text-xs text-slate-600 dark:text-slate-400 font-medium block mt-0.5" data-app-version>v3.1.02</span>
+          <h1 class="text-lg md:text-3xl font-bold tracking-tight text-amber-700 dark:text-amber-400 leading-none whitespace-nowrap"><span class="md:hidden">Salonplafond</span><span class="hidden md:inline">Salonplafond BAR</span></h1>
+          <span class="text-[10px] md:text-xs text-slate-600 dark:text-slate-400 font-medium block mt-0.5" data-app-version>v3.1.03</span>
         </div>
       </div>
 
-      <div class="flex flex-wrap items-center gap-2">
-        <button onclick="handleLogout()" class="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/30 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm" title="Benutzer wechseln">
+      <div class="flex items-center gap-2 shrink-0">
+        <button onclick="handleLogout()" class="hidden md:inline-flex px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/30 rounded-lg text-xs font-bold transition items-center gap-1.5 shadow-sm" title="Benutzer wechseln">
           🚪 Benutzer wechseln
         </button>
 
-        <button onclick="openTeamChatModal()" id="headerChatEnvelopeBtn" class="relative px-3 py-1.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-amber-600 dark:text-amber-400 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm" title="Team-Chat öffnen">
-          <span>✉️ Chat</span>
+        <button onclick="openTeamChatModal()" id="headerChatEnvelopeBtn" class="relative px-3 py-2 md:py-1.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-amber-700 dark:text-amber-400 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm" title="Team-Chat öffnen">
+          <span>✉️<span class="hidden sm:inline"> Chat</span></span>
           <span id="headerChatBadgeDot" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white dark:border-slate-950 pulse-badge-dot"></span>
         </button>
 
-        <button onclick="toggleFullscreen()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-lg text-xs font-semibold border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-300 flex items-center gap-1 transition">
+        <button onclick="toggleFullscreen()" class="hidden md:inline-flex px-3 py-1.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-lg text-xs font-semibold border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-300 items-center gap-1 transition">
           ⛶ Vollbild
         </button>
 
         <div class="relative">
-          <button onclick="toggleSettingsMenu(event)" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs flex items-center gap-1 shadow-md transition relative">
-            ⚙️ Menü
+          <button onclick="toggleSettingsMenu(event)" class="px-3 py-2 md:py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs flex items-center gap-1 shadow-md transition relative">
+            ☰ Menü
             <span id="menuNotificationDot" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-amber-500 dark:bg-amber-400 rounded-full border-2 border-white dark:border-slate-950 pulse-badge-dot"></span>
           </button>
 
@@ -460,9 +468,17 @@
               <span class="menu-ico">🔄</span>
               <span class="menu-text"><span class="menu-label">Daten aktualisieren</span><span class="menu-sub">Getränke neu laden</span></span>
             </button>
+            <button type="button" onclick="openInstallSettings()" id="menuInstallBtn" class="hidden menu-item">
+              <span class="menu-ico">📲</span>
+              <span class="menu-text"><span class="menu-label">App installieren</span><span class="menu-sub">Symbol auf dem Startbildschirm</span></span>
+            </button>
+            <button type="button" onclick="toggleFullscreen(); closeSettingsMenu();" class="menu-item menu-mobile-only">
+              <span class="menu-ico">⛶</span>
+              <span class="menu-text"><span class="menu-label">Vollbild</span><span class="menu-sub">Ganzer Bildschirm ein/aus</span></span>
+            </button>
             <button type="button" onclick="openChangelogModal()" class="menu-item">
               <span class="menu-ico">🚀</span>
-              <span class="menu-text"><span class="menu-label">Was ist neu?</span><span class="menu-sub">Neuigkeiten in <span data-app-version>v3.1.02</span></span></span>
+              <span class="menu-text"><span class="menu-label">Was ist neu?</span><span class="menu-sub">Neuigkeiten in <span data-app-version>v3.1.03</span></span></span>
             </button>
             <button type="button" onclick="openSupportModal()" class="menu-item">
               <span class="menu-ico">🛟<span id="menuDropdownTicketDot" class="hidden menu-dot pulse-badge-dot"></span></span>
@@ -481,51 +497,41 @@
       </div>
     </header>
 
-    <div class="mb-6 flex items-center justify-between flex-wrap gap-3">
+    <!-- Angemeldet (nur am Computer; am Handy zeigt der runde Avatar oben das Profil) -->
+    <div class="hidden md:flex mb-5 items-center justify-between flex-wrap gap-3">
       <div class="inline-flex items-center gap-3">
         <div id="headerUserAvatarContainer" onclick="openUserProfileModal()" class="w-8 h-8 rounded-full border-2 border-amber-500 bg-slate-100 dark:bg-slate-800 overflow-hidden flex items-center justify-center shrink-0 cursor-pointer hover:scale-105 transition shadow" title="Klicken, um mein Profil zu öffnen">
           <span class="text-[10px] font-bold text-amber-700 dark:text-amber-400" id="headerAvatarFallback">?</span>
         </div>
-        <span class="text-xs text-slate-800 dark:text-slate-200 font-bold">Angemeldet: <span id="currentUserEmail" class="text-amber-600 dark:text-amber-300"></span></span>
+        <span class="text-xs text-slate-800 dark:text-slate-200 font-bold">Angemeldet: <span id="currentUserEmail" class="text-amber-700 dark:text-amber-300"></span></span>
       </div>
-
-      <button onclick="openWorkScheduleModal()" class="px-3.5 py-2 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-700 dark:text-amber-400 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
-        📅 Mein Arbeitsplan anzeigen
-      </button>
     </div>
 
-    <!-- Vyhľadávacie pole -->
-    <div class="mb-6 flex flex-col md:flex-row justify-between items-center gap-3">
+    <!-- Suche -->
+    <div class="mb-3 md:mb-4">
       <div class="relative w-full">
         <input type="text" id="searchInput" autocomplete="off" oninput="onSearchInput()" placeholder="🔍 Getränk oder Zutat suchen..." class="px-4 py-3 pr-10 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white w-full focus:outline-none focus:border-amber-500 text-sm shadow-md font-medium">
         <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-sm font-bold bg-slate-200/70 dark:bg-slate-700/50 hover:bg-slate-300 dark:hover:bg-slate-700 w-5 h-5 rounded-full items-center justify-center">&times;</button>
       </div>
-      <div id="activeSeasonBadge" onclick="openSeasonModal()" title="Klicken, um Saison zu wechseln" class="hidden cursor-pointer px-4 py-2.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-xl text-amber-700 dark:text-amber-400 text-xs font-bold flex items-center gap-2 transition shrink-0 shadow-sm">
-        <span>📅 Saison:</span> <span id="activeSeasonName"></span>
-      </div>
     </div>
 
-    <div id="addDrinkBtnContainer" class="hidden mb-4">
-      <button onclick="openAddDrinkModal()" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl text-xs transition shadow-md flex items-center gap-2">
-        ➕ Neues Getränk hinzufügen
-      </button>
+    <!-- Kategorien (wischbar) -->
+    <div class="cat-bar mb-2 md:mb-3">
+      <span class="hidden md:inline text-xs text-slate-600 dark:text-slate-400 font-semibold mr-1 shrink-0">Kategorie:</span>
+      <div id="categories" class="flex gap-2"></div>
     </div>
 
-    <div class="flex flex-col gap-3 mb-6">
-      <div class="flex items-center gap-2 overflow-x-auto pb-2">
-        <span class="text-xs text-slate-600 dark:text-slate-400 font-semibold mr-1 shrink-0">Kategorie:</span>
-        <div id="categories" class="flex gap-2"></div>
+    <!-- Schnellzugriff: Saison, Arbeitsplan, Filter -->
+    <div class="quick-row mb-3 md:mb-5">
+      <div id="activeSeasonBadge" onclick="openSeasonModal()" title="Klicken, um Saison zu wechseln" class="hidden quick-chip quick-chip-amber">
+        <span>📅<span class="hidden sm:inline"> Saison:</span></span> <span id="activeSeasonName"></span>
       </div>
-      
-      <div class="flex flex-col gap-2">
-        <div class="flex items-center gap-2">
-          <button onclick="toggleFilterDrawer()" class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-amber-700 dark:text-amber-400 text-xs font-bold flex items-center gap-1.5 transition">
-            ⚡ Filter & Glasauswahl <span id="filterArrow">▼</span>
-          </button>
-          <span class="text-[11px] text-slate-500" id="activeFilterSummary"></span>
-        </div>
+      <button type="button" onclick="openWorkScheduleModal()" class="quick-chip">🗓️ Arbeitsplan</button>
+      <button type="button" onclick="toggleFilterDrawer()" class="quick-chip">⚡ Filter <span id="filterArrow">▼</span></button>
+      <span class="text-[11px] text-slate-500 shrink-0" id="activeFilterSummary"></span>
+    </div>
 
-        <div id="filterDrawer" class="hidden flex-col gap-3 p-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-xl shadow-sm transition-all">
+    <div id="filterDrawer" class="hidden flex-col gap-3 p-3 mb-4 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-xl shadow-sm transition-all">
           <div>
             <span class="text-xs text-slate-600 dark:text-slate-400 font-semibold mb-1.5 block">Ernährung & Bestseller:</span>
             <div class="flex gap-2 items-center overflow-x-auto text-xs">
@@ -543,7 +549,12 @@
             <div id="glassFilterContainer" class="flex gap-1.5 flex-wrap text-xs"></div>
           </div>
         </div>
-      </div>
+
+    <!-- Neues Getränk: am Handy runder ➕-Knopf unten rechts -->
+    <div id="addDrinkBtnContainer" class="hidden fab-wrap">
+      <button type="button" onclick="openAddDrinkModal()" class="fab-add" title="Neues Getränk hinzufügen">
+        <span class="fab-ico">➕</span><span class="fab-label">Neues Getränk hinzufügen</span>
+      </button>
     </div>
 
     <div id="drinksGrid">
@@ -551,7 +562,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-300 dark:border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App <span data-app-version>v3.1.02</span> • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App <span data-app-version>v3.1.03</span> • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div>
@@ -892,10 +903,19 @@
           </div>
         </section>
 
+        <section class="set-card" id="setInstall">
+          <h4 class="set-head">📲 App installieren</h4>
+          <div class="set-row">
+            <div class="set-text"><b>Auf dem Startbildschirm</b><small id="installStatus">Mit einem Symbol auf dem Startbildschirm startet die App wie eine normale App.</small></div>
+            <button type="button" id="installBtn" onclick="installApp()" class="ui-btn-primary">📲 So geht’s</button>
+          </div>
+          <div id="installSteps" class="install-steps hidden"></div>
+        </section>
+
         <section class="set-card">
           <h4 class="set-head">🧰 App</h4>
           <div class="set-row">
-            <div class="set-text"><b>Version</b><small>Salonplafond BAR <span data-app-version>v3.1.02</span></small></div>
+            <div class="set-text"><b>Version</b><small>Salonplafond BAR <span data-app-version>v3.1.03</span></small></div>
             <button type="button" onclick="closeUnifiedSettingsModal(); openChangelogModal();" class="ui-btn-ghost">🚀 Was ist neu?</button>
           </div>
           <div class="set-row">
@@ -1149,7 +1169,7 @@
       <div class="ui-head">
         <div>
           <h3 class="ui-head-title">🚀 Was ist neu?</h3>
-          <p class="ui-head-sub">Aktuelle Version <span id="changelogVersionBadge" class="cl-ver">v3.1.02</span></p>
+          <p class="ui-head-sub">Aktuelle Version <span id="changelogVersionBadge" class="cl-ver">v3.1.03</span></p>
         </div>
         <button type="button" onclick="closeChangelogModal()" class="ui-close" aria-label="Schließen">&times;</button>
       </div>
@@ -1338,23 +1358,24 @@
     </div>
   </div>
 
-  <script src="js/config.js?v=3.1.02"></script>
-  <script src="js/ui.js?v=3.1.02"></script>
-  <script src="js/settings.js?v=3.1.02"></script>
-  <script src="js/auth.js?v=3.1.02"></script>
-  <script src="js/profile.js?v=3.1.02"></script>
-  <script src="js/staff-admin.js?v=3.1.02"></script>
-  <script src="js/chat.js?v=3.1.02"></script>
-  <script src="js/tickets.js?v=3.1.02"></script>
-  <script src="js/changelog.js?v=3.1.02"></script>
-  <script src="js/schedule.js?v=3.1.02"></script>
-  <script src="js/seasons.js?v=3.1.02"></script>
-  <script src="js/drinks.js?v=3.1.02"></script>
-  <script src="js/drink-admin.js?v=3.1.02"></script>
-  <script src="js/tray.js?v=3.1.02"></script>
-  <script src="js/shopping.js?v=3.1.02"></script>
-  <script src="js/import-export.js?v=3.1.02"></script>
-  <script src="js/print-a3.js?v=3.1.02"></script>
-  <script src="js/app.js?v=3.1.02"></script>
+  <script src="js/config.js?v=3.1.03"></script>
+  <script src="js/ui.js?v=3.1.03"></script>
+  <script src="js/settings.js?v=3.1.03"></script>
+  <script src="js/pwa.js?v=3.1.03"></script>
+  <script src="js/auth.js?v=3.1.03"></script>
+  <script src="js/profile.js?v=3.1.03"></script>
+  <script src="js/staff-admin.js?v=3.1.03"></script>
+  <script src="js/chat.js?v=3.1.03"></script>
+  <script src="js/tickets.js?v=3.1.03"></script>
+  <script src="js/changelog.js?v=3.1.03"></script>
+  <script src="js/schedule.js?v=3.1.03"></script>
+  <script src="js/seasons.js?v=3.1.03"></script>
+  <script src="js/drinks.js?v=3.1.03"></script>
+  <script src="js/drink-admin.js?v=3.1.03"></script>
+  <script src="js/tray.js?v=3.1.03"></script>
+  <script src="js/shopping.js?v=3.1.03"></script>
+  <script src="js/import-export.js?v=3.1.03"></script>
+  <script src="js/print-a3.js?v=3.1.03"></script>
+  <script src="js/app.js?v=3.1.03"></script>
 </body>
 </html>

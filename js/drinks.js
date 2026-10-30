@@ -83,6 +83,7 @@
       }
       updateActiveSeasonBadgeUI();
       renderSeasonFormSelect(currentSeasonFilter);
+      renderCategories();
       renderGlassFilterButtons();
       renderDrinks();
       renderBarTrayUI();

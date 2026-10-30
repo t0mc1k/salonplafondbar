@@ -4,11 +4,23 @@
    ============================================================ */
     function updateHeaderAvatarUI() {
       const container = document.getElementById('headerUserAvatarContainer');
+      const mobileAv = document.getElementById('headerMobileAvatar');
       const menuThumbContainer = document.getElementById('menuAvatarThumbnailContainer');
       const menuName = document.getElementById('menuUserName');
       const menuRole = document.getElementById('menuUserRole');
       if (menuName) menuName.textContent = currentWaiterName || 'Mein Profil';
       if (menuRole) menuRole.textContent = ({ developer: 'Developer', manager: 'Manager' }[currentStaffRole] || 'Kellner') + ' · Profil bearbeiten';
+
+      if (mobileAv) {
+        mobileAv.innerHTML = '';
+        if (currentWaiterAvatar) {
+          const im = document.createElement('img');
+          im.src = currentWaiterAvatar; im.alt = currentWaiterName || '';
+          mobileAv.appendChild(im);
+        } else {
+          mobileAv.textContent = currentWaiterName ? currentWaiterName.charAt(0).toUpperCase() : '?';
+        }
+      }
 
       if (currentWaiterAvatar) {
         container.innerHTML = `<img src="${escapeHtml(currentWaiterAvatar)}" class="w-full h-full object-cover" alt="${escapeHtml(currentWaiterName)}">`;

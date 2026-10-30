@@ -7,6 +7,7 @@
       applyAllSettings();
       initChatComposer();
       applyVersionLabels();
+      initPwa();
       startLogoIconCycler();
       await loadStaffPresenceRecordsForLogin();
 

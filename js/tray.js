@@ -32,6 +32,7 @@
       const countBadge = document.getElementById('trayCountBadge');
       
       if (countBadge) countBadge.innerText = barTraySelection.length;
+      document.body.classList.toggle('has-tray', barTraySelection.length > 0);
 
       if (barTraySelection.length === 0) {
         bar.classList.add('hidden');

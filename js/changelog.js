@@ -10,9 +10,17 @@
    Änderungs-Typen: 'new' Neu, 'improved' Verbessert, 'fixed' Behoben,
                     'security' Sicherheit, 'info' Allgemein
    ============================================================ */
-    const APP_VERSION = '3.1.02';
+    const APP_VERSION = '3.1.03';
 
     const CHANGELOG = [
+  { version: '3.1.03', range: '', date: 'Oktober 2026', title: 'Handy-Ansicht & App installieren',
+    changes: [
+      ['new', 'App installierbar: Symbol auf dem Startbildschirm (Android, iPhone, Computer). Sie startet ohne Browser-Leiste, öffnet schneller und auch bei schwachem Netz. Installieren-Knopf und Anleitung findest du unter Menü → App installieren bzw. in den Einstellungen.'],
+      ['improved', 'Handy-Ansicht deutlich einfacher: schlanke Kopfleiste (Chat und Menü), Kategorien und Schnellzugriff (Saison, Arbeitsplan, Filter) als wischbare Reihen und ein runder ➕-Knopf unten rechts für neue Getränke.'],
+      ['improved', 'Benutzer wechseln und Vollbild liegen am Handy im Menü; am Computer bleibt alles wie gewohnt in der Kopfleiste.'],
+      ['improved', '„App neu laden“ leert jetzt auch den Zwischenspeicher der App.'],
+      ['fixed', 'Die Kategorien-Leiste blieb nach dem Start leer, bis man eine Saison oder Kategorie wählte.']
+    ] },
   { version: '3.1.02', range: '', date: 'Oktober 2026', title: 'Team-Chat, neues Menü, Einstellungen & augenschonender Hellmodus',
     changes: [
       ['new', 'Team-Chat als echte Kommunikations-App: Reaktionen mit Emoji, Nachrichten bearbeiten, Fotos senden, wichtige Nachricht anpinnen, Suche, „schreibt ...“-Anzeige, Trennung nach Tagen und Markierung neuer Nachrichten.'],

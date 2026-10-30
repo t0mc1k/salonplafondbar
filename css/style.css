@@ -34,6 +34,7 @@
     }
 
     .header-logo-container {
+      flex-shrink: 0;
       position: relative;
       width: 3rem;
       height: 3rem;
@@ -622,3 +623,52 @@ body.dark-mode .chat-mention-dd { background: #1e293b; }
 .chat-indicator.hidden, .chat-emoji-panel.hidden, .chat-mention-dd.hidden, .chat-picker.hidden,
 .menu-item.hidden, .menu-primary.hidden, .menu-count.hidden, .menu-dot.hidden, #menuAdminSection.hidden,
 .staff-card.hidden, .set-card.hidden, .profile-dirty.hidden { display: none !important; }
+
+/* =====================================================================
+   HANDY-ANSICHT & APP-INSTALLATION (v3.1.03)
+   ===================================================================== */
+.app-bar { display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding: .35rem 0 .9rem; margin-bottom: 1rem; border-bottom: 1px solid var(--ui-border); }
+.mobile-avatar { display: flex; align-items: center; justify-content: center; width: 2.25rem; height: 2.25rem; border-radius: 50%; overflow: hidden; border: 2px solid #f59e0b; background: var(--ui-surface-hover); color: var(--ui-accent); font-size: .85rem; font-weight: 800; }
+.mobile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.cat-bar { display: flex; align-items: center; gap: .5rem; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; padding-bottom: .25rem; }
+.cat-bar::-webkit-scrollbar, .quick-row::-webkit-scrollbar { display: none; }
+.cat-bar > #categories { flex-shrink: 0; }
+.cat-bar button { flex-shrink: 0; white-space: nowrap; }
+
+.quick-row { display: flex; align-items: center; gap: .5rem; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.quick-chip { display: inline-flex; align-items: center; gap: .35rem; padding: .5rem .9rem; border-radius: 999px; flex-shrink: 0; font-size: .75rem; font-weight: 700; white-space: nowrap; color: var(--ui-text); background: var(--ui-surface); border: 1px solid var(--ui-border); transition: background .15s; cursor: pointer; }
+.quick-chip:hover { background: var(--ui-surface-hover); }
+.quick-chip-amber { color: var(--ui-accent); background: rgba(245, 158, 11, .12); border-color: rgba(245, 158, 11, .4); }
+.quick-chip.hidden { display: none !important; }
+@media (min-width: 768px) { .quick-row { flex-wrap: wrap; overflow: visible; } }
+
+.fab-wrap { margin-bottom: 1rem; }
+.fab-add { display: inline-flex; align-items: center; gap: .5rem; padding: .65rem 1rem; border-radius: .9rem; background: #f59e0b; color: #0f172a; font-weight: 800; font-size: .8rem; box-shadow: 0 6px 16px rgba(0,0,0,.25); transition: background .15s; }
+.fab-add:hover { background: #d97706; }
+.menu-mobile-only { }
+@media (min-width: 768px) { .menu-mobile-only { display: none !important; } }
+
+@media (max-width: 767px) {
+  .app-bar { position: sticky; top: 0; z-index: 35; margin: 0 -.75rem .75rem; padding: .55rem .75rem; }
+  body.dark-mode .app-bar { background: rgba(15, 23, 42, .97); }
+  body.light-mode .app-bar { background: rgba(243, 241, 236, .97); }
+  .header-logo-container { width: 2.5rem; height: 2.5rem; border-radius: .65rem; }
+  .logo-main-char { font-size: 1.05rem; }
+  .logo-macron { width: 1.35rem; height: 2.5px; }
+  .logo-dot { font-size: 7px; }
+  .fab-wrap { margin: 0; height: 0; }
+  .fab-add { position: fixed; right: 1rem; bottom: calc(1rem + env(safe-area-inset-bottom)); z-index: 45; width: 3.6rem; height: 3.6rem; padding: 0; justify-content: center; border-radius: 50%; box-shadow: 0 10px 24px rgba(0,0,0,.4); }
+  .fab-label { display: none; }
+  .fab-ico { font-size: 1.6rem; line-height: 1; }
+  body.has-tray .fab-add { bottom: calc(6rem + env(safe-area-inset-bottom)); }
+  #scrollToTopBtn { right: auto !important; left: 1rem; bottom: calc(1rem + env(safe-area-inset-bottom)) !important; }
+  body.has-tray #scrollToTopBtn { bottom: calc(6rem + env(safe-area-inset-bottom)) !important; }
+}
+
+/* App installieren */
+.install-steps { margin: 0 0 .8rem; padding: .75rem .9rem; border-radius: .8rem; background: var(--ui-surface-hover); font-size: .75rem; line-height: 1.5; color: var(--ui-text); }
+.install-steps ol { list-style: decimal; margin: .3rem 0 0 1.1rem; padding: 0; }
+.install-steps li { margin: .25rem 0; }
+.install-steps .install-title { font-weight: 800; color: var(--ui-accent); }
+.install-steps.hidden { display: none !important; }
