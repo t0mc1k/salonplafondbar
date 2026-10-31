@@ -1,10 +1,10 @@
 /* ============================================================
    js/schedule.js
-   Arbeitsplan (Supabase Integration: Mit Mitarbeiter-Filter für Manager)
+   Arbeitsplan (Supabase Integration: Mit Select-Dropdown & sauberem Layout)
    ============================================================ */
 
     let currentScheduleView = 'personal'; // 'personal' alebo 'team'
-    let selectedTeamEmployee = 'ALL';     // Filter pre konkrétneho zamestnanca v manažérskom móde
+    let selectedTeamEmployee = 'ALL';     // Filter pre konkrétneho zamestnanca
 
     // Pomocná funkcia na prevod Excel desatinného čísla na čas "HH:MM"
     function excelDecimalToTime(val) {
@@ -30,6 +30,7 @@
     async function openWorkScheduleModal() {
       closeSettingsMenu();
       currentScheduleView = 'personal';
+      selectedTeamEmployee = 'ALL';
       renderScheduleModalContent();
     }
 
@@ -113,18 +114,17 @@
 
           container.innerHTML = headerHtml + `
             <div class="font-bold text-amber-600 dark:text-amber-400 mb-2">📅 Arbeitsplan ${currentMonth}/${currentYear} (Mitarbeiter: ${escapeHtml(currentWaiterName)})</div>
-            <div class="flex flex-col gap-2 max-h-[55vh] overflow-y-auto pr-1">${htmlRows}</div>
+            <div class="flex flex-col gap-2 pr-1">${htmlRows}</div>
           `;
         } catch (err) {
           container.innerHTML = headerHtml + `<p class="text-xs text-red-500">Fehler: ${escapeHtml(err.message)}</p>`;
         }
 
       } else {
-        // TEAM / MANAGER ANSICHT S FILTROM
+        // TEAM / MANAGER ANSICHT S SELECTOM A JEDINÝM POSUVNÍKOM
         container.innerHTML = headerHtml + `<p class="text-slate-500 italic text-xs text-center py-4">Lade Team-Daten...</p>`;
 
         try {
-          // Stiahneme všetkých zamestnancov pre daný mesiac, aby sme zistili zoznam mien do dropdownu
           const { data: allSchedules, error } = await _supabase
             .from("work_schedules")
             .select("*")
@@ -141,16 +141,14 @@
             return;
           }
 
-          // Zostavíme jedinečný zoznam mien zamestnancov
+          // Zostavíme zoznam jedinečných mien pre select
           const employees = [...new Set(allSchedules.map(s => s.employee_name))].sort();
 
-          // Filtrovanie dát podľa zvoleného zamestnanca
           let filteredSchedules = allSchedules;
           if (selectedTeamEmployee !== 'ALL') {
             filteredSchedules = allSchedules.filter(s => s.employee_name === selectedTeamEmployee);
           }
 
-          // Vytvorenie HTML pre výberové pole (dropdown)
           let optionsHtml = `<option value="ALL">🌐 Alle Mitarbeiter anzeigen (${allSchedules.length} Schichten)</option>`;
           employees.forEach(emp => {
             optionsHtml += `<option value="${escapeHtml(emp)}" ${selectedTeamEmployee === emp ? 'selected' : ''}>👤 ${escapeHtml(emp)}</option>`;
@@ -191,12 +189,14 @@
 
           container.innerHTML = headerHtml + `
             <div class="mb-3">
-              <label class="block text-[11px] font-bold text-slate-400 mb-1">Mitarbeiter filtern:</label>
-              <select onchange="filterTeamEmployee(this.value)" class="w-full bg-slate-800 border border-slate-700 text-white text-xs rounded-lg p-2 focus:outline-none focus:border-amber-500">
+              <label class="block text-[11px] font-bold text-slate-400 mb-1">Mitarbeiter auswählen:</label>
+              <select onchange="filterTeamEmployee(this.value)" class="w-full bg-slate-800 border border-slate-700 text-white text-xs rounded-lg p-2.5 focus:outline-none focus:border-amber-500">
                 ${optionsHtml}
               </select>
             </div>
-            <div class="flex flex-col gap-2 max-h-[48vh] overflow-y-auto pr-1">${htmlRows}</div>
+            <div class="flex flex-col gap-2 pr-1">
+              ${htmlRows.length > 0 ? htmlRows : '<p class="text-xs text-slate-500 italic text-center py-4">Keine Schichten gefunden.</p>'}
+            </div>
           `;
         } catch (err) {
           container.innerHTML = headerHtml + `<p class="text-xs text-red-500">Fehler: ${escapeHtml(err.message)}</p>`;
@@ -206,7 +206,7 @@
 
     function switchScheduleView(view) {
       currentScheduleView = view;
-      selectedTeamEmployee = 'ALL'; // Reset filtra pri prepnutí
+      selectedTeamEmployee = 'ALL';
       renderScheduleModalContent();
     }
 
