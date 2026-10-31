@@ -1254,64 +1254,132 @@
     </div>
   </div>
 
-  <!-- Jednotný Import & Export Dialog Modal -->
+  <!-- Jednotný Import & Export Dialog Modal s dvoma záložkami (Drinky vs Pracovný plán) -->
   <div id="importExportModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-    <div class="card max-w-xl w-full p-6 relative flex flex-col gap-6 max-h-[90vh] overflow-y-auto border-amber-500/50 shadow-2xl">
-      <button onclick="closeImportExportModal()" class="absolute top-4 right-4 text-slate-400 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-2xl font-bold">&times;</button>
-      
-      <div>
-        <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400 flex items-center gap-2">📊 Import & Export (Zentrale)</h3>
-        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Verwalte deine Rezept-Datenbank zentral durch Export oder geführten Import.</p>
+    <div class="card max-w-2xl w-full relative flex flex-col max-h-[90vh] overflow-hidden p-0 border-amber-500/50 shadow-2xl">
+
+      <!-- Hlavička Modalu -->
+      <div class="ui-head">
+        <div>
+          <h3 class="ui-head-title">📊 Import & Export (Zentrale)</h3>
+          <p class="ui-head-sub">Verwaltung von Rezepten und monatlichem Arbeitsplan (DPL).</p>
+        </div>
+        <button type="button" onclick="closeImportExportModal()" class="ui-close" aria-label="Schließen">&times;</button>
       </div>
 
-      <div class="custom-box p-4 rounded-xl border flex flex-col gap-3">
-        <h4 class="text-sm font-bold flex items-center gap-1.5">📤 Daten exportieren</h4>
-        <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
-          Wähle die gewünschte Saison aus und exportiere die Rezepte in dein bevorzugtes Format (Excel oder CSV).
-        </p>
-        
-        <div class="flex flex-col gap-2 mt-1">
-          <label class="text-[11px] font-semibold">Saison für Export wählen:</label>
-          <select id="exportSeasonSelect" class="p-2.5 rounded-lg border text-xs w-full"></select>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
-          <button onclick="exportToExcel()" class="py-2.5 px-3 custom-box hover:bg-slate-200 dark:hover:bg-slate-800 text-amber-700 dark:text-amber-400 font-bold rounded-lg text-xs border transition flex items-center justify-center gap-1.5">
-            📗 Excel (.xlsx) exportieren
-          </button>
-          <button onclick="exportToCSV()" class="py-2.5 px-3 custom-box hover:bg-slate-200 dark:hover:bg-slate-800 text-amber-700 dark:text-amber-400 font-bold rounded-lg text-xs border transition flex items-center justify-center gap-1.5">
-            📊 CSV-Tabelle exportieren
-          </button>
-        </div>
+      <!-- Prepínač Záložiek (Tab-Leiste) -->
+      <div class="flex border-b border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900/50 p-1 gap-1">
+        <button type="button" onclick="switchImportTab('drinks')" id="tabBtnDrinks" class="flex-1 py-2 px-3 text-xs font-bold rounded-lg transition bg-amber-500 text-slate-950 shadow-sm">🍸 Getränke Import / Export</button>
+        <button type="button" onclick="switchImportTab('schedule')" id="tabBtnSchedule" class="flex-1 py-2 px-3 text-xs font-bold rounded-lg transition text-slate-600 dark:text-slate-400 hover:text-amber-500">📅 Arbeitsplan Import (DPL)</button>
       </div>
 
-      <div class="custom-box p-4 rounded-xl border flex flex-col gap-3">
-        <h4 class="text-sm font-bold flex items-center gap-1.5">📥 Rezepte importieren (Assistent)</h4>
-        <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
-          Lade eine strukturierte Excel-Datei (.xlsx, .xls) hoch, um neue Rezepte direkt in eine gewählte Saison einzuspielen.
-        </p>
-        
-        <div class="flex flex-col gap-2.5 mt-1">
-          <div>
-            <label class="text-[11px] font-semibold mb-1 block">1. Excel-Datei auswählen:</label>
-            <input type="file" id="wizardExcelFile" accept=".xlsx, .xls" class="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-600 cursor-pointer w-full custom-box p-2 rounded-lg border">
+      <div class="flex-1 overflow-y-auto p-5 flex flex-col gap-5">
+
+        <!-- KARTA 1: GETRÄNKE IMPORT & EXPORT -->
+        <div id="importSectionDrinks" class="flex flex-col gap-5">
+
+          <!-- Export Sekcia -->
+          <div class="custom-box p-4 rounded-xl border flex flex-col gap-3">
+            <h4 class="text-sm font-bold flex items-center gap-1.5 text-amber-600 dark:text-amber-400">📤 Getränke exportieren</h4>
+            <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
+              Wähle die gewünschte Saison aus und exportiere die Rezepte in dein bevorzugtes Format (Excel oder CSV).
+            </p>
+            
+            <div class="flex flex-col gap-1.5 mt-1">
+              <label class="text-[11px] font-semibold">Saison für Export wählen:</label>
+              <select id="exportSeasonSelect" class="p-2.5 rounded-lg border text-xs w-full bg-slate-100 dark:bg-slate-900 border-slate-300 dark:border-slate-700"></select>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+              <button onclick="exportToExcel()" class="py-2.5 px-3 custom-box hover:bg-slate-200 dark:hover:bg-slate-800 text-amber-700 dark:text-amber-400 font-bold rounded-lg text-xs border transition flex items-center justify-center gap-1.5">
+                📗 Excel (.xlsx) exportieren
+              </button>
+              <button onclick="exportToCSV()" class="py-2.5 px-3 custom-box hover:bg-slate-200 dark:hover:bg-slate-800 text-amber-700 dark:text-amber-400 font-bold rounded-lg text-xs border transition flex items-center justify-center gap-1.5">
+                📊 CSV-Tabelle exportieren
+              </button>
+            </div>
           </div>
-          <div>
-            <label class="text-[11px] font-semibold mb-1 block">2. Ziel-Saison für den Import:</label>
-            <select id="wizardSeasonSelect" onchange="handleWizardSeasonChange(this)" class="p-2.5 rounded-lg border text-xs w-full"></select>
+
+          <!-- Import Sekcia pre Drinky -->
+          <div class="custom-box p-4 rounded-xl border flex flex-col gap-3">
+            <h4 class="text-sm font-bold flex items-center gap-1.5 text-amber-600 dark:text-amber-400">📥 Getränke importieren (Assistent)</h4>
+            <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
+              Lade eine strukturierte Excel-Datei (.xlsx, .xls) hoch, um neue Rezepte direkt in eine gewählte Saison einzuspielen.
+            </p>
+            
+            <div class="flex flex-col gap-2.5 mt-1">
+              <div>
+                <label class="text-[11px] font-semibold mb-1 block">1. Excel-Datei auswählen:</label>
+                <input type="file" id="wizardExcelFile" accept=".xlsx, .xls" class="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-600 cursor-pointer w-full custom-box p-2 rounded-lg border">
+              </div>
+              <div>
+                <label class="text-[11px] font-semibold mb-1 block">2. Ziel-Saison für den Import:</label>
+                <select id="wizardSeasonSelect" onchange="handleWizardSeasonChange(this)" class="p-2.5 rounded-lg border text-xs w-full bg-slate-100 dark:bg-slate-900 border-slate-300 dark:border-slate-700"></select>
+              </div>
+            </div>
+
+            <div id="wizardStatus" class="text-xs text-amber-600 dark:text-amber-400 font-medium text-center"></div>
+
+            <button onclick="executeWizardImport()" class="py-3 bg-amber-500 hover:bg-amber-600 font-bold text-slate-950 rounded-xl text-xs transition shadow-lg mt-1">
+              🚀 Getränke-Import starten
+            </button>
+          </div>
+
+        </div>
+
+        <!-- KARTA 2: ARBEITSPLAN IMPORT (DPL MA) -->
+        <div id="importSectionSchedule" class="hidden flex-col gap-5">
+          <div class="custom-box p-4 rounded-xl border flex flex-col gap-3 border-amber-500/30">
+            <h4 class="text-sm font-bold flex items-center gap-1.5 text-amber-600 dark:text-amber-400">📅 Monatlichen Arbeitsplan importieren (DPL MA)</h4>
+            <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
+              Importieren Sie den monatlichen Arbeitsplan im offiziellen Formular-Format (z. B. <i>DPL MA. NOVEMOBER 2026.xlsx</i>). Der Parser verarbeitet automatisch zweizeilige Mitarbeiter-Schichten sowie Teilschichten (Früh- und Spätschicht an einem Tag).
+            </p>
+
+            <div class="flex flex-col gap-3 mt-1">
+              <div>
+                <label class="text-[11px] font-semibold mb-1 block">1. Excel-Arbeitsplan-Datei wählen (.xlsx):</label>
+                <input type="file" id="scheduleExcelFile" accept=".xlsx, .xls" class="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-600 cursor-pointer w-full custom-box p-2 rounded-lg border">
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="text-[11px] font-semibold mb-1 block">2. Monat wählen:</label>
+                  <select id="scheduleMonthSelect" class="p-2.5 rounded-lg border text-xs w-full bg-slate-100 dark:bg-slate-900 border-slate-300 dark:border-slate-700">
+                    <option value="1">Januar</option>
+                    <option value="2">Februar</option>
+                    <option value="3">März</option>
+                    <option value="4">April</option>
+                    <option value="5">Mai</option>
+                    <option value="6">Juni</option>
+                    <option value="7">Juli</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">Oktober</option>
+                    <option value="11" selected>November</option>
+                    <option value="12">Dezember</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="text-[11px] font-semibold mb-1 block">3. Jahr wählen:</label>
+                  <input type="number" id="scheduleYearInput" value="2026" min="2024" max="2035" class="p-2.5 rounded-lg border text-xs w-full bg-slate-100 dark:bg-slate-900 border-slate-300 dark:border-slate-700 font-bold">
+                </div>
+              </div>
+            </div>
+
+            <div id="scheduleStatus" class="text-xs text-amber-600 dark:text-amber-400 font-medium text-center"></div>
+
+            <button onclick="executeScheduleImport()" class="py-3 bg-amber-500 hover:bg-amber-600 font-bold text-slate-950 rounded-xl text-xs transition shadow-lg mt-1">
+              🗓️ Arbeitsplan importieren & speichern
+            </button>
           </div>
         </div>
 
-        <div id="wizardStatus" class="text-xs text-amber-600 dark:text-amber-400 font-medium text-center"></div>
-
-        <button onclick="executeWizardImport()" class="py-3 bg-amber-500 hover:bg-amber-600 font-bold text-slate-950 rounded-xl text-xs transition shadow-lg mt-1">
-          🚀 Import starten
-        </button>
       </div>
 
-      <div class="flex justify-end pt-2 border-t border-slate-200 dark:border-slate-800">
-        <button onclick="closeImportExportModal()" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 font-bold text-slate-800 dark:text-white rounded-xl text-xs transition">Schließen</button>
+      <div class="ui-foot">
+        <button type="button" onclick="closeImportExportModal()" class="ui-btn-ghost">Schließen</button>
       </div>
+
     </div>
   </div>
 
