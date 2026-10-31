@@ -3,20 +3,19 @@
    Arbeitsplan (Supabase Integration mit Excel-Zeitkonvertierung)
    ============================================================ */
 
-    // Pomocná funkcia na prevod Excel desatinného čísla (napr. 0.395833) na čas "HH:MM"
+    // Pomocná funkcia na prevod Excel desatinného čísla (vrátane čísel >= 1 pre časy po polnoci) na čas "HH:MM"
     function excelDecimalToTime(val) {
       if (val === null || val === undefined || val === "") return "";
       let str = String(val).trim();
 
-      // Ak to už obsahuje dvojbodku alebo nie je číslom (napr. "Frei (X)" alebo "X"), vrátime to tak ako to je
       if (str.includes(":") || isNaN(Number(str))) {
         return str;
       }
 
       let num = parseFloat(str);
-      // Ak je to desatinné číslo (zlomek dňa v Exceli)
-      if (num >= 0 && num < 1) {
-        let totalMinutes = Math.round(num * 24 * 60);
+      if (num >= 0) {
+        let timeFraction = num % 1;
+        let totalMinutes = Math.round(timeFraction * 24 * 60);
         let hours = Math.floor(totalMinutes / 60);
         let minutes = totalMinutes % 60;
         return String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0');
@@ -35,7 +34,7 @@
       modal.classList.add('flex');
 
       try {
-        // Aktuálny mesiac a rok podľa systému (teraz je november 2026, takže automaticky 11/2026)
+        // Aktuálny mesiac a rok (predvolene november 2026 alebo aktuálny podľa systémového času)
         const now = new Date();
         const currentMonth = now.getMonth() + 1; // 1-12
         const currentYear = now.getFullYear();
@@ -63,7 +62,7 @@
           return;
         }
 
-        // Zostavenie HTML výstupu s konverziou desatinných čísel na časy
+        // Zostavenie HTML výstupu z reálnych dát z databázy s konverziou času
         let htmlRows = schedules.map(s => {
           let s1Start = excelDecimalToTime(s.shift_1_start);
           let s1End = excelDecimalToTime(s.shift_1_end);
