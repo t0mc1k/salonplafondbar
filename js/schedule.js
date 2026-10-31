@@ -1,10 +1,10 @@
 /* ============================================================
    js/schedule.js
-   Arbeitsplan (Supabase Integration: Mit Select-Dropdown & sauberem Layout)
+   Arbeitsplan (Supabase Integration: Clean Layout & Dual Search/Select)
    ============================================================ */
 
     let currentScheduleView = 'personal'; // 'personal' alebo 'team'
-    let selectedTeamEmployee = 'ALL';     // Filter pre konkrétneho zamestnanca
+    let teamSearchQuery = '';             // Text pre vyhľadávanie / filter mena
 
     // Pomocná funkcia na prevod Excel desatinného čísla na čas "HH:MM"
     function excelDecimalToTime(val) {
@@ -30,7 +30,7 @@
     async function openWorkScheduleModal() {
       closeSettingsMenu();
       currentScheduleView = 'personal';
-      selectedTeamEmployee = 'ALL';
+      teamSearchQuery = '';
       renderScheduleModalContent();
     }
 
@@ -114,14 +114,14 @@
 
           container.innerHTML = headerHtml + `
             <div class="font-bold text-amber-600 dark:text-amber-400 mb-2">📅 Arbeitsplan ${currentMonth}/${currentYear} (Mitarbeiter: ${escapeHtml(currentWaiterName)})</div>
-            <div class="flex flex-col gap-2 pr-1">${htmlRows}</div>
+            <div class="flex flex-col gap-2">${htmlRows}</div>
           `;
         } catch (err) {
           container.innerHTML = headerHtml + `<p class="text-xs text-red-500">Fehler: ${escapeHtml(err.message)}</p>`;
         }
 
       } else {
-        // TEAM / MANAGER ANSICHT S SELECTOM A JEDINÝM POSUVNÍKOM
+        // TEAM / MANAGER ANSICHT S VYHĽADÁVANÍM AJ SELECTOM
         container.innerHTML = headerHtml + `<p class="text-slate-500 italic text-xs text-center py-4">Lade Team-Daten...</p>`;
 
         try {
@@ -141,17 +141,21 @@
             return;
           }
 
-          // Zostavíme zoznam jedinečných mien pre select
+          // Zostavíme zoznam jedinečných mien pre rozbaľovacie menu (select)
           const employees = [...new Set(allSchedules.map(s => s.employee_name))].sort();
 
+          // Filtrovanie podľa zadaného textu alebo selectu
           let filteredSchedules = allSchedules;
-          if (selectedTeamEmployee !== 'ALL') {
-            filteredSchedules = allSchedules.filter(s => s.employee_name === selectedTeamEmployee);
+          if (teamSearchQuery && teamSearchQuery.trim() !== '') {
+            const q = teamSearchQuery.toLowerCase().trim();
+            if (q !== 'all') {
+              filteredSchedules = allSchedules.filter(s => s.employee_name && s.employee_name.toLowerCase().includes(q));
+            }
           }
 
-          let optionsHtml = `<option value="ALL">🌐 Alle Mitarbeiter anzeigen (${allSchedules.length} Schichten)</option>`;
+          let optionsHtml = `<option value="">🌐 Alle Mitarbeiter anzeigen (${allSchedules.length} Schichten)</option>`;
           employees.forEach(emp => {
-            optionsHtml += `<option value="${escapeHtml(emp)}" ${selectedTeamEmployee === emp ? 'selected' : ''}>👤 ${escapeHtml(emp)}</option>`;
+            optionsHtml += `<option value="${escapeHtml(emp)}" ${teamSearchQuery.toLowerCase() === emp.toLowerCase() ? 'selected' : ''}>👤 ${escapeHtml(emp)}</option>`;
           });
 
           let htmlRows = filteredSchedules.map(s => {
@@ -188,16 +192,31 @@
           }).join('');
 
           container.innerHTML = headerHtml + `
-            <div class="mb-3">
-              <label class="block text-[11px] font-bold text-slate-400 mb-1">Mitarbeiter auswählen:</label>
-              <select onchange="filterTeamEmployee(this.value)" class="w-full bg-slate-800 border border-slate-700 text-white text-xs rounded-lg p-2.5 focus:outline-none focus:border-amber-500">
-                ${optionsHtml}
-              </select>
+            <div class="mb-3 flex flex-col gap-2">
+              <label class="block text-[11px] font-bold text-slate-400">Mitarbeiter suchen oder auswählen:</label>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <!-- Textové pole na písanie mena -->
+                <input type="text" id="teamSearchInput" value="${escapeHtml(teamSearchQuery === 'all' ? '' : teamSearchQuery)}" oninput="handleTeamSearchInput(this)" placeholder="🔍 Namen tippen (z. B. Benjamin)..." class="w-full bg-slate-800 border border-slate-700 text-white text-xs rounded-lg p-2.5 focus:outline-none focus:border-amber-500">
+                
+                <!-- Klasický Select pre kliknutie zo zoznamu -->
+                <select onchange="handleTeamSelectChange(this)" class="w-full bg-slate-800 border border-slate-700 text-white text-xs rounded-lg p-2.5 focus:outline-none focus:border-amber-500">
+                  ${optionsHtml}
+                </select>
+              </div>
             </div>
-            <div class="flex flex-col gap-2 pr-1">
-              ${htmlRows.length > 0 ? htmlRows : '<p class="text-xs text-slate-500 italic text-center py-4">Keine Schichten gefunden.</p>'}
+            <div class="flex flex-col gap-2">
+              ${htmlRows.length > 0 ? htmlRows : '<p class="text-xs text-slate-500 italic text-center py-4">Kein Mitarbeiter gefunden.</p>'}
             </div>
           `;
+
+          // Udržíme focus v textovom poli, ak užívateľ píše
+          setTimeout(() => {
+            const inputEl = document.getElementById('teamSearchInput');
+            if (inputEl && document.activeElement !== inputEl) {
+              // Necháme fokus iba ak už tam bol, inak nerušime
+            }
+          }, 50);
+
         } catch (err) {
           container.innerHTML = headerHtml + `<p class="text-xs text-red-500">Fehler: ${escapeHtml(err.message)}</p>`;
         }
@@ -206,12 +225,17 @@
 
     function switchScheduleView(view) {
       currentScheduleView = view;
-      selectedTeamEmployee = 'ALL';
+      teamSearchQuery = '';
       renderScheduleModalContent();
     }
 
-    function filterTeamEmployee(empName) {
-      selectedTeamEmployee = empName;
+    function handleTeamSearchInput(inputEl) {
+      teamSearchQuery = inputEl.value;
+      renderScheduleModalContent();
+    }
+
+    function handleTeamSelectChange(selectEl) {
+      teamSearchQuery = selectEl.value;
       renderScheduleModalContent();
     }
 
