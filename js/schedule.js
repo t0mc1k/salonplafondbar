@@ -1,9 +1,10 @@
 /* ============================================================
    js/schedule.js
-   Arbeitsplan (Supabase Integration: Persönlich & Team-Manager-Ansicht)
+   Arbeitsplan (Supabase Integration: Mit Mitarbeiter-Filter für Manager)
    ============================================================ */
 
     let currentScheduleView = 'personal'; // 'personal' alebo 'team'
+    let selectedTeamEmployee = 'ALL';     // Filter pre konkrétneho zamestnanca v manažérskom móde
 
     // Pomocná funkcia na prevod Excel desatinného čísla na čas "HH:MM"
     function excelDecimalToTime(val) {
@@ -28,7 +29,7 @@
 
     async function openWorkScheduleModal() {
       closeSettingsMenu();
-      currentScheduleView = 'personal'; // Predvolene otvoríme osobný plán
+      currentScheduleView = 'personal';
       renderScheduleModalContent();
     }
 
@@ -42,7 +43,6 @@
       const currentMonth = now.getMonth() + 1;
       const currentYear = now.getFullYear();
 
-      // Hlavička s prepínačom medzi osobným a teamovým zobrazením
       let headerHtml = `
         <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-700">
           <div class="flex gap-1 bg-slate-800 p-1 rounded-lg">
@@ -73,7 +73,7 @@
 
           if (!schedules || schedules.length === 0) {
             container.innerHTML = headerHtml + `
-              <p class="text-slate-500 italic text-xs text-center py-6">Keine Schichten für diesen Monat (${currentMonth}/${currentYear}) in der Datenbank gefunden.</p>
+              <p class="text-slate-500 italic text-xs text-center py-6">Keine Schichten für diesen Monat (${currentMonth}/${currentYear}) gefunden.</p>
             `;
             return;
           }
@@ -120,28 +120,43 @@
         }
 
       } else {
-        // TEAM / MANAGER ANSICHT
-        container.innerHTML = headerHtml + `<p class="text-slate-500 italic text-xs text-center py-4">Lade Team-Gesamtübersicht...</p>`;
+        // TEAM / MANAGER ANSICHT S FILTROM
+        container.innerHTML = headerHtml + `<p class="text-slate-500 italic text-xs text-center py-4">Lade Team-Daten...</p>`;
 
         try {
-          const { data: schedules, error } = await _supabase
+          // Stiahneme všetkých zamestnancov pre daný mesiac, aby sme zistili zoznam mien do dropdownu
+          const { data: allSchedules, error } = await _supabase
             .from("work_schedules")
             .select("*")
             .eq("month", currentMonth)
             .eq("year", currentYear)
-            .order("day", { ascending: true })
-            .order("employee_name", { ascending: true });
+            .order("day", { ascending: true });
 
           if (error) throw new Error(error.message);
 
-          if (!schedules || schedules.length === 0) {
+          if (!allSchedules || allSchedules.length === 0) {
             container.innerHTML = headerHtml + `
-              <p class="text-slate-500 italic text-xs text-center py-6">Keine Schichten für das gesamte Team im Monat (${currentMonth}/${currentYear}) gefunden.</p>
+              <p class="text-slate-500 italic text-xs text-center py-6">Keine Schichten für das Team im Monat (${currentMonth}/${currentYear}) gefunden.</p>
             `;
             return;
           }
 
-          let htmlRows = schedules.map(s => {
+          // Zostavíme jedinečný zoznam mien zamestnancov
+          const employees = [...new Set(allSchedules.map(s => s.employee_name))].sort();
+
+          // Filtrovanie dát podľa zvoleného zamestnanca
+          let filteredSchedules = allSchedules;
+          if (selectedTeamEmployee !== 'ALL') {
+            filteredSchedules = allSchedules.filter(s => s.employee_name === selectedTeamEmployee);
+          }
+
+          // Vytvorenie HTML pre výberové pole (dropdown)
+          let optionsHtml = `<option value="ALL">🌐 Alle Mitarbeiter anzeigen (${allSchedules.length} Schichten)</option>`;
+          employees.forEach(emp => {
+            optionsHtml += `<option value="${escapeHtml(emp)}" ${selectedTeamEmployee === emp ? 'selected' : ''}>👤 ${escapeHtml(emp)}</option>`;
+          });
+
+          let htmlRows = filteredSchedules.map(s => {
             let s1Start = excelDecimalToTime(s.shift_1_start);
             let s1End = excelDecimalToTime(s.shift_1_end);
             let s2Start = excelDecimalToTime(s.shift_2_start);
@@ -175,17 +190,28 @@
           }).join('');
 
           container.innerHTML = headerHtml + `
-            <div class="font-bold text-amber-600 dark:text-amber-400 mb-2">👥 Team-Gesamtübersicht (${currentMonth}/${currentYear}) - Alle Mitarbeiter</div>
-            <div class="flex flex-col gap-2 max-h-[55vh] overflow-y-auto pr-1">${htmlRows}</div>
+            <div class="mb-3">
+              <label class="block text-[11px] font-bold text-slate-400 mb-1">Mitarbeiter filtern:</label>
+              <select onchange="filterTeamEmployee(this.value)" class="w-full bg-slate-800 border border-slate-700 text-white text-xs rounded-lg p-2 focus:outline-none focus:border-amber-500">
+                ${optionsHtml}
+              </select>
+            </div>
+            <div class="flex flex-col gap-2 max-h-[48vh] overflow-y-auto pr-1">${htmlRows}</div>
           `;
         } catch (err) {
-          container.innerHTML = headerHtml + `<p class="text-xs text-red-500">Fehler beim Laden des Teams: ${escapeHtml(err.message)}</p>`;
+          container.innerHTML = headerHtml + `<p class="text-xs text-red-500">Fehler: ${escapeHtml(err.message)}</p>`;
         }
       }
     }
 
     function switchScheduleView(view) {
       currentScheduleView = view;
+      selectedTeamEmployee = 'ALL'; // Reset filtra pri prepnutí
+      renderScheduleModalContent();
+    }
+
+    function filterTeamEmployee(empName) {
+      selectedTeamEmployee = empName;
       renderScheduleModalContent();
     }
 
