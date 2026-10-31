@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Salonplafond">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <title>Salonplafond BAR v3.1.03</title>
+  <title>Salonplafond BAR v3.1.04</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import & Export -->
@@ -34,7 +34,7 @@
       window.__salonDark = dark;
     } catch (e) { document.documentElement.classList.add('dark'); window.__salonDark = true; }
   </script>
-  <link rel="stylesheet" href="css/style.css?v=3.1.03">
+  <link rel="stylesheet" href="css/style.css?v=3.1.04">
 </head>
 <body class="dark-mode p-3 pt-0 md:p-8 max-w-6xl mx-auto pb-32" onclick="closeDropdowns(event)">
   <script>if (window.__salonDark === false) { document.body.classList.remove('dark-mode'); document.body.classList.add('light-mode'); }</script>
@@ -52,7 +52,7 @@
       <div>
         <h1 class="text-lg md:text-xl font-black tracking-wider text-slate-900 dark:text-white uppercase">Anmeldung</h1>
         <h2 class="text-xl md:text-2xl font-extrabold text-amber-700 dark:text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-600 dark:text-slate-400 font-medium mt-0.5 block"><span data-app-version>v3.1.03</span> • Touch-Grid PIN-Login</span>
+        <span class="text-xs text-slate-600 dark:text-slate-400 font-medium mt-0.5 block"><span data-app-version>v3.1.04</span> • Touch-Grid PIN-Login</span>
       </div>
 
       <div id="pinLoginForm" class="w-full bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 p-5 rounded-2xl shadow-2xl space-y-4 text-left mt-1">
@@ -61,8 +61,16 @@
             <span>1. Wer bist du? (Personal wählen)</span>
             <span id="selectedWaiterLabel" class="text-amber-700 dark:text-amber-400 font-bold"></span>
           </label>
-          <div id="waiterGridContainer" class="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-48 overflow-y-auto pr-1">
-            <p class="col-span-full text-slate-500 italic text-xs text-center py-4">Personal wird geladen...</p>
+          <div id="loginPickerWrap">
+            <div id="loginSearchRow" class="hidden mb-3">
+              <input type="search" id="loginSearchInput" oninput="renderLoginGrid()" onkeydown="if (event.key === 'Enter') { event.preventDefault(); loginPickFirstMatch(); }" autocomplete="off" placeholder="🔍 Name suchen ..." class="ui-search">
+            </div>
+            <div id="waiterGridContainer" class="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-48 overflow-y-auto pr-1">
+              <p class="col-span-full text-slate-500 italic text-xs text-center py-4">Personal wird geladen...</p>
+            </div>
+            <div class="login-view-toggle">
+              <button type="button" id="loginViewToggleBtn" onclick="toggleLoginView()"></button>
+            </div>
           </div>
         </div>
 
@@ -290,6 +298,13 @@
           <input type="hidden" id="profileInputAvatarUrl" value="">
         </div>
 
+        <!-- Arbeitsplan -->
+        <button type="button" onclick="closeUserProfileModal(); openWorkScheduleModal();" class="profile-link">
+          <span class="profile-link-ico">🗓️</span>
+          <span class="min-w-0 flex-1 text-left"><b class="block text-sm">Mein Arbeitsplan</b><small class="block text-xs profile-link-sub">Deine Schichten dieser Woche ansehen</small></span>
+          <span class="menu-arrow">›</span>
+        </button>
+
         <!-- Über mich -->
         <div class="form-section">
           <div class="form-section-title">Über mich</div>
@@ -371,9 +386,9 @@
           <span class="logo-dot" id="headerLogoDot">•</span>
         </div>
 
-        <div class="flex flex-col justify-center">
-          <h1 class="text-lg md:text-3xl font-bold tracking-tight text-amber-700 dark:text-amber-400 leading-none whitespace-nowrap"><span class="md:hidden">Salonplafond</span><span class="hidden md:inline">Salonplafond BAR</span></h1>
-          <span class="text-[10px] md:text-xs text-slate-600 dark:text-slate-400 font-medium block mt-0.5" data-app-version>v3.1.03</span>
+        <div class="flex flex-col justify-center min-w-0">
+          <h1 class="text-lg md:text-3xl font-bold tracking-tight text-amber-700 dark:text-amber-400 leading-none whitespace-nowrap">Salonplafond BAR</h1>
+          <span class="text-[10px] md:text-xs text-slate-600 dark:text-slate-400 font-medium block mt-0.5" data-app-version>v3.1.04</span>
         </div>
       </div>
 
@@ -382,8 +397,8 @@
           🚪 Benutzer wechseln
         </button>
 
-        <button onclick="openTeamChatModal()" id="headerChatEnvelopeBtn" class="relative px-3 py-2 md:py-1.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-amber-700 dark:text-amber-400 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm" title="Team-Chat öffnen">
-          <span>✉️<span class="hidden sm:inline"> Chat</span></span>
+        <button onclick="openTeamChatModal()" id="headerChatEnvelopeBtn" class="relative w-10 h-10 md:w-auto md:h-auto md:px-3 md:py-1.5 justify-center bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-amber-700 dark:text-amber-400 rounded-xl md:rounded-lg text-base md:text-xs font-bold transition flex items-center gap-1.5 shadow-sm" title="Team-Chat öffnen">
+          <span>✉️<span class="hidden md:inline"> Chat</span></span>
           <span id="headerChatBadgeDot" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white dark:border-slate-950 pulse-badge-dot"></span>
         </button>
 
@@ -392,8 +407,8 @@
         </button>
 
         <div class="relative">
-          <button onclick="toggleSettingsMenu(event)" class="px-3 py-2 md:py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs flex items-center gap-1 shadow-md transition relative">
-            ☰ Menü
+          <button onclick="toggleSettingsMenu(event)" class="w-10 h-10 md:w-auto md:h-auto md:px-3 md:py-1.5 justify-center bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl md:rounded-lg text-base md:text-xs flex items-center gap-1 shadow-md transition relative" title="Menü" aria-label="Menü">
+            <span class="md:hidden">⚙️</span><span class="hidden md:inline">☰ Menü</span>
             <span id="menuNotificationDot" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-amber-500 dark:bg-amber-400 rounded-full border-2 border-white dark:border-slate-950 pulse-badge-dot"></span>
           </button>
 
@@ -478,7 +493,7 @@
             </button>
             <button type="button" onclick="openChangelogModal()" class="menu-item">
               <span class="menu-ico">🚀</span>
-              <span class="menu-text"><span class="menu-label">Was ist neu?</span><span class="menu-sub">Neuigkeiten in <span data-app-version>v3.1.03</span></span></span>
+              <span class="menu-text"><span class="menu-label">Was ist neu?</span><span class="menu-sub">Neuigkeiten in <span data-app-version>v3.1.04</span></span></span>
             </button>
             <button type="button" onclick="openSupportModal()" class="menu-item">
               <span class="menu-ico">🛟<span id="menuDropdownTicketDot" class="hidden menu-dot pulse-badge-dot"></span></span>
@@ -497,7 +512,18 @@
       </div>
     </header>
 
-    <!-- Angemeldet (nur am Computer; am Handy zeigt der runde Avatar oben das Profil) -->
+    <!-- Angemeldet: am Handy gleich unter der Kopfleiste -->
+    <div class="md:hidden">
+      <div class="mobile-userbar">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <span id="headerMobileAvatar" class="mobile-avatar" onclick="openUserProfileModal()" title="Mein Profil">?</span>
+          <span id="mobileUserLabel" class="mobile-user-label"></span>
+        </div>
+        <button type="button" onclick="handleLogout()" class="mobile-switch-btn">🚪 Wechseln</button>
+      </div>
+    </div>
+
+    <!-- Angemeldet (nur am Computer) -->
     <div class="hidden md:flex mb-5 items-center justify-between flex-wrap gap-3">
       <div class="inline-flex items-center gap-3">
         <div id="headerUserAvatarContainer" onclick="openUserProfileModal()" class="w-8 h-8 rounded-full border-2 border-amber-500 bg-slate-100 dark:bg-slate-800 overflow-hidden flex items-center justify-center shrink-0 cursor-pointer hover:scale-105 transition shadow" title="Klicken, um mein Profil zu öffnen">
@@ -526,7 +552,7 @@
       <div id="activeSeasonBadge" onclick="openSeasonModal()" title="Klicken, um Saison zu wechseln" class="hidden quick-chip quick-chip-amber">
         <span>📅<span class="hidden sm:inline"> Saison:</span></span> <span id="activeSeasonName"></span>
       </div>
-      <button type="button" onclick="openWorkScheduleModal()" class="quick-chip">🗓️ Arbeitsplan</button>
+      <button type="button" onclick="openWorkScheduleModal()" class="quick-chip desktop-only">🗓️ Arbeitsplan</button>
       <button type="button" onclick="toggleFilterDrawer()" class="quick-chip">⚡ Filter <span id="filterArrow">▼</span></button>
       <span class="text-[11px] text-slate-500 shrink-0" id="activeFilterSummary"></span>
     </div>
@@ -562,7 +588,7 @@
     </div>
 
     <footer class="mt-20 pt-6 border-t border-slate-300 dark:border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App <span data-app-version>v3.1.03</span> • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond BAR App <span data-app-version>v3.1.04</span> • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
     </footer>
 
   </div>
@@ -915,7 +941,7 @@
         <section class="set-card">
           <h4 class="set-head">🧰 App</h4>
           <div class="set-row">
-            <div class="set-text"><b>Version</b><small>Salonplafond BAR <span data-app-version>v3.1.03</span></small></div>
+            <div class="set-text"><b>Version</b><small>Salonplafond BAR <span data-app-version>v3.1.04</span></small></div>
             <button type="button" onclick="closeUnifiedSettingsModal(); openChangelogModal();" class="ui-btn-ghost">🚀 Was ist neu?</button>
           </div>
           <div class="set-row">
@@ -1082,17 +1108,17 @@
           <p id="dMarginInfo" class="margin-info">Gib beide Preise ein, dann siehst du hier die Marge.</p>
         </div>
 
-        <!-- 7 Foto -->
+        <!-- 7 Fotos -->
         <div class="form-section">
-          <div class="form-section-title">7 · Foto</div>
-          <div class="flex gap-4 items-start flex-wrap">
-            <div id="dPhotoPreview" class="photo-preview"><span>Kein Foto</span></div>
-            <div class="flex-1 min-w-[12rem] flex flex-col gap-2">
-              <input type="file" id="imageFile" accept="image/*" onchange="uploadImageToSupabase(event)" class="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-600 cursor-pointer">
-              <span id="uploadStatus" class="form-hint"></span>
-              <input type="text" id="dPhoto" oninput="updatePhotoPreview()" autocomplete="off" placeholder="oder Bild-URL einfügen ..." class="ui-field">
-            </div>
+          <div class="form-section-title">7 · Fotos (bis zu 3)</div>
+          <div id="photoSlots" class="photo-slots"></div>
+          <input type="file" id="imageFile" accept="image/*" multiple onchange="uploadImageToSupabase(event)" class="hidden">
+          <span id="uploadStatus" class="form-hint block mt-2"></span>
+          <div class="flex gap-2 mt-2">
+            <input type="text" id="dPhoto" autocomplete="off" placeholder="oder Bild-URL einfügen ..." onkeydown="if (event.key === 'Enter') { event.preventDefault(); addPhotoFromUrl(); }" class="ui-field flex-1">
+            <button type="button" onclick="addPhotoFromUrl()" class="ui-btn-ghost">Hinzufügen</button>
           </div>
+          <p class="form-hint mt-1.5">Das erste Foto ist das Hauptfoto (Karte, Druck, Multi-View). Mit ⭐ machst du ein anderes zum Hauptfoto.</p>
         </div>
       </div>
 
@@ -1169,7 +1195,7 @@
       <div class="ui-head">
         <div>
           <h3 class="ui-head-title">🚀 Was ist neu?</h3>
-          <p class="ui-head-sub">Aktuelle Version <span id="changelogVersionBadge" class="cl-ver">v3.1.03</span></p>
+          <p class="ui-head-sub">Aktuelle Version <span id="changelogVersionBadge" class="cl-ver">v3.1.04</span></p>
         </div>
         <button type="button" onclick="closeChangelogModal()" class="ui-close" aria-label="Schließen">&times;</button>
       </div>
@@ -1358,24 +1384,24 @@
     </div>
   </div>
 
-  <script src="js/config.js?v=3.1.03"></script>
-  <script src="js/ui.js?v=3.1.03"></script>
-  <script src="js/settings.js?v=3.1.03"></script>
-  <script src="js/pwa.js?v=3.1.03"></script>
-  <script src="js/auth.js?v=3.1.03"></script>
-  <script src="js/profile.js?v=3.1.03"></script>
-  <script src="js/staff-admin.js?v=3.1.03"></script>
-  <script src="js/chat.js?v=3.1.03"></script>
-  <script src="js/tickets.js?v=3.1.03"></script>
-  <script src="js/changelog.js?v=3.1.03"></script>
-  <script src="js/schedule.js?v=3.1.03"></script>
-  <script src="js/seasons.js?v=3.1.03"></script>
-  <script src="js/drinks.js?v=3.1.03"></script>
-  <script src="js/drink-admin.js?v=3.1.03"></script>
-  <script src="js/tray.js?v=3.1.03"></script>
-  <script src="js/shopping.js?v=3.1.03"></script>
-  <script src="js/import-export.js?v=3.1.03"></script>
-  <script src="js/print-a3.js?v=3.1.03"></script>
-  <script src="js/app.js?v=3.1.03"></script>
+  <script src="js/config.js?v=3.1.04"></script>
+  <script src="js/ui.js?v=3.1.04"></script>
+  <script src="js/settings.js?v=3.1.04"></script>
+  <script src="js/pwa.js?v=3.1.04"></script>
+  <script src="js/auth.js?v=3.1.04"></script>
+  <script src="js/profile.js?v=3.1.04"></script>
+  <script src="js/staff-admin.js?v=3.1.04"></script>
+  <script src="js/chat.js?v=3.1.04"></script>
+  <script src="js/tickets.js?v=3.1.04"></script>
+  <script src="js/changelog.js?v=3.1.04"></script>
+  <script src="js/schedule.js?v=3.1.04"></script>
+  <script src="js/seasons.js?v=3.1.04"></script>
+  <script src="js/drinks.js?v=3.1.04"></script>
+  <script src="js/drink-admin.js?v=3.1.04"></script>
+  <script src="js/tray.js?v=3.1.04"></script>
+  <script src="js/shopping.js?v=3.1.04"></script>
+  <script src="js/import-export.js?v=3.1.04"></script>
+  <script src="js/print-a3.js?v=3.1.04"></script>
+  <script src="js/app.js?v=3.1.04"></script>
 </body>
 </html>

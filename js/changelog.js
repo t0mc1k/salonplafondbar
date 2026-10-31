@@ -10,9 +10,17 @@
    Änderungs-Typen: 'new' Neu, 'improved' Verbessert, 'fixed' Behoben,
                     'security' Sicherheit, 'info' Allgemein
    ============================================================ */
-    const APP_VERSION = '3.1.03';
+    const APP_VERSION = '3.1.04';
 
     const CHANGELOG = [
+  { version: '3.1.04', range: '', date: 'Oktober 2026', title: 'Schnellere Anmeldung, mehrere Fotos & klarere Handy-Ansicht',
+    changes: [
+      ['new', 'Bis zu 3 Fotos pro Getränk: Hauptfoto festlegen, Fotos entfernen, direkt vom Handy aufnehmen oder hochladen. Im Detail gibt es eine kleine Galerie. Fotos werden vor dem Hochladen automatisch verkleinert.'],
+      ['improved', 'Anmeldung neu: „Zuletzt auf diesem Gerät“ ganz oben, Namenssuche, Team und Leitung (Manager/Developer) getrennt und alles kompakt statt langem Scrollen. Mit dem Link unter der Liste kannst du jederzeit zur klassischen Ansicht wechseln.'],
+      ['improved', 'Handy-Kopf wie in der Küche-App: voller Name „Salonplafond BAR“, Chat und Einstellungen als Symbole sowie eine Zeile mit deinem Foto, Namen und „Wechseln“.'],
+      ['improved', 'Der Arbeitsplan ist am Handy nicht mehr auf der Startseite, sondern in Mein Profil (und weiter im Menü). Am Computer bleibt er auf der Startseite.'],
+      ['fixed', 'Saison und Filter werden am Handy nicht mehr abgeschnitten.']
+    ] },
   { version: '3.1.03', range: '', date: 'Oktober 2026', title: 'Handy-Ansicht & App installieren',
     changes: [
       ['new', 'App installierbar: Symbol auf dem Startbildschirm (Android, iPhone, Computer). Sie startet ohne Browser-Leiste, öffnet schneller und auch bei schwachem Netz. Installieren-Knopf und Anleitung findest du unter Menü → App installieren bzw. in den Einstellungen.'],

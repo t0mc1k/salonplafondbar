@@ -15,7 +15,7 @@ js/                 Logik, in Themen aufgeteilt (siehe unten)
 | Supabase-Adresse/Key, gemeinsame Variablen, Hilfsfunktionen | js/config.js    |
 | Einstellungen & Zentrale (Design, Schrift, Sortierung, Blur ...) | js/settings.js |
 | Menü, Einstellungen, Theme, Blur, Hinweise (Toast), Vollbild, Foto-Vorschau | js/ui.js |
-| PIN-Login, Rollen/Rechte, Abmelden, Hinweis bei Kollegen-Login | js/auth.js    |
+| PIN-Login, Namenswahl (neue/klassische Ansicht), Rollen/Rechte, Abmelden | js/auth.js |
 | Eigenes Profil, Profil anderer Mitarbeiter              | js/profile.js        |
 | Personal & PINs, Login-Historie (Admin)                 | js/staff-admin.js    |
 | Team-Chat                                               | js/chat.js           |
@@ -24,7 +24,7 @@ js/                 Logik, in Themen aufgeteilt (siehe unten)
 | Arbeitsplan                                             | js/schedule.js       |
 | Saisons                                                 | js/seasons.js        |
 | Getränkeliste, Filter, Detail-Fenster, Rezept drucken   | js/drinks.js         |
-| Getränk anlegen/ändern/löschen, Zutaten, Foto-Upload    | js/drink-admin.js    |
+| Getränk anlegen/ändern/löschen, Zutaten, Fotos (bis 3)  | js/drink-admin.js    |
 | Multi-View-Korb, Drag & Drop, Getränk tauschen          | js/tray.js           |
 | Einkaufsliste / Inventur                                | js/shopping.js       |
 | Excel-Import, Export (Excel/CSV)                        | js/import-export.js  |

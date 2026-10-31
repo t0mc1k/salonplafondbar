@@ -171,13 +171,42 @@
       }
     }
 
+    // Alle Fotos eines Getränks (höchstens 3, das Hauptfoto steht immer zuerst)
+    function getDrinkPhotos(d) {
+      let list = [];
+      let raw = d.photo_urls;
+      if (typeof raw === 'string') { try { raw = JSON.parse(raw); } catch (e) { raw = []; } }
+      if (Array.isArray(raw)) list = raw.filter(u => typeof u === 'string' && u.trim());
+      // das Hauptfoto (photo_url) steht immer an erster Stelle
+      if (d.photo_url) list = [d.photo_url].concat(list.filter(u => u !== d.photo_url));
+      return list.slice(0, 3);
+    }
+
+    let currentDrinkPhotos = [];
+    let currentDrinkPhotoIndex = 0;
+
+    function showDrinkPhoto(i) {
+      if (!currentDrinkPhotos[i]) return;
+      currentDrinkPhotoIndex = i;
+      currentPhotoPreviewUrl = currentDrinkPhotos[i];
+      const img = document.getElementById('printModalImage');
+      if (img) img.src = currentDrinkPhotos[i];
+      document.querySelectorAll('.gallery-thumb').forEach((b, idx) => b.classList.toggle('active', idx === i));
+    }
+
+    function openCurrentDrinkPhoto() {
+      if (currentDrinkPhotos[currentDrinkPhotoIndex]) openPhotoPreview(currentDrinkPhotos[currentDrinkPhotoIndex]);
+    }
+
     function openDrinkModal(id) {
       const d = allDrinks.find(item => item.id === id);
       if (!d) return;
       
-      currentPhotoPreviewUrl = d.photo_url || null;
+      currentDrinkPhotos = getDrinkPhotos(d);
+      currentDrinkPhotoIndex = 0;
+      currentPhotoPreviewUrl = currentDrinkPhotos[0] || null;
       const photoBtn = document.getElementById('modalPhotoBtn');
-      if (d.photo_url) {
+      if (currentDrinkPhotos.length) {
         photoBtn.classList.remove('hidden');
         photoBtn.classList.add('flex');
       } else {
@@ -186,7 +215,13 @@
       }
 
       let html = '';
-      if (d.photo_url) html += `<img id="printModalImage" src="${escapeHtml(d.photo_url)}" onclick="openPhotoPreview(${jsArg(d.photo_url)})" class="w-full h-64 object-cover rounded-xl mb-4 shadow cursor-pointer hover:opacity-95 transition" title="Klicken für Großansicht" alt="${escapeHtml(d.name)}">`;
+      if (currentDrinkPhotos.length) {
+        html += `<div class="drink-gallery"><img id="printModalImage" src="${escapeHtml(currentDrinkPhotos[0])}" onclick="openCurrentDrinkPhoto()" class="w-full h-64 object-cover rounded-xl shadow cursor-pointer hover:opacity-95 transition" title="Klicken für Großansicht" alt="${escapeHtml(d.name)}">`;
+        if (currentDrinkPhotos.length > 1) {
+          html += `<div class="gallery-thumbs no-print">${currentDrinkPhotos.map((u, i) => `<button type="button" class="gallery-thumb ${i === 0 ? 'active' : ''}" onclick="showDrinkPhoto(${i})" aria-label="Foto ${i + 1}"><img src="${escapeHtml(u)}" alt=""></button>`).join('')}</div>`;
+        }
+        html += `</div>`;
+      }
       let priceText = (d.selling_price && getSetting('showPrices')) ? ` (€ ${parseFloat(d.selling_price).toFixed(2)})` : '';
       html += `<div class="flex items-center gap-2 mb-2 flex-wrap"><span class="text-xs font-semibold px-2.5 py-1 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">${escapeHtml(d.category || 'Getränk')}</span></div>`;
       html += `<h2 class="text-3xl font-bold mb-4">${escapeHtml(d.name)}${priceText}</h2>`;

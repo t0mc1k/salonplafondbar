@@ -50,27 +50,102 @@
       }
     }
 
+    // ---------- Fotos (bis zu 3) ----------
+    const MAX_DRINK_PHOTOS = 3;
+    let drinkFormPhotos = [];
+
+    // Foto vor dem Hochladen verkleinern (spart Datenvolumen und Speicher)
+    async function compressImageFile(file, maxSide, quality) {
+      try {
+        if (!/^image\/(jpeg|png|webp)$/.test(file.type)) return file;
+        const bmp = await createImageBitmap(file);
+        const scale = Math.min(1, (maxSide || 1600) / Math.max(bmp.width, bmp.height));
+        if (scale === 1 && file.size < 900 * 1024) { if (bmp.close) bmp.close(); return file; }
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(bmp.width * scale);
+        canvas.height = Math.round(bmp.height * scale);
+        canvas.getContext('2d').drawImage(bmp, 0, 0, canvas.width, canvas.height);
+        if (bmp.close) bmp.close();
+        const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', quality || 0.82));
+        return blob && blob.size < file.size ? blob : file;
+      } catch (e) { return file; }
+    }
+
+    function renderPhotoSlots() {
+      const box = document.getElementById('photoSlots');
+      if (!box) return;
+      let html = drinkFormPhotos.map((u, i) => `
+        <div class="photo-slot">
+          <img src="${escapeHtml(u)}" alt="Foto ${i + 1}" onerror="this.replaceWith(Object.assign(document.createElement('span'), { textContent: 'Foto nicht ladbar' }))">
+          <span class="photo-badge ${i === 0 ? 'main' : ''}">${i === 0 ? '⭐ Hauptfoto' : 'Foto ' + (i + 1)}</span>
+          <div class="photo-slot-actions">
+            ${i > 0 ? `<button type="button" onclick="makeMainPhoto(${i})" title="Als Hauptfoto festlegen">⭐</button>` : ''}
+            <button type="button" class="danger" onclick="removeDrinkPhoto(${i})" title="Foto entfernen">✕</button>
+          </div>
+        </div>`).join('');
+      if (drinkFormPhotos.length < MAX_DRINK_PHOTOS) {
+        html += `<button type="button" class="photo-slot photo-add" onclick="document.getElementById('imageFile').click()">
+          <span class="photo-add-ico">📷</span><span>Foto hinzufügen</span><small>${drinkFormPhotos.length} / ${MAX_DRINK_PHOTOS}</small>
+        </button>`;
+      }
+      box.innerHTML = html;
+    }
+
+    function updatePhotoPreview() { renderPhotoSlots(); }
+
+    function removeDrinkPhoto(i) {
+      drinkFormPhotos.splice(i, 1);
+      renderPhotoSlots();
+    }
+
+    function makeMainPhoto(i) {
+      const [p] = drinkFormPhotos.splice(i, 1);
+      drinkFormPhotos.unshift(p);
+      renderPhotoSlots();
+    }
+
+    function addPhotoFromUrl() {
+      const input = document.getElementById('dPhoto');
+      const url = input.value.trim();
+      if (!url) return;
+      if (!/^https?:\/\//i.test(url)) return alert("Bitte eine gültige Bild-URL angeben (beginnt mit https://).");
+      if (drinkFormPhotos.length >= MAX_DRINK_PHOTOS) return alert("Es sind höchstens " + MAX_DRINK_PHOTOS + " Fotos pro Getränk möglich.");
+      if (drinkFormPhotos.indexOf(url) === -1) drinkFormPhotos.push(url);
+      input.value = '';
+      renderPhotoSlots();
+    }
+
     async function uploadImageToSupabase(event) {
-      const file = event.target.files[0];
-      if (!file) return;
+      const files = Array.prototype.slice.call(event.target.files || []);
+      event.target.value = '';
+      if (!files.length) return;
       const status = document.getElementById('uploadStatus');
-      status.innerText = "⏳ Foto wird hochgeladen...";
-      
-      const fileName = `${Date.now()}_${file.name}`;
-      let { data, error } = await _supabase.storage.from('drinks').upload(fileName, file);
-      
-      if (error) {
-        console.error("Supabase Storage Error:", error);
-        status.innerText = 'Fehler: ' + error.message;
-        return;
+      const free = MAX_DRINK_PHOTOS - drinkFormPhotos.length;
+      if (free <= 0) { status.innerText = 'Es sind höchstens ' + MAX_DRINK_PHOTOS + ' Fotos möglich. Entferne zuerst eines.'; return; }
+      const batch = files.filter(f => /^image\//.test(f.type)).slice(0, free);
+      let note = '';
+      if (files.length > batch.length) note = ' (maximal ' + MAX_DRINK_PHOTOS + ' Fotos – der Rest wurde ignoriert)';
+
+      let done = 0;
+      for (const file of batch) {
+        status.innerText = `⏳ Foto ${done + 1} von ${batch.length} wird verkleinert und hochgeladen ...`;
+        const prepared = await compressImageFile(file);
+        const isJpeg = prepared !== file;
+        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const fileName = `${Date.now()}_${done}_${isJpeg ? safeName.replace(/\.[^.]+$/, '') + '.jpg' : safeName}`;
+        const { error } = await _supabase.storage.from('drinks').upload(fileName, prepared, isJpeg ? { contentType: 'image/jpeg' } : undefined);
+        if (error) {
+          console.error("Supabase Storage Error:", error);
+          status.innerText = 'Fehler: ' + error.message;
+          renderPhotoSlots();
+          return;
+        }
+        const { data: pub } = _supabase.storage.from('drinks').getPublicUrl(fileName);
+        if (pub && pub.publicUrl) drinkFormPhotos.push(pub.publicUrl);
+        done++;
+        renderPhotoSlots();
       }
-      
-      let { data: publicURLData } = _supabase.storage.from('drinks').getPublicUrl(fileName);
-      if (publicURLData && publicURLData.publicUrl) {
-        document.getElementById('dPhoto').value = publicURLData.publicUrl;
-        status.innerText = '✔ Foto wurde erfolgreich hochgeladen.';
-        updatePhotoPreview();
-      }
+      status.innerText = `✔ ${done} Foto${done === 1 ? '' : 's'} hochgeladen${note}.`;
     }
 
     function toggleMode() {
@@ -125,7 +200,8 @@
       document.getElementById('dPrice').value = d.selling_price || '';
       document.getElementById('dAllergens').value = d.allergens || '';
       document.getElementById('dRecipe').value = d.recipe || '';
-      document.getElementById('dPhoto').value = d.photo_url || '';
+      drinkFormPhotos = getDrinkPhotos(d);
+      document.getElementById('dPhoto').value = '';
       document.getElementById('dFeatured').checked = !!d.is_featured;
       document.getElementById('dVegan').checked = !!d.is_vegan;
       document.getElementById('dGlutenfree').checked = !!d.is_glutenfree;
@@ -169,6 +245,7 @@
       document.getElementById('dPrice').value = '';
       document.getElementById('dAllergens').value = '';
       document.getElementById('dRecipe').value = '';
+      drinkFormPhotos = [];
       document.getElementById('dPhoto').value = '';
       document.getElementById('dFeatured').checked = false;
       document.getElementById('dVegan').checked = false;
@@ -203,7 +280,8 @@
           selling_price: rawPrice !== '' ? parseFloat(rawPrice) || null : null,
           allergens: document.getElementById('dAllergens').value,
           recipe: document.getElementById('dRecipe').value,
-          photo_url: document.getElementById('dPhoto').value,
+          photo_url: drinkFormPhotos[0] || '',
+          photo_urls: drinkFormPhotos.slice(0, MAX_DRINK_PHOTOS),
           is_featured: document.getElementById('dFeatured').checked,
           is_vegan: document.getElementById('dVegan').checked,
           is_glutenfree: document.getElementById('dGlutenfree').checked,
@@ -212,9 +290,17 @@
         };
 
         const id = document.getElementById('editingId').value;
-        let saveRes;
-        if (id) saveRes = await _supabase.from('drinks').update(drinkObj).select().eq('id', id);
-        else saveRes = await _supabase.from('drinks').insert([drinkObj]).select();
+        const persist = obj => id
+          ? _supabase.from('drinks').update(obj).select().eq('id', id)
+          : _supabase.from('drinks').insert([obj]).select();
+        let saveRes = await persist(drinkObj);
+        let photosNote = false;
+        if (saveRes.error && /photo_urls/.test(saveRes.error.message || '')) {
+          // Spalte für mehrere Fotos fehlt noch in der Datenbank: ohne sie speichern (nur Hauptfoto)
+          delete drinkObj.photo_urls;
+          saveRes = await persist(drinkObj);
+          photosNote = drinkFormPhotos.length > 1;
+        }
 
         if (saveRes.error) {
           alert("Fehler beim Speichern: " + saveRes.error.message);
@@ -227,7 +313,7 @@
 
         closeAdminModal();
         await loadDrinks();
-        showAppToast({ initial: '🍸', title: id ? 'Getränk gespeichert' : 'Getränk angelegt', text: name });
+        showAppToast({ initial: '🍸', title: id ? 'Getränk gespeichert' : 'Getränk angelegt', text: photosNote ? name + ' – nur das Hauptfoto gespeichert (SQL für mehrere Fotos fehlt noch)' : name, ms: photosNote ? 8000 : 5000 });
       });
     }
 
@@ -303,18 +389,3 @@
       info.classList.toggle('margin-bad', profit <= 0);
     }
 
-    function updatePhotoPreview() {
-      const box = document.getElementById('dPhotoPreview');
-      if (!box) return;
-      const url = document.getElementById('dPhoto').value.trim();
-      box.innerHTML = '';
-      if (url) {
-        const img = document.createElement('img');
-        img.src = url;
-        img.alt = 'Vorschau';
-        img.onerror = () => { box.innerHTML = '<span>Foto nicht ladbar</span>'; };
-        box.appendChild(img);
-      } else {
-        box.innerHTML = '<span>Kein Foto</span>';
-      }
-    }
