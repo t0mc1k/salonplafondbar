@@ -235,7 +235,7 @@
       reader.readAsArrayBuffer(file);
     }
 
-    // NOVÝ PARSER PRE ARBEITSPLAN (DPL MA) S PODPOROU DELENÝCH SMEN A DVOJRIADKOV
+    // KOMPLETNÝ PARSER PRE ARBEITSPLAN (DPL MA) S UKLADANÍM PRIAMO DO SUPABASE
     function executeScheduleImport() {
       const fileInput = document.getElementById('scheduleExcelFile');
       const file = fileInput.files[0];
@@ -247,7 +247,7 @@
       const month = document.getElementById('scheduleMonthSelect').value;
       const year = document.getElementById('scheduleYearInput').value;
       const statusEl = document.getElementById('scheduleStatus');
-      statusEl.innerText = "⏳ Arbeitsplan-Import prebieha...";
+      statusEl.innerText = "⏳ Arbeitsplan wird analysiert und in Datenbank gespeichert...";
 
       const reader = new FileReader();
       reader.onload = async function(e) {
@@ -259,9 +259,9 @@
 
           let schedulesToInsert = [];
 
-          // Prechádzame riadky s personálom (štandardne od riadku 3 do 48, kde má každý zamestnanec pár 2 riadkov)
+          // Prechádzame riadky s personálom (od riadku 3, kde sa striedajú 2 riadky na zamestnanca)
           for (let i = 3; i < rows.length; i += 2) {
-            const rowTop = rows[i];     // Horný riadok (Začiatky zmien / resp. hodnoty ako X, U)
+            const rowTop = rows[i];     // Horný riadok (Začiatky zmien)
             const rowBot = rows[i + 1]; // Spodný riadok (Konce zmien)
 
             if (!rowTop || !rowTop[1]) continue;
@@ -269,7 +269,7 @@
             const employeeName = String(rowTop[1]).trim();
             const station = rowTop[2] ? String(rowTop[2]).trim() : '';
 
-            // Dni začínajú od stĺpca 4 (index 4), každý deň zaberá 2 stĺpce (dopoludnie / popoludnie alebo delená smena)
+            // Dni začínajú od stĺpca 4, každý deň má 2 stĺpce (dopoludnie / popoludnie / delené smeny)
             for (let col = 4; col < rowTop.length; col += 2) {
               const dayNum = rows[1] && rows[1][col] !== undefined ? rows[1][col] : null;
               if (!dayNum || isNaN(dayNum)) continue;
@@ -279,7 +279,6 @@
               const slot2_start = rowTop[col+1] !== undefined ? rowTop[col+1] : null;
               const slot2_end = rowBot && rowBot[col+1] !== undefined ? rowBot[col+1] : null;
 
-              // Uloženie záznamu do poľa pre import
               schedulesToInsert.push({
                 employee_name: employeeName,
                 station: station,
@@ -295,16 +294,36 @@
           }
 
           if (schedulesToInsert.length > 0) {
-            console.log("Úspešne naparsovaný pracovný plán:", schedulesToInsert);
-            statusEl.innerText = `✔ Arbeitsplan erfolgreich importiert! (${schedulesToInsert.length} Datensätze)`;
-            alert(`Erfolg! Arbeitsplan für ${schedulesToInsert.length} Schicht-Einträge erfolgreich analysiert.`);
+            // Najprv vymažeme starý plán pre daný mesiac a rok, aby nedochádzalo k duplicitám
+            const { error: deleteError } = await _supabase
+              .from("work_schedules")
+              .delete()
+              .eq("month", parseInt(month))
+              .eq("year", parseInt(year));
+
+            if (deleteError) {
+              console.warn("Hinweis beim Löschen alter Schichten:", deleteError.message);
+            }
+
+            // Vloženie nových dát do Supabase tabuľky work_schedules
+            const { error: insertError } = await _supabase
+              .from("work_schedules")
+              .insert(schedulesToInsert);
+
+            if (insertError) {
+              throw new Error(insertError.message);
+            }
+
+            statusEl.innerText = `✔ Arbeitsplan erfolgreich in Supabase gespeichert!`;
+            alert(`Erfolg! Der Arbeitsplan für ${schedulesToInsert.length} Schicht-Einträge wurde erfolgreich in der Datenbank gespeichert.`);
             closeImportExportModal();
           } else {
-            statusEl.innerText = "Keine Schichten in der Datei gefunden.";
+            statusEl.innerText = "Keine Schichten in der Excel-Datei gefunden.";
           }
         } catch (err) {
           console.error(err);
-          statusEl.innerText = "Fehler beim Parsen: " + err.message;
+          statusEl.innerText = "Fehler beim Speichern: " + err.message;
+          alert("Fehler beim Import in die Datenbank: " + err.message);
         }
       };
       reader.readAsArrayBuffer(file);
