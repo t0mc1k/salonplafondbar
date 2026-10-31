@@ -1,7 +1,30 @@
 /* ============================================================
    js/schedule.js
-   Arbeitsplan (Supabase Integration)
+   Arbeitsplan (Supabase Integration mit Excel-Zeitkonvertierung)
    ============================================================ */
+
+    // Pomocná funkcia na prevod Excel desatinného čísla (napr. 0.395833) na čas "HH:MM"
+    function excelDecimalToTime(val) {
+      if (val === null || val === undefined || val === "") return "";
+      let str = String(val).trim();
+
+      // Ak to už obsahuje dvojbodku alebo nie je číslom (napr. "Frei (X)" alebo "X"), vrátime to tak ako to je
+      if (str.includes(":") || isNaN(Number(str))) {
+        return str;
+      }
+
+      let num = parseFloat(str);
+      // Ak je to desatinné číslo (zlomek dňa v Exceli)
+      if (num >= 0 && num < 1) {
+        let totalMinutes = Math.round(num * 24 * 60);
+        let hours = Math.floor(totalMinutes / 60);
+        let minutes = totalMinutes % 60;
+        return String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0');
+      }
+
+      return str;
+    }
+
     async function openWorkScheduleModal() {
       closeSettingsMenu();
       const container = document.getElementById('workScheduleContentContainer');
@@ -12,7 +35,7 @@
       modal.classList.add('flex');
 
       try {
-        // Aktuálny mesiac a rok (predvolene november 2026 alebo aktuálny podľa systémového času)
+        // Aktuálny mesiac a rok podľa systému (teraz je november 2026, takže automaticky 11/2026)
         const now = new Date();
         const currentMonth = now.getMonth() + 1; // 1-12
         const currentYear = now.getFullYear();
@@ -40,20 +63,30 @@
           return;
         }
 
-        // Zostavenie HTML výstupu z reálnych dát z databázy
+        // Zostavenie HTML výstupu s konverziou desatinných čísel na časy
         let htmlRows = schedules.map(s => {
+          let s1Start = excelDecimalToTime(s.shift_1_start);
+          let s1End = excelDecimalToTime(s.shift_1_end);
+          let s2Start = excelDecimalToTime(s.shift_2_start);
+          let s2End = excelDecimalToTime(s.shift_2_end);
+
           let timeStr = "";
           
-          if (s.shift_1_start && s.shift_1_end) {
-            timeStr += `${s.shift_1_start} – ${s.shift_1_end}`;
+          if (s1Start && s1End) {
+            timeStr += `${s1Start} – ${s1End}`;
+          } else if (s1Start) {
+            timeStr += s1Start;
           }
           
-          if (s.shift_2_start && s.shift_2_end) {
+          if (s2Start && s2End) {
             if (timeStr) timeStr += " / ";
-            timeStr += `${s.shift_2_start} – ${s.shift_2_end}`;
+            timeStr += `${s2Start} – ${s2End}`;
+          } else if (s2Start) {
+            if (timeStr) timeStr += " / ";
+            timeStr += s2Start;
           }
 
-          if (!timeStr) {
+          if (!timeStr || timeStr === "X – X" || timeStr.toUpperCase() === "X") {
             timeStr = "Frei (X)";
           }
 
