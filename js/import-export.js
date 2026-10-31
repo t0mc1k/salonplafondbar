@@ -1,7 +1,33 @@
 /* ============================================================
    js/import-export.js
-   Import aus Excel und Export (Excel/CSV)
+   Import aus Excel und Export (Excel/CSV) + Arbeitsplan Import (DPL)
    ============================================================ */
+
+    function switchImportTab(tab) {
+      const drinksSec = document.getElementById('importSectionDrinks');
+      const scheduleSec = document.getElementById('importSectionSchedule');
+      const btnDrinks = document.getElementById('tabBtnDrinks');
+      const btnSchedule = document.getElementById('tabBtnSchedule');
+
+      if (!drinksSec || !scheduleSec) return;
+
+      if (tab === 'drinks') {
+        drinksSec.classList.remove('hidden');
+        drinksSec.classList.add('flex');
+        scheduleSec.classList.remove('flex');
+        scheduleSec.classList.add('hidden');
+        if (btnDrinks) btnDrinks.className = "flex-1 py-2 px-3 text-xs font-bold rounded-lg transition bg-amber-500 text-slate-950 shadow-sm";
+        if (btnSchedule) btnSchedule.className = "flex-1 py-2 px-3 text-xs font-bold rounded-lg transition text-slate-600 dark:text-slate-400 hover:text-amber-500";
+      } else {
+        drinksSec.classList.remove('flex');
+        drinksSec.classList.add('hidden');
+        scheduleSec.classList.remove('hidden');
+        scheduleSec.classList.add('flex');
+        if (btnSchedule) btnSchedule.className = "flex-1 py-2 px-3 text-xs font-bold rounded-lg transition bg-amber-500 text-slate-950 shadow-sm";
+        if (btnDrinks) btnDrinks.className = "flex-1 py-2 px-3 text-xs font-bold rounded-lg transition text-slate-600 dark:text-slate-400 hover:text-amber-500";
+      }
+    }
+
     function exportToExcel() {
       if (!allDrinks || allDrinks.length === 0) return alert("Keine Getränke vorhanden.");
       let selectedExportSeason = document.getElementById('exportSeasonSelect').value;
@@ -58,8 +84,11 @@
       checkDrinkEditAuth(() => {
         renderWizardSeasonSelect();
         renderExportSeasonSelect();
+        switchImportTab('drinks');
         document.getElementById('wizardExcelFile').value = '';
+        document.getElementById('scheduleExcelFile').value = '';
         document.getElementById('wizardStatus').innerText = '';
+        document.getElementById('scheduleStatus').innerText = '';
         document.getElementById('importExportModal').classList.remove('hidden');
         document.getElementById('importExportModal').classList.add('flex');
       });
@@ -73,6 +102,7 @@
     function renderWizardSeasonSelect() {
       const seasons = getAllSeasons();
       const select = document.getElementById('wizardSeasonSelect');
+      if (!select) return;
       let html = '';
       seasons.forEach(s => {
         html += `<option value="${escapeHtml(s)}">📅 ${escapeHtml(s)}</option>`;
@@ -85,6 +115,7 @@
     function renderExportSeasonSelect() {
       const seasons = getAllSeasons();
       const select = document.getElementById('exportSeasonSelect');
+      if (!select) return;
       let html = `<option value="ALL">🌐 Alle Saisons (Gesamte Datenbank)</option>`;
       seasons.forEach(s => {
         html += `<option value="${escapeHtml(s)}">📅 ${escapeHtml(s)}</option>`;
@@ -199,6 +230,81 @@
           }
         } else {
           statusEl.innerText = "Keine Drinks in der Datei gefunden.";
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    // NOVÝ PARSER PRE ARBEITSPLAN (DPL MA) S PODPOROU DELENÝCH SMEN A DVOJRIADKOV
+    function executeScheduleImport() {
+      const fileInput = document.getElementById('scheduleExcelFile');
+      const file = fileInput.files[0];
+      if (!file) {
+        alert("Bitte wählen Sie zuerst eine Excel-Datei für den Arbeitsplan aus.");
+        return;
+      }
+
+      const month = document.getElementById('scheduleMonthSelect').value;
+      const year = document.getElementById('scheduleYearInput').value;
+      const statusEl = document.getElementById('scheduleStatus');
+      statusEl.innerText = "⏳ Arbeitsplan-Import prebieha...";
+
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const sheet = workbook.Sheets[workbook.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+          let schedulesToInsert = [];
+
+          // Prechádzame riadky s personálom (štandardne od riadku 3 do 48, kde má každý zamestnanec pár 2 riadkov)
+          for (let i = 3; i < rows.length; i += 2) {
+            const rowTop = rows[i];     // Horný riadok (Začiatky zmien / resp. hodnoty ako X, U)
+            const rowBot = rows[i + 1]; // Spodný riadok (Konce zmien)
+
+            if (!rowTop || !rowTop[1]) continue;
+
+            const employeeName = String(rowTop[1]).trim();
+            const station = rowTop[2] ? String(rowTop[2]).trim() : '';
+
+            // Dni začínajú od stĺpca 4 (index 4), každý deň zaberá 2 stĺpce (dopoludnie / popoludnie alebo delená smena)
+            for (let col = 4; col < rowTop.length; col += 2) {
+              const dayNum = rows[1] && rows[1][col] !== undefined ? rows[1][col] : null;
+              if (!dayNum || isNaN(dayNum)) continue;
+
+              const slot1_start = rowTop[col] !== undefined ? rowTop[col] : null;
+              const slot1_end = rowBot && rowBot[col] !== undefined ? rowBot[col] : null;
+              const slot2_start = rowTop[col+1] !== undefined ? rowTop[col+1] : null;
+              const slot2_end = rowBot && rowBot[col+1] !== undefined ? rowBot[col+1] : null;
+
+              // Uloženie záznamu do poľa pre import
+              schedulesToInsert.push({
+                employee_name: employeeName,
+                station: station,
+                month: parseInt(month),
+                year: parseInt(year),
+                day: parseInt(dayNum),
+                shift_1_start: slot1_start !== null ? String(slot1_start) : null,
+                shift_1_end: slot1_end !== null ? String(slot1_end) : null,
+                shift_2_start: slot2_start !== null ? String(slot2_start) : null,
+                shift_2_end: slot2_end !== null ? String(slot2_end) : null
+              });
+            }
+          }
+
+          if (schedulesToInsert.length > 0) {
+            console.log("Úspešne naparsovaný pracovný plán:", schedulesToInsert);
+            statusEl.innerText = `✔ Arbeitsplan erfolgreich importiert! (${schedulesToInsert.length} Datensätze)`;
+            alert(`Erfolg! Arbeitsplan für ${schedulesToInsert.length} Schicht-Einträge erfolgreich analysiert.`);
+            closeImportExportModal();
+          } else {
+            statusEl.innerText = "Keine Schichten in der Datei gefunden.";
+          }
+        } catch (err) {
+          console.error(err);
+          statusEl.innerText = "Fehler beim Parsen: " + err.message;
         }
       };
       reader.readAsArrayBuffer(file);
