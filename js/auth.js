@@ -12,9 +12,9 @@
     // ---------- Anmeldung: Namen wählen ----------
     // Ansicht „neu“ (Standard): zuletzt benutzt, Suche, Team und Leitung getrennt, kompakt.
     // Ansicht „klassisch“: das bisherige Raster. Umschalten mit dem Link unter der Liste.
-    function getLoginView() {
-      try { return localStorage.getItem('salon_login_view') === 'classic' ? 'classic' : 'new'; } catch (e) { return 'new'; }
-    }
+  function getLoginView() {
+  try { return localStorage.getItem('salon_login_view') === 'new' ? 'new' : 'classic'; } catch (e) { return 'classic'; }
+   }
 
     function toggleLoginView() {
       try { localStorage.setItem('salon_login_view', getLoginView() === 'classic' ? 'new' : 'classic'); } catch (e) {}
