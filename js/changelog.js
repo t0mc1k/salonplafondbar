@@ -10,9 +10,55 @@
    Änderungs-Typen: 'new' Neu, 'improved' Verbessert, 'fixed' Behoben,
                     'security' Sicherheit, 'info' Allgemein
    ============================================================ */
-    const APP_VERSION = '3.1.04';
+    const APP_VERSION = '4.0.02';
 
     const CHANGELOG = [
+  { version: '4.0.02', range: '', date: 'November 2026', title: 'Englisch für das ganze Team & Startseite nach dem Login',
+    changes: [
+      ['new', 'Englisch erweitert: Die Getränke-Datenbank (Suche, Kategorien, Karten, Rezept, Drucken), Multi-View, Einkaufsliste und dein Profil lassen sich jetzt ebenfalls auf Englisch umstellen (Einstellungen → Sprache).'],
+      ['improved', 'Beim Wechsel der Sprache werden Getränke-Liste, Kategorien und Multi-View-Leiste sofort neu gezeichnet. Die „Über mich“-Vorschläge im Profil werden in der gewählten Sprache gespeichert.'],
+      ['improved', 'Zeitangaben wie „vor 5 Min.“ erscheinen in der gewählten Sprache.'],
+      ['new', 'Einstellung „Nach dem Login öffnen“: Du wählst, ob nach der Anmeldung das Dashboard (Standard) oder direkt die Getränke geöffnet werden. Die Einstellung gehört zu deinem Konto und gilt auf jedem Gerät.'],
+      ['new', 'Englisch vervollständigt: Team-Chat, Mein Arbeitsplan, Schichttausch, Checkliste, Speisekarte & Allergene, Störungen, Fundsachen und Verluste & Bruch lassen sich komplett auf Englisch nutzen. Manager-Ansichten, A3-Karte und „Was ist neu?“ bleiben Deutsch.']
+    ] },
+  { version: '4.0.01', range: '', date: 'November 2026', title: 'Hilfe & Anleitung, Englisch für das Team',
+    changes: [
+      ['new', 'Hilfe & Anleitung: Eine ausführliche Anleitung für alle Funktionen, Schritt für Schritt erklärt, mit Suche und häufigen Fragen. Du findest sie auf dem Dashboard und im Menü. Kapitel für Manager sind mit „Manager“ markiert.'],
+      ['new', 'Englisch: Die App lässt sich auf Englisch umstellen. Auf der Anmeldeseite oben rechts „DE | EN“, in der App unter Einstellungen → Sprache. Die Sprache merkt sich das Gerät.'],
+      ['info', 'Zuerst übersetzt: Anmeldung, Dashboard, Menü, Einstellungen, Kopf der Getränke-Seite und die Hilfe. Weitere Bereiche für das Team folgen in den nächsten Versionen. Manager-Fenster, A3-Karte und „Was ist neu?“ bleiben Deutsch.'],
+      ['improved', '„Mein Arbeitsplan“ im Menü und in der Getränke-Datenbank öffnet jetzt den neuen Monatskalender mit Pausen und Schichttausch.']
+    ] },
+  { version: '4.0.00', range: '', date: 'November 2026', title: 'Fehlerbehebungen & Verlauf aufräumen',
+    changes: [
+      ['fixed', 'In Eingabefeldern und Fenstern (Mengen, Minuten, Preise, PIN, Suche ...) ließen sich keine Zahlen eintippen und mit Backspace nichts löschen. Das funktioniert wieder überall.'],
+      ['new', 'Schichttausch → Verlauf: Manager und Developer können einzelne Einträge oder den gesamten Verlauf löschen.'],
+    ] },
+  { version: '3.2.03', range: '', date: 'November 2026', title: 'Checklisten, Schichttausch, Stunden, Speisekarte & mehr',
+    changes: [
+      ['new', 'Checklisten & Standards: Aufgaben für Öffnung, Laufend und Schließung, getrennt nach Bar, Service und Terrasse. Eine gemeinsame Liste pro Tag: Wer abhakt, steht mit Name und Uhrzeit dabei. Manager/Developer legen die Aufgaben selbst an und ändern sie. Für das Team heißt die Kachel „Meine Schicht“.'],
+      ['new', 'Schichttausch: Anfrage direkt an einen Kollegen oder in die Börse für alle. Wer die Schicht übernimmt, bestätigt; am Ende entscheidet immer der Manager. Erst dann wird der Arbeitsplan geändert.'],
+      ['new', 'Mein Arbeitsplan: Monatskalender mit deinen Schichten, Pausen (Minuten) und Tausch-Anfrage pro Tag.'],
+      ['new', 'Stunden & Lohn (Manager/Developer): Monatsstunden pro Person (geplant − Pause + Korrektur), Korrekturen pro Tag und Excel-Export für die Lohnverrechnung. Ohne Zuschläge.'],
+      ['new', 'Speisekarte & Allergene: Speisekarte pro Saison mit Allergenen A–R (Österreich), Suche, Ausblenden nach Allergen und Einfügen aus Excel. Die Getränke sind ebenfalls nach Allergenen durchsuchbar.'],
+      ['new', 'Störungen melden (mit Foto und Dringlichkeit), Fundsachen und Verluste & Bruch: drei getrennte Funktionen für das ganze Team. Störungen und Verluste sehen Manager/Developer, Fundsachen alle.'],
+      ['improved', 'Das Dashboard hat neue Kacheln und Zähler (Tausch-Anfragen, neue Störungen).'],
+      ['info', 'Wichtig für den Betrieb: Den Arbeitsplan können nur noch Manager und Developer ändern (auch der Excel-Import).']
+    ] },
+  { version: '3.2.02', range: '', date: 'November 2026', title: 'Einfachere, kompakte Anmeldung',
+    changes: [
+      ['improved', 'Anmeldung komplett vereinfacht: alles passt auf einen Bildschirm, ein kleiner Kopf statt großem Logo, alle Namen in einer kompakten Liste (A–Z) mit Suche und den letzten 3 Anmeldungen als schnelle Knöpfe.'],
+      ['improved', 'PIN-Eingabe übersichtlicher: gewählter Name mit Foto und „Ändern“, PIN als Punkte, kleinere Zahlentasten. Am Computer geht die Eingabe auch mit der Tastatur (Enter = Anmelden, Esc = Name ändern).'],
+      ['improved', 'Leitung (Manager/Developer) steht nicht mehr in einem eigenen Bereich, sondern ist in der Liste klein beschriftet.'],
+      ['info', 'Die „klassische Ansicht“ der Anmeldung entfällt, weil die neue Liste sie ersetzt.']
+    ] },
+  { version: '3.2.01', range: '', date: 'November 2026', title: 'Dashboard als Startseite & Team-Arbeitsplan',
+    changes: [
+      ['new', 'Dashboard als Startseite: Nach dem Login siehst du zuerst übersichtliche Kacheln statt direkt der Getränkeliste. Manager und Developer bekommen vier Bereiche (Bar & Betrieb, Team & Personal, Sicherheit & System, Support & Infos), Kellner ihre vier wichtigsten Kacheln: Getränke & Rezepte, Mein Arbeitsplan, Team-Chat und Was ist neu?.'],
+      ['new', 'Team & Arbeitsplan (Manager/Developer): Monatsraster für das ganze Team mit Schichten pro Tag, Stunden pro Mitarbeiter, Besetzung pro Tag, Monatswechsel und Excel-Export. Schichten lassen sich per Tipp auf ein Feld ändern (auch Frei, Urlaub, Krank).'],
+      ['new', 'Zähler auf den Kacheln: ungelesene Chat-Nachrichten und offene Support-Tickets.'],
+      ['improved', 'In der Getränke-Datenbank gibt es oben „← Dashboard“; auch der Zurück-Knopf am Handy führt zurück zum Dashboard. Im Menü stehen „Dashboard“ und „Getränke & Rezepte“ ganz oben.'],
+      ['improved', 'Die Team-Ansicht im alten Arbeitsplan-Fenster sehen jetzt nur noch Manager und Developer; Kellner sehen weiterhin ihren eigenen Plan.']
+    ] },
   { version: '3.1.04', range: '', date: 'Oktober 2026', title: 'Schnellere Anmeldung, mehrere Fotos & klarere Handy-Ansicht',
     changes: [
       ['new', 'Bis zu 3 Fotos pro Getränk: Hauptfoto festlegen, Fotos entfernen, direkt vom Handy aufnehmen oder hochladen. Im Detail gibt es eine kleine Galerie. Fotos werden vor dem Hochladen automatisch verkleinert.'],
@@ -108,8 +154,10 @@
     }
 
     function applyVersionLabels() {
-      document.title = 'Salonplafond BAR v' + APP_VERSION;
+      document.title = 'Salonplafond NeXuS · BAR v' + APP_VERSION;
       document.querySelectorAll('[data-app-version]').forEach(el => { el.textContent = 'v' + APP_VERSION; });
+      document.querySelectorAll('[data-app-number]').forEach(el => { el.textContent = APP_VERSION; });
+      document.querySelectorAll('[data-brand-header]').forEach(el => { el.textContent = 'BAR v' + APP_VERSION; });
       const badge = document.getElementById('changelogVersionBadge');
       if (badge) badge.textContent = 'v' + APP_VERSION;
       if (CHANGELOG[0] && CHANGELOG[0].version !== APP_VERSION) {

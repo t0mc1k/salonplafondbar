@@ -1,4 +1,4 @@
-# Salonplafond BAR – Projektstruktur
+# Salonplafond NeXuS • BAR – Projektstruktur
 
 Statische Web-App (kein Build nötig). Läuft auf GitHub Pages, Daten in Supabase.
 
@@ -22,6 +22,17 @@ js/                 Logik, in Themen aufgeteilt (siehe unten)
 | Support-Tickets                                         | js/tickets.js        |
 | Version, Changelog („Was ist neu?“), Team-News          | js/changelog.js      |
 | Arbeitsplan                                             | js/schedule.js       |
+| Dashboard (Startseite, Kacheln je Rolle, Wechsel Dashboard ↔ Getränke) | js/dashboard.js |
+| Team & Arbeitsplan (Monatsraster, Stunden, Schichten planen) | js/team-plan.js |
+| Gemeinsame Hilfen der Betriebs-Module (Fenster, Datum, Foto-Upload) | js/feature-ui.js |
+| Sprachen DE/EN (Wörterbuch, Umschalter) | js/i18n.js |
+| Übersetzung der Betriebs-Fenster (Tabelle Deutsch → Englisch) | js/i18n-ui.js (generiert) |
+| Hilfe & Anleitung (Kapitel in DE/EN) | js/help.js |
+| Checklisten & Standards (Öffnung/Laufend/Schließung) | js/checklists.js |
+| Mein Arbeitsplan + Schichttausch (direkt/Börse, Manager genehmigt) | js/shift-swap.js |
+| Stunden & Lohn (Pausen, Korrekturen, Excel) | js/payroll.js |
+| Speisekarte & Allergene A–R | js/menu-allergens.js |
+| Störungen, Fundsachen, Verluste & Bruch | js/reports.js |
 | Saisons                                                 | js/seasons.js        |
 | Getränkeliste, Filter, Detail-Fenster, Rezept drucken   | js/drinks.js         |
 | Getränk anlegen/ändern/löschen, Zutaten, Fotos (bis 3)  | js/drink-admin.js    |

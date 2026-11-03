@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Salonplafond">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <title>Salonplafond BAR v3.1.04</title>
+  <title>Salonplafond NeXuS · BAR v4.0.02</title>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS pre Excel Import & Export -->
@@ -34,79 +34,80 @@
       window.__salonDark = dark;
     } catch (e) { document.documentElement.classList.add('dark'); window.__salonDark = true; }
   </script>
-  <link rel="stylesheet" href="css/style.css?v=3.1.04">
+  <link rel="stylesheet" href="css/style.css?v=4.0.02">
 </head>
 <body class="dark-mode p-3 pt-0 md:p-8 max-w-6xl mx-auto pb-32" onclick="closeDropdowns(event)">
   <script>if (window.__salonDark === false) { document.body.classList.remove('dark-mode'); document.body.classList.add('light-mode'); }</script>
 
-  <!-- 1. PRIHLASOVACIA OBRAZOVKA -->
-  <div id="authContainer" class="fixed inset-0 z-[200] bg-slate-100 dark:bg-slate-950 flex flex-col items-center justify-center p-4 md:p-6 text-center overflow-y-auto">
-    <div class="flex flex-col items-center gap-4 w-full max-w-lg my-auto">
-      
-      <div class="login-logo-advanced w-16 h-16 bg-amber-400 rounded-2xl flex flex-col items-center justify-center shadow-2xl p-1 text-slate-950 font-bold select-none border-2 border-amber-300 mx-auto">
-        <div class="logo-bar-login"></div>
-        <div class="text-2xl font-black leading-none my-0">O</div>
-        <div class="text-[10px] font-black leading-none mt-0.5">•</div>
+  <!-- 1. ANMELDUNG (kompakt, ein Bildschirm) -->
+  <div id="authContainer" class="login-screen fixed inset-0 z-[200] bg-slate-100 dark:bg-slate-950 overflow-y-auto">
+    <div class="login-shell">
+      <div class="lang-switch" role="group" aria-label="Language">
+        <button type="button" data-lang="de" onclick="setLanguage('de')">DE</button>
+        <button type="button" data-lang="en" onclick="setLanguage('en')">EN</button>
       </div>
 
-      <div>
-        <h1 class="text-lg md:text-xl font-black tracking-wider text-slate-900 dark:text-white uppercase">Anmeldung</h1>
-        <h2 class="text-xl md:text-2xl font-extrabold text-amber-700 dark:text-amber-400 tracking-tight mt-1">Salonplafond BAR</h2>
-        <span class="text-xs text-slate-600 dark:text-slate-400 font-medium mt-0.5 block"><span data-app-version>v3.1.04</span> • Touch-Grid PIN-Login</span>
-      </div>
+      <header class="login-head">
+        <div class="login-logo-advanced login-logo bg-amber-400 shadow-2xl text-slate-950 font-bold select-none border-2 border-amber-300">
+          <div class="logo-bar-login"></div>
+          <div class="login-logo-o">O</div>
+          <div class="login-logo-dot">•</div>
+        </div>
+        <div class="login-head-text">
+          <h1>Salonplafond NeXuS</h1>
+          <span><span data-brand-header>BAR v4.0.02</span> · <span data-i18n="login.title">Anmeldung</span></span>
+        </div>
+      </header>
 
-      <div id="pinLoginForm" class="w-full bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 p-5 rounded-2xl shadow-2xl space-y-4 text-left mt-1">
-        <div>
-          <label class="block text-xs font-semibold uppercase mb-2 text-slate-700 dark:text-slate-300 flex items-center justify-between">
-            <span>1. Wer bist du? (Personal wählen)</span>
-            <span id="selectedWaiterLabel" class="text-amber-700 dark:text-amber-400 font-bold"></span>
-          </label>
-          <div id="loginPickerWrap">
-            <div id="loginSearchRow" class="hidden mb-3">
-              <input type="search" id="loginSearchInput" oninput="renderLoginGrid()" onkeydown="if (event.key === 'Enter') { event.preventDefault(); loginPickFirstMatch(); }" autocomplete="off" placeholder="🔍 Name suchen ..." class="ui-search">
-            </div>
-            <div id="waiterGridContainer" class="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-48 overflow-y-auto pr-1">
-              <p class="col-span-full text-slate-500 italic text-xs text-center py-4">Personal wird geladen...</p>
-            </div>
-            <div class="login-view-toggle">
-              <button type="button" id="loginViewToggleBtn" onclick="toggleLoginView()"></button>
-            </div>
+      <div id="pinLoginForm" class="login-card">
+
+        <!-- Schritt 1: Name wählen -->
+        <div id="loginPickerWrap">
+          <p class="login-step" data-i18n="login.who">Wer bist du?</p>
+          <div id="loginSearchRow" class="hidden">
+            <input type="search" id="loginSearchInput" oninput="renderLoginGrid()" onkeydown="if (event.key === 'Enter') { event.preventDefault(); loginPickFirstMatch(); }" autocomplete="off" placeholder="🔍 Name suchen ..." data-i18n-ph="login.search" class="login-search">
+          </div>
+          <div id="loginRecentRow" class="login-recent"></div>
+          <div id="waiterGridContainer" class="login-list">
+            <p class="login-empty" data-i18n="login.loading">Personal wird geladen ...</p>
           </div>
         </div>
 
-        <div id="pinInputSection" class="hidden border-t border-slate-300 dark:border-slate-800 pt-3">
-          <div class="flex items-center justify-between mb-1">
-            <label class="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300">2. PIN-Code eingeben</label>
-            <button type="button" onclick="resetWaiterSelection()" class="text-[11px] text-amber-700 dark:text-amber-400 hover:underline">← Anderen Namen wählen</button>
-          </div>
-          <div class="relative mb-2">
-            <input type="password" id="loginPinInput" readonly placeholder="••••" class="w-full p-2.5 text-center tracking-widest text-base rounded-xl bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-amber-700 dark:text-amber-400 font-black focus:outline-none focus:border-amber-400">
+        <!-- Schritt 2: PIN eingeben -->
+        <div id="pinInputSection" class="hidden">
+          <div class="login-who">
+            <span id="selectedWaiterAvatar" class="login-av lg"></span>
+            <div class="login-who-text">
+              <b id="selectedWaiterLabel"></b>
+              <small data-i18n="login.enterPin">PIN eingeben</small>
+            </div>
+            <button type="button" onclick="resetWaiterSelection()" class="login-change" data-i18n="login.change">Ändern</button>
           </div>
 
-          <div class="grid grid-cols-3 gap-1.5">
-            <button type="button" onclick="appendPinNum('1')" class="p-2.5 bg-slate-100 dark:bg-slate-950 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white text-sm font-bold rounded-xl transition">1</button>
-            <button type="button" onclick="appendPinNum('2')" class="p-2.5 bg-slate-100 dark:bg-slate-950 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white text-sm font-bold rounded-xl transition">2</button>
-            <button type="button" onclick="appendPinNum('3')" class="p-2.5 bg-slate-100 dark:bg-slate-950 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white text-sm font-bold rounded-xl transition">3</button>
-            <button type="button" onclick="appendPinNum('4')" class="p-2.5 bg-slate-100 dark:bg-slate-950 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white text-sm font-bold rounded-xl transition">4</button>
-            <button type="button" onclick="appendPinNum('5')" class="p-2.5 bg-slate-100 dark:bg-slate-950 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white text-sm font-bold rounded-xl transition">5</button>
-            <button type="button" onclick="appendPinNum('6')" class="p-2.5 bg-slate-100 dark:bg-slate-950 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white text-sm font-bold rounded-xl transition">6</button>
-            <button type="button" onclick="appendPinNum('7')" class="p-2.5 bg-slate-100 dark:bg-slate-950 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white text-sm font-bold rounded-xl transition">7</button>
-            <button type="button" onclick="appendPinNum('8')" class="p-2.5 bg-slate-100 dark:bg-slate-950 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white text-sm font-bold rounded-xl transition">8</button>
-            <button type="button" onclick="appendPinNum('9')" class="p-2.5 bg-slate-100 dark:bg-slate-950 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white text-sm font-bold rounded-xl transition">9</button>
-            <button type="button" onclick="clearPinInput()" class="p-2.5 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 text-red-700 dark:text-red-400 text-xs font-bold rounded-xl transition">C</button>
-            <button type="button" onclick="appendPinNum('0')" class="p-2.5 bg-slate-100 dark:bg-slate-950 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-white text-sm font-bold rounded-xl transition">0</button>
-            <button type="button" onclick="backspacePinInput()" class="p-2.5 bg-slate-100 dark:bg-slate-950 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-800 text-amber-700 dark:text-amber-400 text-xs font-bold rounded-xl transition">⌫</button>
+          <div id="loginPinDots" class="login-dots" aria-label="PIN-Eingabe"></div>
+          <input type="password" id="loginPinInput" readonly tabindex="-1" class="hidden">
+
+          <div class="login-keypad">
+            <button type="button" onclick="appendPinNum('1')" class="login-key">1</button>
+            <button type="button" onclick="appendPinNum('2')" class="login-key">2</button>
+            <button type="button" onclick="appendPinNum('3')" class="login-key">3</button>
+            <button type="button" onclick="appendPinNum('4')" class="login-key">4</button>
+            <button type="button" onclick="appendPinNum('5')" class="login-key">5</button>
+            <button type="button" onclick="appendPinNum('6')" class="login-key">6</button>
+            <button type="button" onclick="appendPinNum('7')" class="login-key">7</button>
+            <button type="button" onclick="appendPinNum('8')" class="login-key">8</button>
+            <button type="button" onclick="appendPinNum('9')" class="login-key">9</button>
+            <button type="button" onclick="clearPinInput()" class="login-key login-key-c" aria-label="Löschen">C</button>
+            <button type="button" onclick="appendPinNum('0')" class="login-key">0</button>
+            <button type="button" onclick="backspacePinInput()" class="login-key login-key-b" aria-label="Zurück">⌫</button>
           </div>
-          <button type="button" id="pinSubmitBtn" onclick="submitPinLogin()" class="w-full mt-2 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold rounded-xl text-sm transition shadow-lg">🔓 Anmelden</button>
+          <button type="button" id="pinSubmitBtn" onclick="submitPinLogin()" class="login-submit" data-i18n="login.submit">Anmelden</button>
         </div>
 
-        <div id="pinAuthError" class="text-xs text-red-700 dark:text-red-400 hidden font-medium text-center"></div>
-
+        <div id="pinAuthError" class="login-error hidden"></div>
       </div>
 
-      <div class="mt-2 flex flex-col items-center gap-1">
-        <span class="text-xs text-slate-700 dark:text-slate-300 font-extrabold block">Erstellt von © T0mc1k (Tomas Kardos)</span>
-      </div>
+      <p class="login-credit">Salonplafond NeXuS • BAR v<span data-app-number>4.0.02</span> • Developed by Tomas Kardos © 2026</p>
     </div>
   </div>
 
@@ -264,8 +265,8 @@
 
       <div class="ui-head">
         <div>
-          <h3 class="ui-head-title">👤 Mein Profil</h3>
-          <p class="ui-head-sub">So sehen dich deine Kollegen im Chat und in der Personalliste.</p>
+          <h3 class="ui-head-title" data-i18n="prof.title">👤 Mein Profil</h3>
+          <p class="ui-head-sub" data-i18n="prof.sub">So sehen dich deine Kollegen im Chat und in der Personalliste.</p>
         </div>
         <button type="button" onclick="closeUserProfileModal()" class="ui-close" aria-label="Schließen">&times;</button>
       </div>
@@ -290,8 +291,8 @@
           </div>
           <p id="profileBioPreview" class="profile-bio-preview"></p>
           <div class="flex gap-2 flex-wrap px-4 pb-4">
-            <button type="button" onclick="document.getElementById('profileAvatarFile').click()" class="ui-btn-ghost">📷 Foto ändern</button>
-            <button type="button" onclick="openMyFullAvatar()" class="ui-btn-ghost">🔍 Foto ansehen</button>
+            <button type="button" onclick="document.getElementById('profileAvatarFile').click()" class="ui-btn-ghost" data-i18n="prof.photo">📷 Foto ändern</button>
+            <button type="button" onclick="openMyFullAvatar()" class="ui-btn-ghost" data-i18n="prof.viewPhoto">🔍 Foto ansehen</button>
             <span id="profileAvatarStatus" class="profile-meta self-center"></span>
           </div>
           <input type="file" id="profileAvatarFile" accept="image/*" class="hidden" onchange="uploadMyAvatarToSupabase(event)">
@@ -299,22 +300,22 @@
         </div>
 
         <!-- Arbeitsplan -->
-        <button type="button" onclick="closeUserProfileModal(); openWorkScheduleModal();" class="profile-link">
+        <button type="button" onclick="closeUserProfileModal(); openMyPlanModal();" class="profile-link">
           <span class="profile-link-ico">🗓️</span>
-          <span class="min-w-0 flex-1 text-left"><b class="block text-sm">Mein Arbeitsplan</b><small class="block text-xs profile-link-sub">Deine Schichten dieser Woche ansehen</small></span>
+          <span class="min-w-0 flex-1 text-left"><b class="block text-sm" data-i18n="prof.plan">Mein Arbeitsplan</b><small class="block text-xs profile-link-sub" data-i18n="prof.planSub">Deine Schichten ansehen</small></span>
           <span class="menu-arrow">›</span>
         </button>
 
         <!-- Über mich -->
         <div class="form-section">
-          <div class="form-section-title">Über mich</div>
-          <textarea id="profileInputBio" rows="2" maxlength="140" oninput="onProfileBioInput()" placeholder="Schreibe etwas über dich oder deinen Status ..." class="ui-field"></textarea>
+          <div class="form-section-title" data-i18n="prof.about">Über mich</div>
+          <textarea id="profileInputBio" rows="2" maxlength="140" oninput="onProfileBioInput()" placeholder="Schreibe etwas über dich oder deinen Status ..." data-i18n-ph="prof.bioPh" class="ui-field"></textarea>
           <div class="flex items-center justify-between gap-2 mt-1.5 flex-wrap">
             <div class="flex gap-1.5 flex-wrap">
-              <button type="button" class="ui-chip" onclick="setProfileBio('🍸 Hinter der Bar')">🍸 Hinter der Bar</button>
-              <button type="button" class="ui-chip" onclick="setProfileBio('☕ In der Pause')">☕ In der Pause</button>
-              <button type="button" class="ui-chip" onclick="setProfileBio('🔥 Heute voll dabei')">🔥 Voll dabei</button>
-              <button type="button" class="ui-chip" onclick="setProfileBio('')">Leeren</button>
+              <button type="button" class="ui-chip" onclick="setProfileBio(t('prof.bioBar'))" data-i18n="prof.btnBar">🍸 Hinter der Bar</button>
+              <button type="button" class="ui-chip" onclick="setProfileBio(t('prof.bioPause'))" data-i18n="prof.btnPause">☕ In der Pause</button>
+              <button type="button" class="ui-chip" onclick="setProfileBio(t('prof.bioIn'))" data-i18n="prof.btnIn">🔥 Voll dabei</button>
+              <button type="button" class="ui-chip" onclick="setProfileBio('')" data-i18n="prof.clear">Leeren</button>
             </div>
             <span id="profileBioCount" class="form-hint">0 / 140</span>
           </div>
@@ -322,35 +323,35 @@
 
         <!-- PIN -->
         <div class="form-section">
-          <div class="form-section-title">PIN-Code ändern</div>
+          <div class="form-section-title" data-i18n="prof.pinTitle">PIN-Code ändern</div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label class="form-label" for="profileInputNewPin">Neuer PIN</label>
-              <input type="password" id="profileInputNewPin" inputmode="numeric" maxlength="6" autocomplete="new-password" oninput="onProfilePinInput()" placeholder="4 bis 6 Ziffern" class="ui-field tracking-widest">
+              <label class="form-label" for="profileInputNewPin" data-i18n="prof.newPin">Neuer PIN</label>
+              <input type="password" id="profileInputNewPin" inputmode="numeric" maxlength="6" autocomplete="new-password" oninput="onProfilePinInput()" placeholder="4 bis 6 Ziffern" data-i18n-ph="prof.pinPh" class="ui-field tracking-widest">
             </div>
             <div>
-              <label class="form-label" for="profileInputPin2">PIN wiederholen</label>
-              <input type="password" id="profileInputPin2" inputmode="numeric" maxlength="6" autocomplete="new-password" oninput="onProfilePinInput()" placeholder="Zur Kontrolle" class="ui-field tracking-widest">
+              <label class="form-label" for="profileInputPin2" data-i18n="prof.repeatPin">PIN wiederholen</label>
+              <input type="password" id="profileInputPin2" inputmode="numeric" maxlength="6" autocomplete="new-password" oninput="onProfilePinInput()" placeholder="Zur Kontrolle" data-i18n-ph="prof.pinPh2" class="ui-field tracking-widest">
             </div>
           </div>
           <div class="flex items-center justify-between gap-2 mt-2 flex-wrap">
-            <p id="profilePinHint" class="form-hint">Leer lassen, wenn dein PIN gleich bleiben soll.</p>
-            <button type="button" onclick="toggleProfilePinVisibility()" class="ui-link-btn">👁️ Anzeigen / verbergen</button>
+            <p id="profilePinHint" class="form-hint" data-i18n="prof.pinHint">Leer lassen, wenn dein PIN gleich bleiben soll.</p>
+            <button type="button" onclick="toggleProfilePinVisibility()" class="ui-link-btn" data-i18n="prof.showHide">👁️ Anzeigen / verbergen</button>
           </div>
         </div>
 
         <!-- Rechte -->
         <div class="form-section">
-          <div class="form-section-title">Meine Rechte</div>
+          <div class="form-section-title" data-i18n="prof.rights">Meine Rechte</div>
           <div id="profileRightsBox" class="flex flex-col gap-1.5"></div>
         </div>
       </div>
 
       <div class="ui-foot">
-        <span id="profileDirtyHint" class="profile-dirty hidden">● Ungespeicherte Änderungen</span>
+        <span id="profileDirtyHint" class="profile-dirty hidden" data-i18n="prof.unsaved">● Ungespeicherte Änderungen</span>
         <span class="flex-1"></span>
-        <button type="button" onclick="closeUserProfileModal()" class="ui-btn-ghost">Schließen</button>
-        <button type="button" id="profileSaveBtn" onclick="saveMyUserProfile()" class="ui-btn-primary">💾 Speichern</button>
+        <button type="button" onclick="closeUserProfileModal()" class="ui-btn-ghost" data-i18n="common.close">Schließen</button>
+        <button type="button" id="profileSaveBtn" onclick="saveMyUserProfile()" class="ui-btn-primary" data-i18n="prof.save">💾 Speichern</button>
       </div>
     </div>
   </div>
@@ -367,10 +368,10 @@
         <span id="userDetailRole" class="text-[10px] uppercase tracking-wider text-amber-700 dark:text-amber-400 font-semibold block mt-0.5"></span>
       </div>
       <div class="w-full custom-box p-3 rounded-xl border text-left">
-        <span class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 block mb-1">Über mich:</span>
-        <p id="userDetailBio" class="text-xs italic text-slate-700 dark:text-slate-300">Keine Beschreibung angegeben.</p>
+        <span class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 block mb-1" data-i18n="prof.aboutColon">Über mich:</span>
+        <p id="userDetailBio" class="text-xs italic text-slate-700 dark:text-slate-300" data-i18n="prof.noBio">Keine Beschreibung angegeben.</p>
       </div>
-      <button onclick="closeUserDetailModal()" class="w-full py-2.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 font-bold text-slate-800 dark:text-white rounded-xl text-xs transition">Schließen</button>
+      <button onclick="closeUserDetailModal()" class="w-full py-2.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 font-bold text-slate-800 dark:text-white rounded-xl text-xs transition" data-i18n="common.close">Schließen</button>
     </div>
   </div>
 
@@ -387,13 +388,13 @@
         </div>
 
         <div class="flex flex-col justify-center min-w-0">
-          <h1 class="text-lg md:text-3xl font-bold tracking-tight text-amber-700 dark:text-amber-400 leading-none whitespace-nowrap">Salonplafond BAR</h1>
-          <span class="text-[10px] md:text-xs text-slate-600 dark:text-slate-400 font-medium block mt-0.5" data-app-version>v3.1.04</span>
+          <h1 class="text-lg md:text-3xl font-bold tracking-tight text-amber-700 dark:text-amber-400 leading-none whitespace-nowrap">Salonplafond NeXuS</h1>
+          <span class="text-[10px] md:text-xs text-slate-600 dark:text-slate-400 font-medium block mt-0.5" data-brand-header>BAR v4.0.02</span>
         </div>
       </div>
 
       <div class="flex items-center gap-2 shrink-0">
-        <button onclick="handleLogout()" class="hidden md:inline-flex px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/30 rounded-lg text-xs font-bold transition items-center gap-1.5 shadow-sm" title="Benutzer wechseln">
+        <button onclick="handleLogout()" class="hidden md:inline-flex px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/30 rounded-lg text-xs font-bold transition items-center gap-1.5 shadow-sm" title="Benutzer wechseln" data-i18n="hdr.switch">
           🚪 Benutzer wechseln
         </button>
 
@@ -402,13 +403,13 @@
           <span id="headerChatBadgeDot" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white dark:border-slate-950 pulse-badge-dot"></span>
         </button>
 
-        <button onclick="toggleFullscreen()" class="hidden md:inline-flex px-3 py-1.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-lg text-xs font-semibold border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-300 items-center gap-1 transition">
+        <button onclick="toggleFullscreen()" class="hidden md:inline-flex px-3 py-1.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-lg text-xs font-semibold border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-300 items-center gap-1 transition" data-i18n="hdr.fullscreen">
           ⛶ Vollbild
         </button>
 
         <div class="relative">
           <button onclick="toggleSettingsMenu(event)" class="w-10 h-10 md:w-auto md:h-auto md:px-3 md:py-1.5 justify-center bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl md:rounded-lg text-base md:text-xs flex items-center gap-1 shadow-md transition relative" title="Menü" aria-label="Menü">
-            <span class="md:hidden">⚙️</span><span class="hidden md:inline">☰ Menü</span>
+            <span class="md:hidden">⚙️</span><span class="hidden md:inline" data-i18n="hdr.menu">☰ Menü</span>
             <span id="menuNotificationDot" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-amber-500 dark:bg-amber-400 rounded-full border-2 border-white dark:border-slate-950 pulse-badge-dot"></span>
           </button>
 
@@ -427,84 +428,101 @@
               <span class="menu-arrow">›</span>
             </button>
 
-            <button type="button" onclick="openAddDrinkModalFromMenu()" id="menuAddDrinkBtn" class="hidden menu-primary mt-1">
+            <button type="button" onclick="closeSettingsMenu(); showDashboard();" class="menu-item mt-1">
+              <span class="menu-ico">🏠</span>
+              <span class="menu-text"><span class="menu-label" data-i18n="menu.dashboard">Dashboard</span><span class="menu-sub" data-i18n="menu.dashboardSub">Zurück zur Startseite</span></span>
+            </button>
+            <button type="button" onclick="closeSettingsMenu(); openDrinksView();" class="menu-item">
+              <span class="menu-ico">🍸</span>
+              <span class="menu-text"><span class="menu-label" data-i18n="menu.drinks">Getränke & Rezepte</span><span class="menu-sub" data-i18n="menu.drinksSub">Datenbank öffnen</span></span>
+            </button>
+
+            <button type="button" onclick="openAddDrinkModalFromMenu()" id="menuAddDrinkBtn" class="hidden menu-primary mt-1" data-i18n="menu.addDrink">
               ➕ Neues Getränk hinzufügen
             </button>
 
-            <div class="menu-section">Getränke & Karte</div>
+            <div class="menu-section" data-i18n="menu.secDrinks">Getränke & Karte</div>
 
             <button type="button" onclick="openSeasonModal()" class="menu-item">
               <span class="menu-ico">📅</span>
-              <span class="menu-text"><span class="menu-label">Saison wählen</span><span class="menu-sub" id="menuSeasonSub">Aktive Karte wechseln</span></span>
+              <span class="menu-text"><span class="menu-label" data-i18n="menu.season">Saison wählen</span><span class="menu-sub" id="menuSeasonSub" data-i18n="menu.seasonSub">Aktive Karte wechseln</span></span>
             </button>
             <button type="button" onclick="createNewSeasonPrompt()" id="menuNewSeasonBtn" class="hidden menu-item">
               <span class="menu-ico">➕</span>
-              <span class="menu-text"><span class="menu-label">Neue Saison erstellen</span><span class="menu-sub">Neue Karte anlegen</span></span>
+              <span class="menu-text"><span class="menu-label" data-i18n="menu.newSeason">Neue Saison erstellen</span><span class="menu-sub" data-i18n="menu.newSeasonSub">Neue Karte anlegen</span></span>
             </button>
             <button type="button" onclick="openShoppingModal()" class="menu-item">
               <span class="menu-ico">🛒</span>
-              <span class="menu-text"><span class="menu-label">Einkaufsliste / Inventur</span><span class="menu-sub">Zutaten der Saison zusammenrechnen</span></span>
+              <span class="menu-text"><span class="menu-label" data-i18n="menu.shopping">Einkaufsliste / Inventur</span><span class="menu-sub" data-i18n="menu.shoppingSub">Zutaten der Saison zusammenrechnen</span></span>
             </button>
             <button type="button" onclick="openA3PrintSetupModal()" class="menu-item">
               <span class="menu-ico">🖨️</span>
-              <span class="menu-text"><span class="menu-label">Karten-Druck (A3)</span><span class="menu-sub">Getränkekarte zum Ausdrucken</span></span>
+              <span class="menu-text"><span class="menu-label" data-i18n="menu.print">Karten-Druck (A3)</span><span class="menu-sub" data-i18n="menu.printSub">Getränkekarte zum Ausdrucken</span></span>
             </button>
             <button type="button" onclick="openImportExportModal()" id="btnMenuImportExport" class="hidden menu-item">
               <span class="menu-ico">📊</span>
-              <span class="menu-text"><span class="menu-label">Import & Export</span><span class="menu-sub">Excel oder CSV</span></span>
+              <span class="menu-text"><span class="menu-label" data-i18n="menu.impexp">Import & Export</span><span class="menu-sub" data-i18n="menu.impexpSub">Excel oder CSV</span></span>
             </button>
 
-            <div class="menu-section">Team & Arbeit</div>
+            <div class="menu-section" data-i18n="menu.secTeam">Team & Arbeit</div>
 
             <button type="button" onclick="openTeamChatModal()" class="menu-item">
               <span class="menu-ico">💬<span id="menuChatBadge" class="hidden menu-count">0</span></span>
-              <span class="menu-text"><span class="menu-label">Team-Chat</span><span class="menu-sub">Nachrichten an das ganze Team</span></span>
+              <span class="menu-text"><span class="menu-label" data-i18n="menu.chat">Team-Chat</span><span class="menu-sub" data-i18n="menu.chatSub">Nachrichten an das ganze Team</span></span>
             </button>
-            <button type="button" onclick="openWorkScheduleModal()" class="menu-item">
+            <button type="button" onclick="openMyPlanModal()" class="menu-item">
               <span class="menu-ico">🗓️</span>
-              <span class="menu-text"><span class="menu-label">Mein Arbeitsplan</span><span class="menu-sub">Deine Schichten</span></span>
+              <span class="menu-text"><span class="menu-label" data-i18n="menu.myplan">Mein Arbeitsplan</span><span class="menu-sub" data-i18n="menu.myplanSub">Deine Schichten</span></span>
             </button>
 
             <div id="menuAdminSection" class="hidden flex-col gap-0.5">
               <div class="menu-section">Verwaltung</div>
+              <button type="button" onclick="openTeamPlanModal()" class="menu-item">
+                <span class="menu-ico">📆</span>
+                <span class="menu-text"><span class="menu-label">Team & Arbeitsplan</span><span class="menu-sub">Monatsraster, Stunden, Schichten</span></span>
+              </button>
               <button type="button" onclick="openStaffPinModalFromMenu()" id="menuStaffPinBtn" class="menu-item">
                 <span class="menu-ico">👤</span>
                 <span class="menu-text"><span class="menu-label">Personal & PINs</span><span class="menu-sub">Mitarbeiter, Rollen und Rechte</span></span>
               </button>
             </div>
 
-            <div class="menu-section">App</div>
+            <div class="menu-section" data-i18n="menu.secApp">App</div>
 
             <button type="button" onclick="openUnifiedSettingsModal()" class="menu-item">
               <span class="menu-ico">⚙️</span>
-              <span class="menu-text"><span class="menu-label">Einstellungen & Zentrale</span><span class="menu-sub">Design, Schrift, Hinweise, Sortierung</span></span>
+              <span class="menu-text"><span class="menu-label" data-i18n="menu.settings">Einstellungen & Zentrale</span><span class="menu-sub" data-i18n="menu.settingsSub">Design, Schrift, Hinweise, Sortierung</span></span>
             </button>
             <button type="button" onclick="refreshData()" class="menu-item">
               <span class="menu-ico">🔄</span>
-              <span class="menu-text"><span class="menu-label">Daten aktualisieren</span><span class="menu-sub">Getränke neu laden</span></span>
+              <span class="menu-text"><span class="menu-label" data-i18n="menu.refresh">Daten aktualisieren</span><span class="menu-sub" data-i18n="menu.refreshSub">Getränke neu laden</span></span>
             </button>
             <button type="button" onclick="openInstallSettings()" id="menuInstallBtn" class="hidden menu-item">
               <span class="menu-ico">📲</span>
-              <span class="menu-text"><span class="menu-label">App installieren</span><span class="menu-sub">Symbol auf dem Startbildschirm</span></span>
+              <span class="menu-text"><span class="menu-label" data-i18n="menu.install">App installieren</span><span class="menu-sub" data-i18n="menu.installSub">Symbol auf dem Startbildschirm</span></span>
             </button>
             <button type="button" onclick="toggleFullscreen(); closeSettingsMenu();" class="menu-item menu-mobile-only">
               <span class="menu-ico">⛶</span>
-              <span class="menu-text"><span class="menu-label">Vollbild</span><span class="menu-sub">Ganzer Bildschirm ein/aus</span></span>
+              <span class="menu-text"><span class="menu-label" data-i18n="menu.fullscreen">Vollbild</span><span class="menu-sub" data-i18n="menu.fullscreenSub">Ganzer Bildschirm ein/aus</span></span>
+            </button>
+            <button type="button" onclick="closeSettingsMenu(); openHelpModal();" class="menu-item">
+              <span class="menu-ico">📖</span>
+              <span class="menu-text"><span class="menu-label" data-i18n="menu.help">Hilfe & Anleitung</span><span class="menu-sub" data-i18n="menu.helpSub">So funktioniert die App</span></span>
             </button>
             <button type="button" onclick="openChangelogModal()" class="menu-item">
               <span class="menu-ico">🚀</span>
-              <span class="menu-text"><span class="menu-label">Was ist neu?</span><span class="menu-sub">Neuigkeiten in <span data-app-version>v3.1.04</span></span></span>
+              <span class="menu-text"><span class="menu-label" data-i18n="menu.news">Was ist neu?</span><span class="menu-sub"><span data-i18n="menu.newsSub">Neuigkeiten in </span><span data-app-version>v4.0.02</span></span></span>
             </button>
             <button type="button" onclick="openSupportModal()" class="menu-item">
               <span class="menu-ico">🛟<span id="menuDropdownTicketDot" class="hidden menu-dot pulse-badge-dot"></span></span>
-              <span class="menu-text"><span class="menu-label">Support & Tickets</span><span class="menu-sub">Fehler melden oder Fragen stellen</span></span>
+              <span class="menu-text"><span class="menu-label" data-i18n="menu.support">Support & Tickets</span><span class="menu-sub" data-i18n="menu.supportSub">Fehler melden oder Fragen stellen</span></span>
             </button>
 
             <div class="menu-divider"></div>
 
             <button type="button" onclick="handleLogout()" class="menu-item menu-item-danger">
               <span class="menu-ico">🚪</span>
-              <span class="menu-text"><span class="menu-label">Benutzer wechseln</span><span class="menu-sub">Abmelden</span></span>
+              <span class="menu-text"><span class="menu-label" data-i18n="menu.logout">Benutzer wechseln</span><span class="menu-sub" data-i18n="menu.logoutSub">Abmelden</span></span>
             </button>
 
           </div>
@@ -526,52 +544,71 @@
     <!-- Angemeldet (nur am Computer) -->
     <div class="hidden md:flex mb-5 items-center justify-between flex-wrap gap-3">
       <div class="inline-flex items-center gap-3">
-        <div id="headerUserAvatarContainer" onclick="openUserProfileModal()" class="w-8 h-8 rounded-full border-2 border-amber-500 bg-slate-100 dark:bg-slate-800 overflow-hidden flex items-center justify-center shrink-0 cursor-pointer hover:scale-105 transition shadow" title="Klicken, um mein Profil zu öffnen">
+        <div id="headerUserAvatarContainer" onclick="openUserProfileModal()" class="w-8 h-8 rounded-full border-2 border-amber-500 bg-slate-100 dark:bg-slate-800 overflow-hidden flex items-center justify-center shrink-0 cursor-pointer hover:scale-105 transition shadow" title="Klicken, um mein Profil zu öffnen" data-i18n-title="hdr.profileTitle">
           <span class="text-[10px] font-bold text-amber-700 dark:text-amber-400" id="headerAvatarFallback">?</span>
         </div>
         <span class="text-xs text-slate-800 dark:text-slate-200 font-bold">Angemeldet: <span id="currentUserEmail" class="text-amber-700 dark:text-amber-300"></span></span>
       </div>
     </div>
 
+    <!-- ===== DASHBOARD (Startseite nach dem Login) ===== -->
+    <main id="dashboardView">
+      <section class="dash-hero">
+        <div class="min-w-0">
+          <h2 class="dash-hello" id="dashHello">Hallo!</h2>
+          <p class="dash-date" id="dashDate"></p>
+        </div>
+        <span id="dashRolePill" class="staff-pill pill-staff"></span>
+      </section>
+      <div id="dashGroups" class="dash-groups"></div>
+    </main>
+
+    <!-- ===== GETRÄNKE-DATENBANK ===== -->
+    <div id="drinksView" class="hidden">
+      <div class="dash-back-bar">
+        <button type="button" onclick="showDashboard()" class="dash-back-btn" title="Zurück zum Dashboard" data-i18n-title="dv.backTitle">← Dashboard</button>
+        <span class="dash-back-title" data-i18n="dv.title">🍸 Getränke & Rezepte</span>
+      </div>
+
     <!-- Suche -->
     <div class="mb-3 md:mb-4">
       <div class="relative w-full">
-        <input type="text" id="searchInput" autocomplete="off" oninput="onSearchInput()" placeholder="🔍 Getränk oder Zutat suchen..." class="px-4 py-3 pr-10 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white w-full focus:outline-none focus:border-amber-500 text-sm shadow-md font-medium">
+        <input type="text" id="searchInput" autocomplete="off" oninput="onSearchInput()" placeholder="🔍 Getränk oder Zutat suchen..." data-i18n-ph="dv.search" class="px-4 py-3 pr-10 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white w-full focus:outline-none focus:border-amber-500 text-sm shadow-md font-medium">
         <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-sm font-bold bg-slate-200/70 dark:bg-slate-700/50 hover:bg-slate-300 dark:hover:bg-slate-700 w-5 h-5 rounded-full items-center justify-center">&times;</button>
       </div>
     </div>
 
     <!-- Kategorien (wischbar) -->
     <div class="cat-bar mb-2 md:mb-3">
-      <span class="hidden md:inline text-xs text-slate-600 dark:text-slate-400 font-semibold mr-1 shrink-0">Kategorie:</span>
+      <span class="hidden md:inline text-xs text-slate-600 dark:text-slate-400 font-semibold mr-1 shrink-0" data-i18n="dv.category">Kategorie:</span>
       <div id="categories" class="flex gap-2"></div>
     </div>
 
     <!-- Schnellzugriff: Saison, Arbeitsplan, Filter -->
     <div class="quick-row mb-3 md:mb-5">
-      <div id="activeSeasonBadge" onclick="openSeasonModal()" title="Klicken, um Saison zu wechseln" class="hidden quick-chip quick-chip-amber">
-        <span>📅<span class="hidden sm:inline"> Saison:</span></span> <span id="activeSeasonName"></span>
+      <div id="activeSeasonBadge" onclick="openSeasonModal()" title="Klicken, um Saison zu wechseln" data-i18n-title="dv.seasonTitle" class="hidden quick-chip quick-chip-amber">
+        <span>📅<span class="hidden sm:inline" data-i18n="dv.season"> Saison:</span></span> <span id="activeSeasonName"></span>
       </div>
-      <button type="button" onclick="openWorkScheduleModal()" class="quick-chip desktop-only">🗓️ Arbeitsplan</button>
+      <button type="button" onclick="openMyPlanModal()" class="quick-chip desktop-only" data-i18n="dv.schedule">🗓️ Arbeitsplan</button>
       <button type="button" onclick="toggleFilterDrawer()" class="quick-chip">⚡ Filter <span id="filterArrow">▼</span></button>
       <span class="text-[11px] text-slate-500 shrink-0" id="activeFilterSummary"></span>
     </div>
 
     <div id="filterDrawer" class="hidden flex-col gap-3 p-3 mb-4 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-xl shadow-sm transition-all">
           <div>
-            <span class="text-xs text-slate-600 dark:text-slate-400 font-semibold mb-1.5 block">Ernährung & Bestseller:</span>
+            <span class="text-xs text-slate-600 dark:text-slate-400 font-semibold mb-1.5 block" data-i18n="dv.diet">Ernährung & Bestseller:</span>
             <div class="flex gap-2 items-center overflow-x-auto text-xs">
-              <button onclick="toggleSpecialFilter('featured')" id="filterFeatured" class="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 hover:border-amber-500 flex items-center gap-1 whitespace-nowrap">⭐ TOP / Highlight</button>
-              <button onclick="toggleSpecialFilter('vegan')" id="filterVegan" class="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 hover:border-amber-500 whitespace-nowrap">🌱 Vegan</button>
-              <button onclick="toggleSpecialFilter('glutenfree')" id="filterGluten" class="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 hover:border-amber-500 whitespace-nowrap">🌾 Glutenfrei</button>
-              <button onclick="toggleSpecialFilter('lactosefree')" id="filterLactose" class="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 hover:border-amber-500 whitespace-nowrap">🥛 Laktosefrei</button>
-              <button onclick="toggleSpecialFilter('nonalcoholic')" id="filterNonAlc" class="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 hover:border-amber-500 whitespace-nowrap">🚫 Alkoholfrei</button>
-              <button onclick="toggleSpecialFilter('favorites')" id="filterFavs" class="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 hover:border-amber-500 whitespace-nowrap">❤️ Schicht-Favoriten</button>
+              <button onclick="toggleSpecialFilter('featured')" id="filterFeatured" class="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 hover:border-amber-500 flex items-center gap-1 whitespace-nowrap" data-i18n="dv.top">⭐ TOP / Highlight</button>
+              <button onclick="toggleSpecialFilter('vegan')" id="filterVegan" class="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 hover:border-amber-500 whitespace-nowrap" data-i18n="dv.vegan">🌱 Vegan</button>
+              <button onclick="toggleSpecialFilter('glutenfree')" id="filterGluten" class="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 hover:border-amber-500 whitespace-nowrap" data-i18n="dv.gluten">🌾 Glutenfrei</button>
+              <button onclick="toggleSpecialFilter('lactosefree')" id="filterLactose" class="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 hover:border-amber-500 whitespace-nowrap" data-i18n="dv.lactose">🥛 Laktosefrei</button>
+              <button onclick="toggleSpecialFilter('nonalcoholic')" id="filterNonAlc" class="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 hover:border-amber-500 whitespace-nowrap" data-i18n="dv.noalc">🚫 Alkoholfrei</button>
+              <button onclick="toggleSpecialFilter('favorites')" id="filterFavs" class="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 hover:border-amber-500 whitespace-nowrap" data-i18n="dv.fav">❤️ Schicht-Favoriten</button>
             </div>
           </div>
 
           <div>
-            <span class="text-xs text-slate-600 dark:text-slate-400 font-semibold mb-1.5 block">🍸 Nach Glas-Typ filtern:</span>
+            <span class="text-xs text-slate-600 dark:text-slate-400 font-semibold mb-1.5 block" data-i18n="dv.glass">🍸 Nach Glas-Typ filtern:</span>
             <div id="glassFilterContainer" class="flex gap-1.5 flex-wrap text-xs"></div>
           </div>
         </div>
@@ -584,11 +621,13 @@
     </div>
 
     <div id="drinksGrid">
-      <p id="loadingTxt" class="col-span-full text-slate-500 dark:text-slate-400">Lade Getränke aus der Datenbank...</p>
+      <p id="loadingTxt" class="col-span-full text-slate-500 dark:text-slate-400" data-i18n="dv.loading">Lade Getränke aus der Datenbank...</p>
     </div>
 
+    </div><!-- /drinksView -->
+
     <footer class="mt-20 pt-6 border-t border-slate-300 dark:border-slate-800 text-center text-xs text-slate-500">
-      Salonplafond BAR App <span data-app-version>v3.1.04</span> • Erstellt von <span class="text-amber-600 dark:text-amber-400 font-semibold">© T0mc1k (Tomas Kardos)</span>
+      Salonplafond NeXuS • BAR v<span data-app-number>4.0.02</span> • Developed by <span class="text-amber-600 dark:text-amber-400 font-semibold">Tomas Kardos © 2026</span>
     </footer>
 
   </div>
@@ -605,7 +644,7 @@
       <button onclick="openMultiViewModal()" class="px-3 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl text-xs transition shadow flex items-center gap-1.5">
         ⚡ Multi-View (<span id="trayCountBadge">0</span>)
       </button>
-      <button onclick="clearBarTray()" class="px-2.5 py-2 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white rounded-xl text-xs transition border border-slate-300 dark:border-slate-700" title="Leeren">🗑️</button>
+      <button onclick="clearBarTray()" data-i18n-title="tray.clear" class="px-2.5 py-2 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white rounded-xl text-xs transition border border-slate-300 dark:border-slate-700" title="Leeren">🗑️</button>
     </div>
   </div>
 
@@ -633,24 +672,108 @@
     </div>
   </div>
 
+  <!-- TEAM & ARBEITSPLAN (Monatsraster, Manager/Developer) -->
+  <div id="teamPlanModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-2 sm:p-4 z-[295]">
+    <div class="card w-full max-w-[98vw] relative flex flex-col h-[94vh] max-h-[94vh] overflow-hidden p-0 border-amber-500/50 shadow-2xl">
+      <div class="ui-head !items-center">
+        <div class="min-w-0">
+          <h3 class="ui-head-title">📆 Team & Arbeitsplan</h3>
+          <p class="ui-head-sub">Monatsübersicht für das ganze Team: Schichten, Stunden und Planung. Tippe auf ein Feld, um die Schicht zu ändern.</p>
+        </div>
+        <button type="button" onclick="closeTeamPlanModal()" class="ui-close" aria-label="Schließen">&times;</button>
+      </div>
+
+      <div class="ui-toolbar">
+        <div class="flex gap-2 flex-wrap items-center">
+          <div class="tp-monthnav">
+            <button type="button" onclick="teamPlanShiftMonth(-1)" class="ui-btn-ghost" aria-label="Vorheriger Monat">‹</button>
+            <b id="tpMonthLabel" class="tp-month-label">–</b>
+            <button type="button" onclick="teamPlanShiftMonth(1)" class="ui-btn-ghost" aria-label="Nächster Monat">›</button>
+          </div>
+          <button type="button" onclick="teamPlanToday()" class="ui-btn-ghost">Heute</button>
+          <input type="search" id="tpSearch" oninput="onTeamPlanSearch(this.value)" placeholder="🔍 Mitarbeiter ..." class="ui-search flex-1 min-w-[9rem]">
+          <select id="tpAddEmployee" onchange="teamPlanAddEmployee(this)" class="ui-field tp-add-select"></select>
+          <button type="button" onclick="exportTeamPlanExcel()" class="ui-btn-ghost">📗 Excel</button>
+          <button type="button" id="tpImportBtn" onclick="closeTeamPlanModal(); openImportExportModal(); switchImportTab('schedule');" class="ui-btn-ghost">📥 Plan importieren</button>
+        </div>
+        <div id="tpSummary" class="tp-summary"></div>
+      </div>
+
+      <div id="tpGridWrap" class="tp-wrap flex-1 min-h-0">
+        <p class="staff-empty">Lade Arbeitsplan ...</p>
+      </div>
+
+      <div class="ui-foot !justify-between flex-wrap">
+        <span class="tp-legend"><i class="tp-dot tp-dot-work"></i>Schicht <i class="tp-dot tp-dot-free"></i>Frei (X) <i class="tp-dot tp-dot-special"></i>U / K / Sonstiges <i class="tp-dot tp-dot-today"></i>Heute</span>
+        <button type="button" onclick="closeTeamPlanModal()" class="ui-btn-primary">Fertig</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Schicht bearbeiten (aus dem Monatsraster) -->
+  <div id="tpCellModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[310]">
+    <div class="card max-w-md w-full relative flex flex-col max-h-[90vh] overflow-hidden p-0 border-amber-500/50 shadow-2xl">
+      <div class="ui-head">
+        <div class="min-w-0">
+          <h3 class="ui-head-title" id="tpCellTitle">Schicht</h3>
+          <p class="ui-head-sub" id="tpCellSub"></p>
+        </div>
+        <button type="button" onclick="closeTeamPlanCell()" class="ui-close" aria-label="Schließen">&times;</button>
+      </div>
+      <div class="flex-1 overflow-y-auto p-5 flex flex-col gap-4">
+        <div class="flex gap-1.5 flex-wrap">
+          <button type="button" class="ui-chip" onclick="tpCellPreset('X')">Frei (X)</button>
+          <button type="button" class="ui-chip" onclick="tpCellPreset('U')">Urlaub (U)</button>
+          <button type="button" class="ui-chip" onclick="tpCellPreset('K')">Krank (K)</button>
+        </div>
+        <div class="form-section">
+          <div class="form-section-title">Schicht 1</div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="form-label" for="tpS1Start">Beginn</label><input type="time" id="tpS1Start" class="ui-field"></div>
+            <div><label class="form-label" for="tpS1End">Ende</label><input type="time" id="tpS1End" class="ui-field"></div>
+          </div>
+        </div>
+        <div class="form-section">
+          <div class="form-section-title">Schicht 2 (optional, geteilter Dienst)</div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="form-label" for="tpS2Start">Beginn</label><input type="time" id="tpS2Start" class="ui-field"></div>
+            <div><label class="form-label" for="tpS2End">Ende</label><input type="time" id="tpS2End" class="ui-field"></div>
+          </div>
+        </div>
+        <div>
+          <label class="form-label" for="tpStation">Station</label>
+          <input type="text" id="tpStation" maxlength="30" autocomplete="off" placeholder="z. B. Bar, Service" class="ui-field">
+        </div>
+        <p id="tpCellHours" class="form-hint"></p>
+        <input type="hidden" id="tpCellPresetCode" value="">
+      </div>
+      <div class="ui-foot">
+        <button type="button" id="tpCellDeleteBtn" onclick="deleteTeamPlanCell()" class="hidden px-4 py-2.5 bg-red-600 hover:bg-red-500 font-bold text-white rounded-xl text-xs transition">🗑️ Leeren</button>
+        <span class="flex-1"></span>
+        <button type="button" onclick="closeTeamPlanCell()" class="ui-btn-ghost">Abbrechen</button>
+        <button type="button" onclick="saveTeamPlanCell()" class="ui-btn-primary">💾 Speichern</button>
+      </div>
+    </div>
+  </div>
+
   <!-- TEAM CHAT MODAL -->
   <div id="teamChatModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-3 sm:p-4 z-[280]">
     <div class="card max-w-5xl w-full relative flex flex-col h-[90vh] max-h-[90vh] overflow-hidden p-0 border-amber-500/50 shadow-2xl">
 
       <div class="ui-head !items-center">
         <div class="min-w-0">
-          <h3 class="ui-head-title">💬 Team-Chat</h3>
-          <p class="ui-head-sub">🟢 Online: <span id="chatOnlineCountLabel" class="font-bold">0 Mitglieder</span> · Nachrichten sehen alle Kollegen</p>
+          <h3 class="ui-head-title" data-i18n="chat.title">💬 Team-Chat</h3>
+          <p class="ui-head-sub"><span data-i18n="chat.online">🟢 Online: </span><span id="chatOnlineCountLabel" class="font-bold">0 Mitglieder</span><span data-i18n="chat.seenAll"> · Nachrichten sehen alle Kollegen</span></p>
         </div>
         <div class="flex items-center gap-1.5 shrink-0">
-          <button type="button" onclick="toggleChatSearch()" class="ui-btn-ghost" title="Im Chat suchen">🔍</button>
-          <button type="button" onclick="toggleChatSidebar()" class="ui-btn-ghost chat-side-toggle" title="Team anzeigen">👥</button>
-          <button type="button" onclick="closeTeamChatModal()" class="ui-close" aria-label="Schließen">&times;</button>
+          <button type="button" onclick="toggleChatSearch()" class="ui-btn-ghost" title="Im Chat suchen" data-i18n-title="chat.searchTitle">🔍</button>
+          <button type="button" onclick="toggleChatSidebar()" class="ui-btn-ghost chat-side-toggle" title="Team anzeigen" data-i18n-title="chat.teamTitle">👥</button>
+          <button type="button" onclick="closeTeamChatModal()" class="ui-close" aria-label="Schließen" data-i18n-aria="common.close">&times;</button>
         </div>
       </div>
 
       <div id="chatSearchBar" class="hidden ui-toolbar !flex-row !items-center">
-        <input type="search" id="chatSearchInput" oninput="onChatSearch(this.value)" placeholder="🔍 Nachrichten oder Namen suchen ..." class="ui-search flex-1">
+        <input type="search" id="chatSearchInput" oninput="onChatSearch(this.value)" placeholder="🔍 Nachrichten oder Namen suchen ..." data-i18n-ph="chat.searchPh" class="ui-search flex-1">
         <span id="chatSearchInfo" class="form-hint whitespace-nowrap"></span>
       </div>
 
@@ -659,18 +782,18 @@
       <div class="chat-body">
 
         <aside id="chatSidebar" class="chat-side">
-          <div class="chat-side-title">Team</div>
+          <div class="chat-side-title" data-i18n="chat.team">Team</div>
           <div id="chatSidebarUsersList" class="chat-side-list">
-            <span class="form-hint">Lade Mitglieder ...</span>
+            <span class="form-hint" data-i18n="chat.loadMembers">Lade Mitglieder ...</span>
           </div>
         </aside>
 
         <section class="chat-main">
           <div class="chat-scroll-wrap">
             <div id="chatMessagesContainer" class="chat-scroll" onscroll="onChatScroll()">
-              <p class="chat-empty">Lade Chat-Nachrichten ...</p>
+              <p class="chat-empty" data-i18n="chat.loadMsgs">Lade Chat-Nachrichten ...</p>
             </div>
-            <button type="button" id="chatJumpBtn" class="hidden chat-jump" onclick="scrollChatToBottom(true)">↓ Neue Nachrichten</button>
+            <button type="button" id="chatJumpBtn" class="hidden chat-jump" onclick="scrollChatToBottom(true)" data-i18n="chat.newBtn">↓ Neue Nachrichten</button>
           </div>
 
           <div id="chatTypingIndicator" class="chat-typing"></div>
@@ -680,15 +803,15 @@
               <span class="chat-indicator-title">↩️ Antwort auf <span id="replyingAuthorName"></span></span>
               <span id="replyingSnippetText" class="chat-indicator-text"></span>
             </div>
-            <button type="button" onclick="cancelReply()" class="ui-close" aria-label="Antwort abbrechen">&times;</button>
+            <button type="button" onclick="cancelReply()" class="ui-close" aria-label="Antwort abbrechen" data-i18n-aria="chat.cancelReply">&times;</button>
           </div>
 
           <div id="editingIndicatorBox" class="hidden chat-indicator">
             <div class="min-w-0">
-              <span class="chat-indicator-title">✏️ Nachricht bearbeiten</span>
-              <span class="chat-indicator-text">Ändere den Text und sende ihn erneut ab.</span>
+              <span class="chat-indicator-title" data-i18n="chat.editTitle">✏️ Nachricht bearbeiten</span>
+              <span class="chat-indicator-text" data-i18n="chat.editSub">Ändere den Text und sende ihn erneut ab.</span>
             </div>
-            <button type="button" onclick="cancelEdit()" class="ui-close" aria-label="Bearbeiten abbrechen">&times;</button>
+            <button type="button" onclick="cancelEdit()" class="ui-close" aria-label="Bearbeiten abbrechen" data-i18n-aria="chat.cancelEdit">&times;</button>
           </div>
 
           <div id="chatImageChip" class="hidden chat-indicator">
@@ -696,7 +819,7 @@
               <img id="chatImageThumb" class="chat-thumb" alt="">
               <span id="chatImageName" class="chat-indicator-text"></span>
             </div>
-            <button type="button" onclick="clearChatImage()" class="ui-close" aria-label="Bild entfernen">&times;</button>
+            <button type="button" onclick="clearChatImage()" class="ui-close" aria-label="Bild entfernen" data-i18n-aria="chat.removeImg">&times;</button>
           </div>
 
           <form id="chatForm" onsubmit="handleSendChatMessage(event)" class="chat-composer">
@@ -704,20 +827,20 @@
             <input type="file" id="chatImageFile" accept="image/*" class="hidden" onchange="onChatImagePicked(event)">
 
             <div class="chat-toolbar">
-              <button type="button" onclick="applyTextStyling('**')" class="chat-tool" title="Fett (Strg+B)"><b>B</b></button>
-              <button type="button" onclick="applyTextStyling('*')" class="chat-tool" title="Kursiv (Strg+I)"><i>I</i></button>
-              <button type="button" onclick="applyTextStyling('~~')" class="chat-tool" title="Durchgestrichen"><s>S</s></button>
-              <button type="button" onclick="applyTextStyling('`')" class="chat-tool font-mono" title="Code">&lt;/&gt;</button>
+              <button type="button" onclick="applyTextStyling('**')" class="chat-tool" title="Fett (Strg+B)" data-i18n-title="chat.bold"><b>B</b></button>
+              <button type="button" onclick="applyTextStyling('*')" class="chat-tool" title="Kursiv (Strg+I)" data-i18n-title="chat.italic"><i>I</i></button>
+              <button type="button" onclick="applyTextStyling('~~')" class="chat-tool" title="Durchgestrichen" data-i18n-title="chat.strike"><s>S</s></button>
+              <button type="button" onclick="applyTextStyling('`')" class="chat-tool font-mono" title="Code" data-i18n-title="chat.code">&lt;/&gt;</button>
               <span class="chat-tool-sep"></span>
-              <button type="button" onclick="insertChatAt()" class="chat-tool" title="Kollegen erwähnen">@</button>
-              <button type="button" onclick="toggleChatEmojiPanel()" class="chat-tool" title="Emoji">😊</button>
-              <button type="button" onclick="document.getElementById('chatImageFile').click()" class="chat-tool" title="Foto senden">📷</button>
+              <button type="button" onclick="insertChatAt()" class="chat-tool" title="Kollegen erwähnen" data-i18n-title="chat.mention">@</button>
+              <button type="button" onclick="toggleChatEmojiPanel()" class="chat-tool" title="Emoji" data-i18n-title="chat.emoji">😊</button>
+              <button type="button" onclick="document.getElementById('chatImageFile').click()" class="chat-tool" title="Foto senden" data-i18n-title="chat.sendPhoto">📷</button>
             </div>
             <div id="chatEmojiPanel" class="hidden chat-emoji-panel"></div>
 
             <div class="chat-input-row">
-              <textarea id="chatMessageInput" rows="1" maxlength="2000" autocomplete="off" placeholder="Nachricht schreiben ... (@ erwähnt Kollegen)" title="Enter sendet, Shift+Enter macht eine neue Zeile" class="chat-input"></textarea>
-              <button type="submit" id="chatSendBtn" class="ui-btn-primary chat-send">Senden ➔</button>
+              <textarea id="chatMessageInput" rows="1" maxlength="2000" autocomplete="off" placeholder="Nachricht schreiben ... (@ erwähnt Kollegen)" data-i18n-ph="chat.inputPh" title="Enter sendet, Shift+Enter macht eine neue Zeile" data-i18n-title="chat.hintEnter" class="chat-input"></textarea>
+              <button type="submit" id="chatSendBtn" class="ui-btn-primary chat-send" data-i18n="chat.send">Senden ➔</button>
             </div>
           </form>
         </section>
@@ -779,7 +902,7 @@
       
       <div id="a3PrintContainer" class="flex flex-col gap-8 bg-white text-slate-900 p-4 relative">
         <div id="a3PrintDrinksList" class="flex flex-col gap-8"></div>
-        <div class="print-watermark-footer">Salonplafond BAR App create Tomas Kardos</div>
+        <div class="print-watermark-footer">Salonplafond NeXuS • BAR • Developed by Tomas Kardos © 2026</div>
       </div>
 
       <div class="no-print flex justify-end gap-2 pt-4 border-t border-slate-200 bg-white">
@@ -797,15 +920,15 @@
       <button onclick="closeShoppingModal()" class="no-print absolute top-4 right-4 text-slate-600 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white text-2xl font-bold">&times;</button>
       
       <div>
-        <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400 flex items-center gap-2">🛒 Einkaufsliste & Inventur</h3>
-        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Übersicht aller benötigten Zutaten für die aktive Saison: <span id="shoppingSeasonName" class="font-bold text-amber-600 dark:text-amber-300"></span></p>
+        <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400 flex items-center gap-2" data-i18n="shop.title">🛒 Einkaufsliste & Inventur</h3>
+        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1"><span data-i18n="shop.intro">Übersicht aller benötigten Zutaten für die aktive Saison: </span><span id="shoppingSeasonName" class="font-bold text-amber-600 dark:text-amber-300"></span></p>
       </div>
 
       <div class="no-print flex flex-wrap gap-2 pt-1 pb-2 border-b border-slate-200 dark:border-slate-800">
-        <button onclick="printShoppingList()" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl text-xs transition shadow flex items-center gap-1.5">
+        <button onclick="printShoppingList()" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl text-xs transition shadow flex items-center gap-1.5" data-i18n="shop.print">
           🖨️ Einkaufsliste drucken
         </button>
-        <button onclick="exportShoppingListExcel()" class="px-3.5 py-2 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 font-bold rounded-xl text-xs transition border border-slate-300 dark:border-slate-700 flex items-center gap-1.5">
+        <button onclick="exportShoppingListExcel()" class="px-3.5 py-2 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 font-bold rounded-xl text-xs transition border border-slate-300 dark:border-slate-700 flex items-center gap-1.5" data-i18n="shop.excel">
           📗 Als Excel exportieren
         </button>
       </div>
@@ -813,7 +936,7 @@
       <div id="shoppingListContainer" class="flex flex-col gap-2 mt-1 custom-box p-4 rounded-xl border text-xs max-h-[50vh] overflow-y-auto"></div>
 
       <div class="no-print flex justify-end pt-3 border-t border-slate-200 dark:border-slate-800">
-        <button onclick="closeShoppingModal()" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 font-bold text-slate-800 dark:text-white rounded-xl text-xs transition">Schließen</button>
+        <button onclick="closeShoppingModal()" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 font-bold text-slate-800 dark:text-white rounded-xl text-xs transition" data-i18n="common.close">Schließen</button>
       </div>
     </div>
   </div>
@@ -824,8 +947,8 @@
 
       <div class="ui-head">
         <div>
-          <h3 class="ui-head-title">⚙️ Einstellungen & Zentrale</h3>
-          <p class="ui-head-sub">Gelten nur auf diesem Gerät und werden automatisch gespeichert.</p>
+          <h3 class="ui-head-title" data-i18n="set.title">⚙️ Einstellungen & Zentrale</h3>
+          <p class="ui-head-sub" data-i18n="set.sub">Gelten nur auf diesem Gerät und werden automatisch gespeichert.</p>
         </div>
         <button type="button" onclick="closeUnifiedSettingsModal()" class="ui-close" aria-label="Schließen">&times;</button>
       </div>
@@ -833,131 +956,146 @@
       <div id="settingsBody" class="flex-1 overflow-y-auto p-5 flex flex-col gap-4">
 
         <section class="set-card">
-          <h4 class="set-head">🎨 Darstellung</h4>
+          <h4 class="set-head" data-i18n="set.appearance">🎨 Darstellung</h4>
 
           <div class="set-row">
-            <div class="set-text"><b>Design</b><small id="settingsThemeInfo">Hell ist augenschonend bei Tageslicht, Dunkel für die Bar am Abend.</small></div>
+            <div class="set-text"><b data-i18n="set.startTitle">Nach dem Login öffnen</b><small data-i18n="set.startSub">Welche Seite sich nach der Anmeldung zuerst öffnet. Gilt auf allen deinen Geräten.</small></div>
             <div class="seg">
-              <button type="button" class="seg-btn" data-setting="theme" data-value="light" onclick="setSetting('theme','light')">☀️ Hell</button>
-              <button type="button" class="seg-btn" data-setting="theme" data-value="dark" onclick="setSetting('theme','dark')">🌙 Dunkel</button>
+              <button type="button" class="seg-btn" data-startpage="dashboard" onclick="setStartPage('dashboard')" data-i18n="set.startDash">🏠 Dashboard</button>
+              <button type="button" class="seg-btn" data-startpage="drinks" onclick="setStartPage('drinks')" data-i18n="set.drinks">🍸 Getränke</button>
+            </div>
+          </div>
+          <div class="set-row">
+            <div class="set-text"><b data-i18n="set.langTitle">Sprache / Language</b><small data-i18n="set.langSub">Gilt für Anmeldung, Dashboard, Menü, Einstellungen und Hilfe.</small></div>
+            <div class="seg">
+              <button type="button" class="seg-btn" data-lang="de" onclick="setLanguage('de')">Deutsch</button>
+              <button type="button" class="seg-btn" data-lang="en" onclick="setLanguage('en')">English</button>
+            </div>
+          </div>
+
+          <div class="set-row">
+            <div class="set-text"><b data-i18n="set.theme">Design</b><small id="settingsThemeInfo">Hell ist augenschonend bei Tageslicht, Dunkel für die Bar am Abend.</small></div>
+            <div class="seg">
+              <button type="button" class="seg-btn" data-setting="theme" data-value="light" onclick="setSetting('theme','light')" data-i18n="set.light">☀️ Hell</button>
+              <button type="button" class="seg-btn" data-setting="theme" data-value="dark" onclick="setSetting('theme','dark')" data-i18n="set.dark">🌙 Dunkel</button>
               <button type="button" class="seg-btn" data-setting="theme" data-value="auto" onclick="setSetting('theme','auto')">🖥️ Auto</button>
             </div>
           </div>
 
           <div class="set-row">
-            <div class="set-text"><b>Schriftgröße</b><small>Vergrößert alle Texte der App.</small></div>
+            <div class="set-text"><b data-i18n="set.font">Schriftgröße</b><small data-i18n="set.fontSub">Vergrößert alle Texte der App.</small></div>
             <div class="seg">
-              <button type="button" class="seg-btn" data-setting="fontScale" data-value="90" onclick="setSetting('fontScale',90)">Klein</button>
-              <button type="button" class="seg-btn" data-setting="fontScale" data-value="100" onclick="setSetting('fontScale',100)">Normal</button>
-              <button type="button" class="seg-btn" data-setting="fontScale" data-value="112" onclick="setSetting('fontScale',112)">Groß</button>
-              <button type="button" class="seg-btn" data-setting="fontScale" data-value="125" onclick="setSetting('fontScale',125)">Sehr groß</button>
+              <button type="button" class="seg-btn" data-setting="fontScale" data-value="90" onclick="setSetting('fontScale',90)" data-i18n="set.fs90">Klein</button>
+              <button type="button" class="seg-btn" data-setting="fontScale" data-value="100" onclick="setSetting('fontScale',100)" data-i18n="set.fs100">Normal</button>
+              <button type="button" class="seg-btn" data-setting="fontScale" data-value="112" onclick="setSetting('fontScale',112)" data-i18n="set.fs112">Groß</button>
+              <button type="button" class="seg-btn" data-setting="fontScale" data-value="125" onclick="setSetting('fontScale',125)" data-i18n="set.fs125">Sehr groß</button>
             </div>
           </div>
 
           <div class="set-row">
-            <div class="set-text"><b>Weichzeichner (Blur)</b><small>Milchglas-Effekt in Dialogen, Menüs und Hinweisen. Auf schwächeren Geräten ausschalten.</small></div>
+            <div class="set-text"><b data-i18n="set.blur">Weichzeichner (Blur)</b><small data-i18n="set.blurSub">Milchglas-Effekt in Dialogen, Menüs und Hinweisen. Auf schwächeren Geräten ausschalten.</small></div>
             <label class="switch"><input type="checkbox" id="unifiedBlurCheck" onchange="setBlurEnabled(this.checked)"><span class="switch-track"></span></label>
           </div>
 
           <div class="set-row">
-            <div class="set-text"><b>Animationen reduzieren</b><small>Weniger Bewegung und Übergänge, ruhiger und akkusparender.</small></div>
+            <div class="set-text"><b data-i18n="set.motion">Animationen reduzieren</b><small data-i18n="set.motionSub">Weniger Bewegung und Übergänge, ruhiger und akkusparender.</small></div>
             <label class="switch"><input type="checkbox" data-setting-check="reduceMotion" onchange="setSetting('reduceMotion',this.checked)"><span class="switch-track"></span></label>
           </div>
         </section>
 
         <section class="set-card">
-          <h4 class="set-head">🍸 Getränke</h4>
+          <h4 class="set-head" data-i18n="set.drinks">🍸 Getränke</h4>
 
           <div class="set-row">
-            <div class="set-text"><b>Ansicht</b><small>Karten mit Foto oder kompakte Liste.</small></div>
+            <div class="set-text"><b data-i18n="set.view">Ansicht</b><small data-i18n="set.viewSub">Karten mit Foto oder kompakte Liste.</small></div>
             <div class="seg">
-              <button type="button" class="seg-btn" data-setting="viewMode" data-value="grid" onclick="setViewMode('grid')">▦ Karten</button>
-              <button type="button" class="seg-btn" data-setting="viewMode" data-value="list" onclick="setViewMode('list')">☰ Liste</button>
+              <button type="button" class="seg-btn" data-setting="viewMode" data-value="grid" onclick="setViewMode('grid')" data-i18n="set.cards">▦ Karten</button>
+              <button type="button" class="seg-btn" data-setting="viewMode" data-value="list" onclick="setViewMode('list')" data-i18n="set.list">☰ Liste</button>
             </div>
           </div>
 
           <div class="set-row">
-            <div class="set-text"><b>Sortierung</b><small>Reihenfolge der Getränke in der Liste.</small></div>
+            <div class="set-text"><b data-i18n="set.sort">Sortierung</b><small data-i18n="set.sortSub">Reihenfolge der Getränke in der Liste.</small></div>
             <select id="unifiedSortSelect" onchange="setSetting('sort',this.value)" class="ui-field set-select">
-              <option value="newest">Neueste zuerst</option>
-              <option value="name_asc">Name A – Z</option>
+              <option value="newest" data-i18n="set.sortNew">Neueste zuerst</option>
+              <option value="name_asc" data-i18n="set.sortName">Name A – Z</option>
               <option value="name_desc">Name Z – A</option>
-              <option value="price_asc">Preis aufsteigend</option>
-              <option value="price_desc">Preis absteigend</option>
-              <option value="favorites">Favoriten zuerst</option>
+              <option value="price_asc" data-i18n="set.sortPA">Preis aufsteigend</option>
+              <option value="price_desc" data-i18n="set.sortPD">Preis absteigend</option>
+              <option value="favorites" data-i18n="set.sortFav">Favoriten zuerst</option>
             </select>
           </div>
 
           <div class="set-row">
-            <div class="set-text"><b>Preise anzeigen</b><small>Preis neben dem Namen auf Karten und im Detail.</small></div>
+            <div class="set-text"><b data-i18n="set.prices">Preise anzeigen</b><small data-i18n="set.pricesSub">Preis neben dem Namen auf Karten und im Detail.</small></div>
             <label class="switch"><input type="checkbox" data-setting-check="showPrices" onchange="setSetting('showPrices',this.checked)"><span class="switch-track"></span></label>
           </div>
 
           <div class="set-row">
-            <div class="set-text"><b>Aktive Saison</b><small>Welche Karte gerade angezeigt wird.</small></div>
+            <div class="set-text"><b data-i18n="set.season">Aktive Saison</b><small data-i18n="set.seasonSub">Welche Karte gerade angezeigt wird.</small></div>
             <select id="unifiedSeasonSelect" onchange="onUnifiedSeasonChange(this)" class="ui-field set-select"></select>
           </div>
         </section>
 
         <section class="set-card">
-          <h4 class="set-head">🔔 Hinweise</h4>
+          <h4 class="set-head" data-i18n="set.notif">🔔 Hinweise</h4>
 
           <div class="set-row">
-            <div class="set-text"><b>Wenn sich ein Kollege anmeldet</b><small>Kurzer Hinweis oben rechts mit Foto.</small></div>
+            <div class="set-text"><b data-i18n="set.nLogin">Wenn sich ein Kollege anmeldet</b><small data-i18n="set.nLoginSub">Kurzer Hinweis oben rechts mit Foto.</small></div>
             <label class="switch"><input type="checkbox" data-setting-check="loginToast" onchange="setSetting('loginToast',this.checked)"><span class="switch-track"></span></label>
           </div>
 
           <div class="set-row">
-            <div class="set-text"><b>Neue Chat-Nachricht</b><small>Hinweis, wenn der Chat gerade geschlossen ist.</small></div>
+            <div class="set-text"><b data-i18n="set.nChat">Neue Chat-Nachricht</b><small data-i18n="set.nChatSub">Hinweis, wenn der Chat gerade geschlossen ist.</small></div>
             <label class="switch"><input type="checkbox" data-setting-check="chatToast" onchange="setSetting('chatToast',this.checked)"><span class="switch-track"></span></label>
           </div>
 
           <div class="set-row">
-            <div class="set-text"><b>Ton bei neuer Nachricht</b><small>Leiser Signalton im Chat.</small></div>
+            <div class="set-text"><b data-i18n="set.nSound">Ton bei neuer Nachricht</b><small data-i18n="set.nSoundSub">Leiser Signalton im Chat.</small></div>
             <label class="switch"><input type="checkbox" data-setting-check="chatSound" onchange="setSetting('chatSound',this.checked); if (this.checked) playChatSound();"><span class="switch-track"></span></label>
           </div>
         </section>
 
         <section class="set-card" id="setGroupMode">
-          <h4 class="set-head">👤 Ansicht für Mitarbeiter mit Rechten</h4>
+          <h4 class="set-head" data-i18n="set.rights">👤 Ansicht für Mitarbeiter mit Rechten</h4>
           <div class="set-row">
-            <div class="set-text"><b>Ansichtsmodus</b><small>Kellner-Ansicht blendet Verwaltungs-Knöpfe aus.</small></div>
+            <div class="set-text"><b data-i18n="set.mode">Ansichtsmodus</b><small data-i18n="set.modeSub">Kellner-Ansicht blendet Verwaltungs-Knöpfe aus.</small></div>
             <div class="seg">
-              <button type="button" class="seg-btn" id="unifiedModeStaff" onclick="setAdminView(false)">Kellner</button>
-              <button type="button" class="seg-btn" id="unifiedModeAdmin" onclick="setAdminView(true)">Verwaltung</button>
+              <button type="button" class="seg-btn" id="unifiedModeStaff" onclick="setAdminView(false)" data-i18n="set.modeStaff">Kellner</button>
+              <button type="button" class="seg-btn" id="unifiedModeAdmin" onclick="setAdminView(true)" data-i18n="set.modeAdmin">Verwaltung</button>
             </div>
           </div>
         </section>
 
         <section class="set-card" id="setInstall">
-          <h4 class="set-head">📲 App installieren</h4>
+          <h4 class="set-head" data-i18n="set.install">📲 App installieren</h4>
           <div class="set-row">
-            <div class="set-text"><b>Auf dem Startbildschirm</b><small id="installStatus">Mit einem Symbol auf dem Startbildschirm startet die App wie eine normale App.</small></div>
-            <button type="button" id="installBtn" onclick="installApp()" class="ui-btn-primary">📲 So geht’s</button>
+            <div class="set-text"><b data-i18n="set.installOn">Auf dem Startbildschirm</b><small id="installStatus" data-i18n="set.installSub">Mit einem Symbol auf dem Startbildschirm startet die App wie eine normale App.</small></div>
+            <button type="button" id="installBtn" onclick="installApp()" class="ui-btn-primary" data-i18n="set.installBtn">📲 So geht’s</button>
           </div>
           <div id="installSteps" class="install-steps hidden"></div>
         </section>
 
         <section class="set-card">
-          <h4 class="set-head">🧰 App</h4>
+          <h4 class="set-head" data-i18n="set.app">🧰 App</h4>
           <div class="set-row">
-            <div class="set-text"><b>Version</b><small>Salonplafond BAR <span data-app-version>v3.1.04</span></small></div>
-            <button type="button" onclick="closeUnifiedSettingsModal(); openChangelogModal();" class="ui-btn-ghost">🚀 Was ist neu?</button>
+            <div class="set-text"><b data-i18n="set.version">Version</b><small>Salonplafond NeXuS • BAR v<span data-app-number>4.0.02</span></small></div>
+            <button type="button" onclick="closeUnifiedSettingsModal(); openChangelogModal();" class="ui-btn-ghost" data-i18n="set.news">🚀 Was ist neu?</button>
           </div>
           <div class="set-row">
-            <div class="set-text"><b>App neu laden</b><small>Hilft, wenn etwas hängt oder alt aussieht.</small></div>
-            <button type="button" onclick="reloadApp()" class="ui-btn-ghost">🔄 Neu laden</button>
+            <div class="set-text"><b data-i18n="set.reload">App neu laden</b><small data-i18n="set.reloadSub">Hilft, wenn etwas hängt oder alt aussieht.</small></div>
+            <button type="button" onclick="reloadApp()" class="ui-btn-ghost" data-i18n="set.reloadBtn">🔄 Neu laden</button>
           </div>
           <div class="set-row">
-            <div class="set-text"><b>Einstellungen zurücksetzen</b><small>Setzt alle Einstellungen dieses Geräts auf Standard.</small></div>
-            <button type="button" onclick="resetSettings()" class="ui-btn-ghost set-danger">↩️ Zurücksetzen</button>
+            <div class="set-text"><b data-i18n="set.reset">Einstellungen zurücksetzen</b><small data-i18n="set.resetSub">Setzt alle Einstellungen dieses Geräts auf Standard.</small></div>
+            <button type="button" onclick="resetSettings()" class="ui-btn-ghost set-danger" data-i18n="set.resetBtn">↩️ Zurücksetzen</button>
           </div>
         </section>
 
       </div>
 
       <div class="ui-foot">
-        <button type="button" onclick="closeUnifiedSettingsModal()" class="ui-btn-primary">Fertig</button>
+        <button type="button" onclick="closeUnifiedSettingsModal()" class="ui-btn-primary" data-i18n="set.done">Fertig</button>
       </div>
     </div>
   </div>
@@ -966,10 +1104,10 @@
   <div id="multiViewModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-50">
     <div class="card max-w-7xl w-full max-h-[90vh] overflow-y-auto p-6 relative flex flex-col gap-4 border-amber-500/50 shadow-2xl">
       <button onclick="closeMultiViewModal()" class="absolute top-4 right-4 text-slate-600 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white text-2xl font-bold">&times;</button>
-      <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400">⚡ Multi-View: Rezepte im direkten Vergleich</h3>
+      <h3 class="text-xl font-bold text-amber-600 dark:text-amber-400" data-i18n="mv.title">⚡ Multi-View: Rezepte im direkten Vergleich</h3>
       <div id="multiViewContentContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-2"></div>
       <div class="flex justify-end pt-3 border-t border-slate-200 dark:border-slate-800">
-        <button onclick="closeMultiViewModal()" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 font-bold text-slate-800 dark:text-white rounded-xl text-xs transition border border-slate-300 dark:border-slate-700">Schließen</button>
+        <button onclick="closeMultiViewModal()" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 font-bold text-slate-800 dark:text-white rounded-xl text-xs transition border border-slate-300 dark:border-slate-700" data-i18n="common.close">Schließen</button>
       </div>
     </div>
   </div>
@@ -978,8 +1116,8 @@
   <div id="replaceDrinkModal" class="fixed inset-0 modal-bg backdrop-blur-sm hidden items-center justify-center p-4 z-[270]">
     <div class="card max-w-md w-full p-6 relative flex flex-col gap-4 border-amber-500/50 shadow-2xl max-h-[80vh] overflow-y-auto">
       <button onclick="closeReplaceDrinkModal()" class="absolute top-4 right-4 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-2xl font-bold">&times;</button>
-      <h3 class="text-lg font-bold text-amber-600 dark:text-amber-400">🔄 Drink ersetzen</h3>
-      <p class="text-xs text-slate-600 dark:text-slate-400">Wähle einen neuen Drink aus der aktuellen Saison aus, der diesen ersetzen soll:</p>
+      <h3 class="text-lg font-bold text-amber-600 dark:text-amber-400" data-i18n="rep.title">🔄 Drink ersetzen</h3>
+      <p class="text-xs text-slate-600 dark:text-slate-400" data-i18n="rep.sub">Wähle einen neuen Drink aus der aktuellen Saison aus, der diesen ersetzen soll:</p>
       <input type="hidden" id="replaceIndexTarget" value="">
       <div id="replaceDrinkListContainer" class="flex flex-col gap-2 max-h-[50vh] overflow-y-auto pr-1"></div>
     </div>
@@ -1137,25 +1275,25 @@
       <div>
         <button onclick="closeModal()" class="no-print absolute top-4 right-4 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-2xl font-bold">&times;</button>
         <div id="modalContent"></div>
-        <div class="print-watermark-footer">Salonplafond BAR App create Tomas Kardos</div>
+        <div class="print-watermark-footer">Salonplafond NeXuS • BAR • Developed by Tomas Kardos © 2026</div>
       </div>
       <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 flex gap-2 no-print items-center flex-wrap">
-        <button id="modalPhotoBtn" onclick="openPhotoPreviewFromModal()" class="hidden px-4 py-3 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-amber-700 dark:text-amber-400 font-bold rounded-xl transition text-sm flex items-center justify-center gap-2 border border-slate-300 dark:border-slate-700">
+        <button id="modalPhotoBtn" onclick="openPhotoPreviewFromModal()" class="hidden px-4 py-3 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-amber-700 dark:text-amber-400 font-bold rounded-xl transition text-sm flex items-center justify-center gap-2 border border-slate-300 dark:border-slate-700" data-i18n="drm.photo">
           🖼️ Foto anzeigen
         </button>
         <button id="modalFavBtn" class="px-4 py-3 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-amber-700 dark:text-amber-400 font-bold rounded-xl transition text-sm flex items-center justify-center gap-2 border border-slate-300 dark:border-slate-700">
           ❤️ Schicht-Favorit
         </button>
-        <button id="modalEditBtn" class="px-4 py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl transition text-sm flex items-center justify-center gap-2 shadow-sm">
+        <button id="modalEditBtn" class="px-4 py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl transition text-sm flex items-center justify-center gap-2 shadow-sm" data-i18n="drm.edit">
           ✏️ Bearbeiten
         </button>
-        <button id="modalDeleteBtn" class="px-4 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl transition text-sm flex items-center justify-center gap-2 shadow-sm">
+        <button id="modalDeleteBtn" class="px-4 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl transition text-sm flex items-center justify-center gap-2 shadow-sm" data-i18n="drm.del">
           🗑️ Löschen
         </button>
-        <button onclick="openPrintOptionsModal()" class="px-4 py-3 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-amber-700 dark:text-amber-400 font-bold rounded-xl transition text-sm flex items-center justify-center gap-2 border border-slate-300 dark:border-slate-700">
+        <button onclick="openPrintOptionsModal()" class="px-4 py-3 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-amber-700 dark:text-amber-400 font-bold rounded-xl transition text-sm flex items-center justify-center gap-2 border border-slate-300 dark:border-slate-700" data-i18n="drm.print">
           🖨️ Drucken / PDF
         </button>
-        <button onclick="closeModal()" class="flex-1 py-3.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 active:scale-[0.99] text-amber-700 dark:text-amber-400 font-extrabold text-sm rounded-xl border-2 border-amber-500/50 transition shadow-sm tracking-wide">
+        <button onclick="closeModal()" class="flex-1 py-3.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 active:scale-[0.99] text-amber-700 dark:text-amber-400 font-extrabold text-sm rounded-xl border-2 border-amber-500/50 transition shadow-sm tracking-wide" data-i18n="drm.close">
           ✕ Schließen
         </button>
       </div>
@@ -1167,13 +1305,13 @@
     <div class="card max-w-sm w-full p-6 relative flex flex-col gap-4 text-center border-amber-500/50 shadow-2xl">
       <button onclick="closePrintOptionsModal()" class="absolute top-4 right-4 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-2xl font-bold">&times;</button>
       <div class="w-12 h-12 bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-xl mx-auto flex items-center justify-center text-2xl border border-amber-500/30">🖨️</div>
-      <h3 class="text-lg font-bold text-amber-600 dark:text-amber-400">Drucken-Optionen</h3>
-      <p class="text-xs text-slate-600 dark:text-slate-300">Wähle aus, wie das Rezept gedruckt werden soll:</p>
+      <h3 class="text-lg font-bold text-amber-600 dark:text-amber-400" data-i18n="prn.title">Drucken-Optionen</h3>
+      <p class="text-xs text-slate-600 dark:text-slate-300" data-i18n="prn.sub">Wähle aus, wie das Rezept gedruckt werden soll:</p>
       <div class="flex flex-col gap-2.5 mt-2">
-        <button onclick="executePrint(true)" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl text-xs transition shadow flex items-center justify-center gap-2">
+        <button onclick="executePrint(true)" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl text-xs transition shadow flex items-center justify-center gap-2" data-i18n="prn.img">
           🖼️ Mit Bild drucken
         </button>
-        <button onclick="executePrint(false)" class="w-full py-3 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold rounded-xl text-xs transition border border-slate-300 dark:border-slate-700 flex items-center justify-center gap-2">
+        <button onclick="executePrint(false)" class="w-full py-3 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold rounded-xl text-xs transition border border-slate-300 dark:border-slate-700 flex items-center justify-center gap-2" data-i18n="prn.noimg">
           📄 Ohne Bild drucken (Text pur)
         </button>
       </div>
@@ -1195,7 +1333,7 @@
       <div class="ui-head">
         <div>
           <h3 class="ui-head-title">🚀 Was ist neu?</h3>
-          <p class="ui-head-sub">Aktuelle Version <span id="changelogVersionBadge" class="cl-ver">v3.1.04</span></p>
+          <p class="ui-head-sub">Aktuelle Version <span id="changelogVersionBadge" class="cl-ver">v4.0.02</span></p>
         </div>
         <button type="button" onclick="closeChangelogModal()" class="ui-close" aria-label="Schließen">&times;</button>
       </div>
@@ -1452,24 +1590,35 @@
     </div>
   </div>
 
-  <script src="js/config.js?v=3.1.04"></script>
-  <script src="js/ui.js?v=3.1.04"></script>
-  <script src="js/settings.js?v=3.1.04"></script>
-  <script src="js/pwa.js?v=3.1.04"></script>
-  <script src="js/auth.js?v=3.1.04"></script>
-  <script src="js/profile.js?v=3.1.04"></script>
-  <script src="js/staff-admin.js?v=3.1.04"></script>
-  <script src="js/chat.js?v=3.1.04"></script>
-  <script src="js/tickets.js?v=3.1.04"></script>
-  <script src="js/changelog.js?v=3.1.04"></script>
-  <script src="js/schedule.js?v=3.1.04"></script>
-  <script src="js/seasons.js?v=3.1.04"></script>
-  <script src="js/drinks.js?v=3.1.04"></script>
-  <script src="js/drink-admin.js?v=3.1.04"></script>
-  <script src="js/tray.js?v=3.1.04"></script>
-  <script src="js/shopping.js?v=3.1.04"></script>
-  <script src="js/import-export.js?v=3.1.04"></script>
-  <script src="js/print-a3.js?v=3.1.04"></script>
-  <script src="js/app.js?v=3.1.04"></script>
+  <script src="js/config.js?v=4.0.02"></script>
+  <script src="js/i18n.js?v=4.0.02"></script>
+  <script src="js/i18n-ui.js?v=4.0.02"></script>
+  <script src="js/ui.js?v=4.0.02"></script>
+  <script src="js/settings.js?v=4.0.02"></script>
+  <script src="js/pwa.js?v=4.0.02"></script>
+  <script src="js/auth.js?v=4.0.02"></script>
+  <script src="js/profile.js?v=4.0.02"></script>
+  <script src="js/staff-admin.js?v=4.0.02"></script>
+  <script src="js/chat.js?v=4.0.02"></script>
+  <script src="js/tickets.js?v=4.0.02"></script>
+  <script src="js/changelog.js?v=4.0.02"></script>
+  <script src="js/schedule.js?v=4.0.02"></script>
+  <script src="js/team-plan.js?v=4.0.02"></script>
+  <script src="js/feature-ui.js?v=4.0.02"></script>
+  <script src="js/checklists.js?v=4.0.02"></script>
+  <script src="js/shift-swap.js?v=4.0.02"></script>
+  <script src="js/payroll.js?v=4.0.02"></script>
+  <script src="js/menu-allergens.js?v=4.0.02"></script>
+  <script src="js/reports.js?v=4.0.02"></script>
+  <script src="js/help.js?v=4.0.02"></script>
+  <script src="js/seasons.js?v=4.0.02"></script>
+  <script src="js/drinks.js?v=4.0.02"></script>
+  <script src="js/drink-admin.js?v=4.0.02"></script>
+  <script src="js/tray.js?v=4.0.02"></script>
+  <script src="js/shopping.js?v=4.0.02"></script>
+  <script src="js/import-export.js?v=4.0.02"></script>
+  <script src="js/print-a3.js?v=4.0.02"></script>
+  <script src="js/dashboard.js?v=4.0.02"></script>
+  <script src="js/app.js?v=4.0.02"></script>
 </body>
 </html>
