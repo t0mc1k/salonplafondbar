@@ -19,6 +19,7 @@
       return {
         drinks:   { icon: '🍸', title: t('dash.drinks'), sub: drinkSub, run: 'openDrinksView', need: 'all', primary: true },
         allergens:{ icon: '🍽️', title: t('dash.allergens'), sub: t('dash.allergensSub'), run: 'openAllergenModal', need: 'all' },
+        specials: { icon: '🍰', title: t('dash.specials'), sub: t('dash.specialsSub'), run: 'openSpecialsModal', need: 'all' },
         season:   { icon: '📅', title: t('dash.season'), sub: seasonSub, run: 'openSeasonModal', need: 'admin' },
         print:    { icon: '🖨️', title: t('dash.print'), sub: t('dash.printSub'), run: 'openA3PrintSetupModal', need: 'admin' },
         impexp:   { icon: '📊', title: t('dash.impexp'), sub: t('dash.impexpSub'), run: 'openImportExportModal', need: 'edit' },
@@ -28,13 +29,15 @@
         loss:     { icon: '🔨', title: adm ? t('dash.lossA') : t('dash.lossS'), sub: adm ? t('dash.lossAS') : t('dash.lossSS'), run: 'openLossModal', need: 'all' },
         teamplan: { icon: '📆', title: t('dash.teamplan'), sub: t('dash.teamplanSub'), run: 'openTeamPlanModal', need: 'admin' },
         swaps:    { icon: '🔄', title: t('dash.swaps'), sub: adm ? t('dash.swapsA') : t('dash.swapsS'), run: 'openSwapModal', need: 'all', badge: 'dashSwapBadge' },
+        absence:  { icon: '🏖️', title: t('dash.absence'), sub: adm ? t('dash.absenceA') : t('dash.absenceS'), run: 'openAbsenceModal', need: 'all', badge: 'dashAbsBadge' },
         payroll:  { icon: '💶', title: t('dash.payroll'), sub: t('dash.payrollSub'), run: 'openPayrollModal', need: 'admin' },
         staff:    { icon: '👤', title: t('dash.staff'), sub: t('dash.staffSub'), run: 'openStaffPinModal', need: 'admin' },
         chat:     { icon: '💬', title: t('dash.chat'), sub: t('dash.chatSub'), run: 'openTeamChatModal', need: 'all', badge: 'dashChatBadge' },
         myplan:   { icon: '🗓️', title: t('dash.myplan'), sub: t('dash.myplanSub'), run: 'openMyPlanModal', need: 'all' },
-        login:    { icon: '🔐', title: t('dash.login'), sub: t('dash.loginSub'), run: 'openLoginHistoryModal', need: 'admin' },
+        login:    { icon: '🔐', title: t('dash.login'), sub: t('dash.loginSub'), run: 'openLoginLogModal', need: 'admin' },
         settings: { icon: '⚙️', title: t('dash.settings'), sub: t('dash.settingsSub'), run: 'openUnifiedSettingsModal', need: 'admin' },
         news:     { icon: '🚀', title: t('dash.news'), sub: t('dash.newsSub'), run: 'openChangelogModal', need: 'all' },
+        tomi:     { icon: '✨', title: t('dash.tomi'), sub: adm ? t('dash.tomiSubA') : t('dash.tomiSubS'), run: 'openTomiModal', need: 'all', ai: true },
         help:     { icon: '📖', title: t('dash.help'), sub: t('dash.helpSub'), run: 'openHelpModal', need: 'all' },
         support:  { icon: '🛟', title: t('dash.support'), sub: t('dash.supportSub'), run: 'openSupportModal', need: 'admin', badge: 'dashTicketBadge' }
       };
@@ -44,18 +47,18 @@
     function dashLayoutFor() {
       if (userIsAdmin) {
         return [
-          { title: t('dash.g.bar'),  ids: ['drinks', 'allergens', 'season', 'print', 'impexp'] },
+          { title: t('dash.g.bar'),  ids: ['drinks', 'allergens', 'specials', 'season', 'print', 'impexp'] },
           { title: t('dash.g.std'),  ids: ['checklist', 'maint', 'found', 'loss'] },
-          { title: t('dash.g.team'), ids: ['teamplan', 'swaps', 'payroll', 'staff', 'chat'] },
+          { title: t('dash.g.team'), ids: ['teamplan', 'swaps', 'absence', 'payroll', 'staff', 'chat'] },
           { title: t('dash.g.sys'),  ids: ['login', 'settings'] },
-          { title: t('dash.g.info'), ids: ['news', 'help', 'support'] }
+          { title: t('dash.g.info'), ids: ['news', 'tomi', 'help', 'support'] }
         ];
       }
       // Kellner/Barkeeper (+ Import, falls Getränke-Recht)
-      const bar = ['drinks', 'allergens', 'maint', 'found', 'loss', 'help', 'news'];
+      const bar = ['drinks', 'allergens', 'specials', 'maint', 'found', 'loss', 'tomi', 'help', 'news'];
       if (userCanEdit) bar.splice(1, 0, 'impexp');
       return [
-        { title: t('dash.g.shift'),      ids: ['checklist', 'myplan', 'swaps', 'chat'] },
+        { title: t('dash.g.shift'),      ids: ['checklist', 'myplan', 'swaps', 'absence', 'chat'] },
         { title: t('dash.g.barService'), ids: bar }
       ];
     }
@@ -99,6 +102,7 @@
 
       refreshDashboardBadges();
       loadDashboardCounts();
+      if (typeof pushRenderBanner === 'function') pushRenderBanner();
     }
 
     // Kachel antippen: Funktion aufrufen (nur bekannte Funktionen, nie beliebigen Text ausführen)
@@ -120,10 +124,11 @@
       set('dashChatBadge', (typeof chatUnreadCount !== 'undefined') ? chatUnreadCount : 0);
       set('dashTicketBadge', window.dashPendingTickets || 0);
       set('dashSwapBadge', window.dashSwapCount || 0);
+      set('dashAbsBadge', window.dashAbsCount || 0);
       set('dashMaintBadge', window.dashMaintCount || 0);
     }
 
-    // Zähler für Tausch-Anfragen und Störungen laden (höchstens alle 20 Sekunden)
+    // Zähler für Tausch-Anfragen, Urlaub/Krank und Störungen laden (höchstens alle 20 Sekunden)
     let dashCountsAt = 0;
     async function loadDashboardCounts(force) {
       if (!currentWaiterName) return;
@@ -141,6 +146,11 @@
             else if (s.kind === 'pool' ? String(s.requester).toLowerCase() !== me : String(s.target_name || '').toLowerCase() === me) n++;
           });
           window.dashSwapCount = n;
+        }
+        if (userIsAdmin) {
+          // Urlaubsanträge/Krankmeldungen, die auf den Manager warten (Tabelle erst ab SQL 4.1.05)
+          const ab = await _supabase.from('absence_requests').select('id').eq('status', 'pending');
+          if (!ab.error) window.dashAbsCount = (ab.data || []).length;
         }
         if (userIsAdmin) {
           const mt = await _supabase.from('maintenance_reports').select('id').eq('status', 'neu');
@@ -208,17 +218,31 @@
 
     async function loadStartPage() {
       userStartPage = readLocalStartPage();
+      if (typeof readLocalIntro === 'function') userIntroEnabled = readLocalIntro();
+      const timeout = () => new Promise(resolve => setTimeout(() => resolve({ timeout: true }), 1500));
       try {
-        const res = await Promise.race([
-          _supabase.rpc('get_my_start_page'),
-          new Promise(resolve => setTimeout(() => resolve({ timeout: true }), 1500))
-        ]);
-        if (res && !res.timeout && !res.error && (res.data === 'drinks' || res.data === 'dashboard')) {
-          userStartPage = res.data;
-          try { localStorage.setItem(startPageKey(), res.data); } catch (e) {}
+        // Neu (SQL 4.1.03): Startseite und Begrüßungsanimation in einer Abfrage
+        const res = await Promise.race([_supabase.rpc('get_my_ui_prefs'), timeout()]);
+        if (res && !res.timeout && !res.error && res.data && typeof res.data === 'object') {
+          if (res.data.start_page === 'drinks' || res.data.start_page === 'dashboard') {
+            userStartPage = res.data.start_page;
+            try { localStorage.setItem(startPageKey(), userStartPage); } catch (e) {}
+          }
+          if (typeof res.data.intro === 'boolean') {
+            userIntroEnabled = res.data.intro;
+            try { localStorage.setItem(introLocalKey(), userIntroEnabled ? 'on' : 'off'); } catch (e) {}
+          }
+        } else {
+          // Ältere Datenbank (nur SQL 4.0.02): nur die Startseite
+          const r2 = await Promise.race([_supabase.rpc('get_my_start_page'), timeout()]);
+          if (r2 && !r2.timeout && !r2.error && (r2.data === 'drinks' || r2.data === 'dashboard')) {
+            userStartPage = r2.data;
+            try { localStorage.setItem(startPageKey(), r2.data); } catch (e) {}
+          }
         }
       } catch (e) {}
       updateStartPageUI();
+      if (typeof updateIntroUI === 'function') updateIntroUI();
       return userStartPage;
     }
 

@@ -1,18 +1,64 @@
 /* ============================================================
    js/changelog.js
-   Version, Changelog ("Was ist neu?") und dessen Bedienung
+   „Was ist neu?“ (Änderungsliste) und dessen Bedienung
 
-   NEUE VERSION VERÖFFENTLICHEN (nur hier ändern):
-   1. APP_VERSION unten auf die neue Nummer setzen.
-   2. Oben in CHANGELOG einen neuen Eintrag einfügen (neueste Version zuerst).
+   NEUE VERSION VERÖFFENTLICHEN:
+   1. In js/version.js die Nummer APP_VERSION ändern (einzige Stelle für die Versionsnummer!).
+   2. Hier oben in CHANGELOG einen neuen Eintrag einfügen (neueste Version zuerst).
       Die bisher aktuelle Version rutscht automatisch ins Archiv.
-   3. In index.html alle "?v=..." auf die neue Nummer setzen (Cache).
+   Titel, Anzeige in der App, „?v=“ (Cache) und Service Worker nehmen die Nummer selbst aus version.js.
    Änderungs-Typen: 'new' Neu, 'improved' Verbessert, 'fixed' Behoben,
                     'security' Sicherheit, 'info' Allgemein
    ============================================================ */
-    const APP_VERSION = '4.0.02';
 
     const CHANGELOG = [
+  { version: '4.1.06', range: '', date: 'November 2026', title: 'Tagesangebot: Tageskuchen & Tagessuppe mit Allergenen, Zettel per Foto einlesen',
+    changes: [
+      ['new', 'Neue Kachel „🍰 Tagesangebot“ im Dashboard: Alle sehen den Tageskuchen und die Tagessuppe von heute mit Preis und Allergenen (A–R, auch im Klartext). Reiter „Kommend“ zeigt die nächsten Tage.'],
+      ['new', 'Manager und Developer tragen Einträge mit Gültigkeit von–bis ein (Schnellwahl „Nur heute“, „Bis Sonntag“, „7 Tage“) und sehen den Verlauf.'],
+      ['new', '📷 Foto scannen: Den Zettel fotografieren, die KI liest Namen, Preise und Allergen-Buchstaben. Du prüfst alles neben dem Foto, korrigierst bei Bedarf und speicherst erst nach Bestätigung. Das Foto wird nicht gespeichert.'],
+      ['new', 'TomiAI kennt das Tagesangebot: „Was ist heute die Suppe und welche Allergene hat sie?“'],
+      ['info', 'Einrichtung: sql/4.1.06_daily_specials.sql im Supabase SQL Editor ausführen, Edge Function scan-special bereitstellen (supabase functions deploy scan-special) und tomi-ai neu bereitstellen.']
+    ] },
+  { version: '4.1.05', range: '', date: 'November 2026', title: 'Urlaub & Krankmeldung, TomiAI schneller, verschiebbarer TomiAI-Knopf',
+    changes: [
+      ['new', 'Neue Kachel „Urlaub / Krank“ im Dashboard: Du kannst Urlaub beantragen und dich krank melden. Manager sehen alle Anträge, genehmigen oder lehnen ab und können Urlaub (U) bzw. Krank (K) mit einem Klick in den Arbeitsplan eintragen. Push-Benachrichtigungen für Anträge und Entscheidungen.'],
+      ['new', 'Einstellungen → Darstellung: Der TomiAI-Knopf lässt sich ausblenden und – wenn eingeschaltet – mit Finger oder Maus an eine beliebige Stelle ziehen. „Position zurücksetzen“ bringt ihn zurück. TomiAI bleibt über das Dashboard erreichbar.'],
+      ['improved', 'TomiAI antwortet deutlich schneller: Statt der ganzen Datenbank bekommt die KI nur noch das, was zur Frage passt (passende Getränke, relevante Tage im Arbeitsplan). Zufalls-Fragen („nenne mir 5 zufällige Drinks“) werden jetzt echt zufällig ausgewählt. Kürzere Wartezeit bei Überlastung.'],
+      ['improved', 'Einstellungs-Reiter: Wenn nicht alle Reiter Platz haben, erscheinen Pfeile links/rechts (auch am PC bedienbar, zusätzlich Mausrad und Ziehen).'],
+      ['improved', 'Die Versionsnummer steht nur noch an einer einzigen Stelle (js/version.js) – für Entwickler.'],
+      ['info', 'Einrichtung: sql/4.1.05_absences.sql im Supabase SQL Editor ausführen. Danach die Edge Function tomi-ai neu bereitstellen (supabase functions deploy tomi-ai).']
+    ] },
+  { version: '4.1.04', range: '', date: 'November 2026', title: 'Login-Protokoll: sichere Datenbank-Namen',
+    changes: [
+      ['fixed', 'Die Datenbank-Einrichtung für das Login-Protokoll brach mit „column started_at does not exist“ ab, weil der Name einer neuen Tabelle schon von der App benutzt wird. Alle neuen Objekte heißen jetzt eindeutig (nx_...), bestehende Daten bleiben unberührt.']
+    ] },
+  { version: '4.1.03', range: '', date: 'November 2026', title: 'Login-Protokoll, Online-Status, Begrüßung & Einstellungs-Reiter',
+    changes: [
+      ['new', 'Login-Protokoll (Manager/Developer): Live-Ansicht (wer ist gerade wo), Sitzungen mit Gerät, Anmeldung, Abmeldung und Dauer, Aktivität (geöffnete Bereiche und wichtige Aktionen), Statistik pro Person und Excel-Export. Keine IP-Adressen, automatische Löschung nach 90 Tagen, jederzeit manuell leerbar.'],
+      ['improved', 'Online-Status genauer: Wer in den letzten 3 Minuten aktiv war, ist online (vorher 15 Minuten). Das gilt im Chat, in der Personalliste und im Protokoll. Dafür sendet die App einmal pro Minute ein kleines Lebenszeichen, solange sie geöffnet ist.'],
+      ['new', 'Begrüßungsanimation nach dem Anmelden mit dem App-Logo und „powered by TomiAI“. Tippen überspringt sie. Ausschalten: Einstellungen → Allgemein → Begrüßungsanimation (gilt für dein Konto).'],
+      ['improved', 'Einstellungen übersichtlich in Reitern: Allgemein, Darstellung, Getränke, Hinweise, Konto, App. Die App merkt sich den zuletzt geöffneten Reiter.'],
+      ['fixed', 'Die Push-Einstellungen waren für Kellner im Einstellungsfenster nicht sichtbar. Jetzt sind sie für alle im Reiter „Hinweise“.'],
+      ['info', 'Einrichtung: sql/4.1.04_presence_log.sql im Supabase SQL Editor ausführen.']
+    ] },
+  { version: '4.1.02', range: '', date: 'November 2026', title: 'TomiAI findet das richtige Modell, Push-Schlüssel bleibt erhalten',
+    changes: [
+      ['fixed', 'TomiAI: Wenn ein bestimmtes Gemini-Modell nicht verfügbar ist, nutzt TomiAI jetzt automatisch das aktuelle Modell und fragt bei Bedarf Google, welche Modelle der Schlüssel kann.'],
+      ['fixed', 'Push-Benachrichtigungen: Der öffentliche Schlüssel liegt jetzt in der Datenbank. Nach einem App-Update bleiben „Aktivieren“ und „Test senden“ dadurch immer verfügbar.']
+    ] },
+  { version: '4.1.01', range: '', date: 'November 2026', title: 'TomiAI: stabiler bei Überlastung',
+    changes: [
+      ['fixed', 'TomiAI antwortete manchmal nicht, wenn der KI-Dienst von Google kurz überlastet war. Jetzt versucht TomiAI es automatisch erneut und weicht bei Bedarf auf ein anderes Modell aus. Bleibt der Dienst überlastet, erscheint eine verständliche Meldung.'],
+      ['improved', 'Fehlgeschlagene TomiAI-Anfragen zählen nicht mehr zum Tageslimit.']
+    ] },
+  { version: '4.1.00', range: '', date: 'November 2026', title: 'Benachrichtigungen & TomiAI',
+    changes: [
+      ['new', 'Push-Benachrichtigungen: Du bekommst eine Meldung auf dein Handy, auch wenn die App geschlossen ist: neue Chat-Nachrichten, @Erwähnungen, Änderungen am Arbeitsplan, Schichttausch-Anfragen und Entscheidungen, Team-News. Manager erfahren zusätzlich von Tauschanfragen zur Genehmigung, dringenden Störungen und neuen Tickets. Aktivieren: Dashboard-Karte oder Einstellungen → Push-Benachrichtigungen. Auf dem iPhone muss die App dafür auf dem Home-Bildschirm liegen.'],
+      ['new', 'TomiAI: Der neue Assistent (Knopf „✨ TomiAI“ unten links). Er beantwortet Fragen zu Rezepten, Allergenen, Speisekarte, Checklisten und zur App, auf Deutsch, Englisch oder Slowakisch. Manager/Developer bekommen zusätzlich Hilfe bei Plan, Stunden, Tausch und Tickets: Änderungen schlägt TomiAI nur vor, du bestätigst sie mit einem Knopf.'],
+      ['improved', 'Einzelne Meldungsarten lassen sich in den Einstellungen ein- und ausschalten. Beim Abmelden wird das Gerät von deinem Konto getrennt.'],
+      ['info', 'Einrichtung durch Manager/Developer nötig: siehe docs/SETUP-4.1.00.md (SQL, Schlüssel, zwei Edge Functions). Der TomiAI-Gesprächsverlauf wird nicht gespeichert.']
+    ] },
   { version: '4.0.02', range: '', date: 'November 2026', title: 'Englisch für das ganze Team & Startseite nach dem Login',
     changes: [
       ['new', 'Englisch erweitert: Die Getränke-Datenbank (Suche, Kategorien, Karten, Rezept, Drucken), Multi-View, Einkaufsliste und dein Profil lassen sich jetzt ebenfalls auf Englisch umstellen (Einstellungen → Sprache).'],

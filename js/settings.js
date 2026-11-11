@@ -14,7 +14,9 @@
       reduceMotion: false,
       loginToast: true,       // Hinweis, wenn sich ein Kollege anmeldet
       chatToast: true,        // Hinweis bei neuer Chat-Nachricht
-      chatSound: false        // Ton bei neuer Chat-Nachricht
+      chatSound: false,       // Ton bei neuer Chat-Nachricht
+      tomiFab: true,          // TomiAI-Knopf auf dem Bildschirm anzeigen (v4.1.05)
+      tomiMove: false         // TomiAI-Knopf verschiebbar (v4.1.05); Position siehe tomi.js
     };
     let appSettings = Object.assign({}, SETTINGS_DEFAULTS);
 
@@ -90,6 +92,11 @@
         case 'theme': applyTheme(); break;
         case 'fontScale': document.documentElement.style.fontSize = appSettings.fontScale + '%'; break;
         case 'reduceMotion': document.documentElement.classList.toggle('reduce-motion', !!appSettings.reduceMotion); break;
+        case 'tomiFab':
+        case 'tomiMove':
+          document.documentElement.classList.toggle('tomi-fab-off', appSettings.tomiFab === false);
+          if (typeof tomiFabApply === 'function') tomiFabApply();
+          break;
         case 'sort':
         case 'showPrices':
           if (typeof renderDrinks === 'function' && Array.isArray(allDrinks) && allDrinks.length) renderDrinks();
@@ -101,6 +108,7 @@
       applyTheme();
       applySetting('fontScale');
       applySetting('reduceMotion');
+      applySetting('tomiFab');
       if (!applyAllSettings._bound && window.matchMedia) {
         applyAllSettings._bound = true;
         const mq = window.matchMedia('(prefers-color-scheme: dark)');
@@ -114,6 +122,7 @@
       appSettings = Object.assign({}, SETTINGS_DEFAULTS);
       viewMode = 'grid';
       saveSettings();
+      if (typeof tomiFabResetPosition === 'function') tomiFabResetPosition(true);
       setBlurEnabled(true);
       applyAllSettings();
       renderDrinks();
@@ -161,8 +170,10 @@
       const modal = document.getElementById('unifiedSettingsModal');
       modal.classList.remove('hidden');
       modal.classList.add('flex');
-      const body = document.getElementById('settingsBody');
-      if (body) body.scrollTop = 0;
+      let tab = 'general';
+      try { tab = localStorage.getItem('nexus_settings_tab') || 'general'; } catch (e) {}
+      setSettingsTab(tab);
+      setTimeout(settingsTabsUpdate, 0);
     }
 
     function closeUnifiedSettingsModal() {
@@ -184,6 +195,9 @@
       const blurCheck = document.getElementById('unifiedBlurCheck');
       if (blurCheck) blurCheck.checked = isBlurEnabled();
 
+      const moveRows = document.getElementById('setTomiMoveRows');
+      if (moveRows) moveRows.classList.toggle('hidden', appSettings.tomiFab === false);
+
       const sortSel = document.getElementById('unifiedSortSelect');
       if (sortSel) sortSel.value = appSettings.sort;
 
@@ -199,6 +213,12 @@
       if (themeInfo) themeInfo.textContent = appSettings.theme === 'auto'
         ? t('set.themeAuto', { mode: themeMode === 'dark' ? t('set.themeDark') : t('set.themeLight') }) : '';
       if (typeof updateStartPageUI === 'function') updateStartPageUI();
+      if (typeof updateIntroUI === 'function') updateIntroUI();
+      if (typeof pushRefresh === 'function') pushRefresh();
+      const accName = document.getElementById('setAccName');
+      if (accName) accName.textContent = currentWaiterName || '–';
+      const accRole = document.getElementById('setAccRole');
+      if (accRole) accRole.textContent = ({ developer: t('role.developer'), manager: t('role.manager') }[currentStaffRole]) || t('role.staff');
     }
 
     function setAdminView(on) {
@@ -225,3 +245,77 @@
     }
 
     loadSettings();
+
+    // Einstellungen in Reitern: den zuletzt benutzten Reiter merkt sich das Gerät
+    function setSettingsTab(id) {
+      if (['general', 'look', 'drinks', 'notif', 'account', 'app'].indexOf(id) === -1) id = 'general';
+      document.querySelectorAll('#settingsTabs .set-tab').forEach(b => b.classList.toggle('active', b.getAttribute('data-settab') === id));
+      document.querySelectorAll('#settingsBody .set-panel').forEach(p => p.classList.toggle('active', p.getAttribute('data-panel') === id));
+      try { localStorage.setItem('nexus_settings_tab', id); } catch (e) {}
+      const body = document.getElementById('settingsBody');
+      if (body) body.scrollTop = 0;
+      // Aktiven Reiter nur seitlich ins Bild holen (ohne die Seite zu verschieben)
+      const bar = document.getElementById('settingsTabs'), act = document.querySelector('#settingsTabs .set-tab.active');
+      if (bar && act) {
+        const l = act.offsetLeft - bar.offsetLeft, r = l + act.offsetWidth;
+        if (l < bar.scrollLeft) bar.scrollLeft = Math.max(0, l - 40);
+        else if (r > bar.scrollLeft + bar.clientWidth) bar.scrollLeft = r - bar.clientWidth + 40;
+      }
+      settingsTabsUpdate();
+    }
+
+    // ---------- Einstellungs-Reiter: Pfeile, Mausrad und Ziehen (v4.1.05) ----------
+    // Die Pfeile erscheinen nur, wenn links/rechts noch weitere Reiter versteckt sind.
+    function settingsTabsUpdate() {
+      const bar = document.getElementById('settingsTabs');
+      const wrap = document.getElementById('settingsTabsWrap');
+      if (!bar || !wrap) return;
+      const max = bar.scrollWidth - bar.clientWidth;
+      const canLeft = bar.scrollLeft > 4;
+      const canRight = max > 4 && bar.scrollLeft < max - 4;
+      wrap.classList.toggle('can-left', canLeft);
+      wrap.classList.toggle('can-right', canRight);
+    }
+
+    function settingsTabsScroll(dir) {
+      const bar = document.getElementById('settingsTabs');
+      if (!bar) return;
+      const step = Math.max(120, Math.round(bar.clientWidth * 0.7));
+      try { bar.scrollBy({ left: dir * step, behavior: 'smooth' }); } catch (e) { bar.scrollLeft += dir * step; }
+    }
+
+    function settingsTabsInit() {
+      const bar = document.getElementById('settingsTabs');
+      if (!bar || bar._init) return;
+      bar._init = true;
+      bar.addEventListener('scroll', settingsTabsUpdate, { passive: true });
+      window.addEventListener('resize', settingsTabsUpdate);
+      // Mausrad: senkrechtes Rollen bewegt die Reiter seitwärts
+      bar.addEventListener('wheel', e => {
+        if (bar.scrollWidth <= bar.clientWidth) return;
+        const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+        if (!d) return;
+        bar.scrollLeft += d;
+        e.preventDefault();
+      }, { passive: false });
+      // Mit gedrückter Maustaste ziehen (Touch scrollt ohnehin von selbst)
+      let down = false, moved = false, startX = 0, startLeft = 0;
+      bar.addEventListener('mousedown', e => {
+        if (e.button !== 0 || bar.scrollWidth <= bar.clientWidth) return;
+        down = true; moved = false; startX = e.clientX; startLeft = bar.scrollLeft;
+      });
+      window.addEventListener('mousemove', e => {
+        if (!down) return;
+        const dx = e.clientX - startX;
+        if (Math.abs(dx) > 4) { moved = true; bar.classList.add('dragging'); }
+        if (moved) bar.scrollLeft = startLeft - dx;
+      });
+      window.addEventListener('mouseup', () => {
+        if (!down) return;
+        down = false;
+        bar.classList.remove('dragging');
+      });
+      // Nach dem Ziehen keinen Klick auf einen Reiter auslösen
+      bar.addEventListener('click', e => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
+    }
+    settingsTabsInit();
